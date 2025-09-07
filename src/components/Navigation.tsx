@@ -1,0 +1,154 @@
+import React from 'react';
+import { Brain, Home, Mail, User, LogOut, BookOpen, Menu, X } from 'lucide-react';
+import { User as SupabaseUser } from '@supabase/supabase-js';
+import { useSubscription } from '../hooks/useSubscription';
+import { useProfile } from '../hooks/useProfile';
+
+interface NavigationProps {
+  currentPage: string;
+  onNavigate: (page: string) => void;
+  onSignOut: () => Promise<{ error: any }>;
+  user: SupabaseUser;
+}
+
+const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSignOut, user }) => {
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const { getActiveProduct, hasActiveAccess } = useSubscription(user);
+  const { profile } = useProfile(user);
+
+  const navItems = [
+    { id: 'home', label: 'Hem', icon: Home },
+    { id: 'modules', label: 'Moduler', icon: Brain },
+    { id: 'resources', label: 'Resurser', icon: BookOpen },
+    { id: 'profile', label: 'Profil', icon: User },
+    { id: 'contact', label: 'Kontakt', icon: Mail }
+  ];
+
+  const handleNavigation = (page: string) => {
+    onNavigate(page);
+    setMobileMenuOpen(false);
+  };
+
+  const activeProduct = getActiveProduct();
+  const hasAccess = hasActiveAccess();
+  return (
+    <nav className="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 relative">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-16 sm:h-20">
+          {/* Logo */}
+          <div className="flex items-center space-x-3">
+            <img src="https://j0bzpddd4j.ufs.sh/f/bwjssIq7FWHCTuLlG8ZtZKdCcYS0qzlf2bvOgIJwexGAMR89" alt="KongMindset Logo" className="w-8 h-8 sm:w-10 sm:h-10" />
+            <span className="text-xl sm:text-2xl font-display font-bold bg-gradient-to-r from-primary-700 to-primary-600 bg-clip-text text-transparent">
+              KongMindset
+            </span>
+          </div>
+          
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex space-x-8">
+            {/* Navigation Items */}
+            {navItems.map(item => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavigation(item.id)}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    currentPage === item.id
+                      ? 'text-primary-600 bg-primary-50 shadow-sm'
+                      : 'text-neutral-600 hover:text-primary-600 hover:bg-neutral-50'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+            
+            {/* User Menu */}
+            <div className="flex items-center space-x-4">
+              <div>
+                <div className="text-right">
+                  <span className="text-sm text-neutral-600">Välkommen, {profile?.display_name || user?.email?.split('@')[0] || 'Användare'}</span>
+                  {hasAccess && activeProduct && (
+                    <div className="text-xs text-green-600 font-medium">
+                      ✅ {activeProduct.name}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => onSignOut()}
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-red-600 hover:bg-red-50 transition-all duration-200 min-h-[44px]"
+                title="Logga ut"
+              >
+                <LogOut className="w-5 h-5" />
+                <span>Logga ut</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="lg:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg text-neutral-600 hover:text-primary-600 hover:bg-neutral-50 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label="Öppna meny"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-lg z-50">
+            <div className="px-4 py-4 space-y-2">
+              {navItems.map(item => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavigation(item.id)}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left font-medium transition-all duration-200 min-h-[44px] ${
+                      currentPage === item.id
+                        ? 'text-primary-600 bg-primary-50'
+                        : 'text-neutral-600 hover:text-primary-600 hover:bg-neutral-50'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+              
+              <div className="border-t pt-3 mt-3">
+                <div className="px-4 py-2">
+                  <div>
+                    <span className="text-sm text-neutral-600">Välkommen, {profile?.display_name || user?.email?.split('@')[0] || 'Elev'}</span>
+                    {hasAccess && activeProduct && (
+                      <div className="text-xs text-green-600 font-medium mt-1">
+                        ✅ {activeProduct.name}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    onSignOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left font-medium text-red-600 hover:bg-red-50 transition-colors min-h-[44px]"
+                >
+                  <LogOut className="w-5 h-5 flex-shrink-0" />
+                  <span>Logga ut</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+};
+
+export default Navigation;
