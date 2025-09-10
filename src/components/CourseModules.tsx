@@ -144,20 +144,19 @@ const CourseModules: React.FC<CourseModulesProps> = ({ onModuleStart }) => {
           <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-6 max-w-4xl mx-auto border-2 border-amber-200 mb-8">
             <div className="flex items-center justify-center space-x-3 mb-4">
               <Clock className="w-8 h-8 text-amber-600" />
-              <h2 className="text-2xl font-bold text-amber-800">En Vecka Per Princip - Ingen Genväg Till Framgång</h2>
+              <h2 className="text-2xl font-bold text-amber-800">13 Veckor Per Princip - Ingen Genväg Till Framgång</h2>
             </div>
             <p className="text-amber-700 text-lg mb-4 max-w-2xl mx-auto">
-              Napoleon Hill studerade 500+ miljonärer i 20 år och upptäckte att bestående framgång kräver tid och repetition. 
-              Varje princip måste få tid att sätta sig i undermedvetandet.
+              Napoleon Hill studerade 500+ miljonärer i 20 år och upptäckte att bestående framgång kräver tid och repetition för att varje princip ska sätta sig i undermedvetandet. 13 veckor ger dig tid att verkligen internalisera varje princip.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-amber-600">
               <div className="bg-white/60 rounded-lg p-3">
                 <strong>⏰ Varför 13 veckor?</strong><br/>
-                Hjärnforskning visar att det tar 7-21 dagar att forma nya vanor. Vi ger varje princip en vecka för optimal integration.
+                Hjärnforskning visar att det tar 7-21 dagar att forma nya vanor. Vi ger dig 13 full veckor för att verkligen bemästra alla principer.
               </div>
               <div className="bg-white/60 rounded-lg p-3">
                 <strong>🧠 Undermedvetet lärande:</strong><br/>
-                Daglig repetition programmerar ditt undermedvetna sinne - grunden till all bestående förändring.
+                Veckovis fokus och daglig repetition programmerar ditt undermedvetna sinne - grunden till all bestående förändring.
               </div>
             </div>
           </div>
