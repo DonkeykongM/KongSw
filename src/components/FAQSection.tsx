@@ -40,9 +40,9 @@ const faqs: FAQ[] = [
   },
   {
     id: 5,
-    question: "Kostar kursen verkligen bara 10 kr?",
-    answer: "Ja, vårt specialerbjudande ger dig fullständig kurstillgång för endast 10 kr som en engångskostnad! Det här är otroligt värde jämfört med traditionell framgångscoaching som kostar 2,000-5,000 kr per månad. Du får 13 interaktiva moduler, Napoleon Hills AI-mentor, den ursprungliga boken plus livstidsåtkomst till alla uppdateringar - ett totalt värde på över 1,400 kr för endast 10 kr!",
-    keywords: ["napoleon hill kurs pris", "tänk och bli rik kurs kostnad", "billig framgångskurs sverige", "10 kr kurs"],
+    question: "Kostar kursen verkligen bara 299 kr?",
+    answer: "Ja, vårt specialerbjudande ger dig fullständig kurstillgång för endast 299 kr som en engångskostnad! Det här är otroligt värde jämfört med traditionell framgångscoaching som kostar 2,000-5,000 kr per månad. Du får 13 interaktiva moduler, Napoleon Hills AI-mentor, den ursprungliga boken plus livstidsåtkomst till alla uppdateringar - ett totalt värde på över 1,400 kr för endast 299 kr! Efter de första 100 medlemmarna blir priset 299 kr per månad.",
+    keywords: ["napoleon hill kurs pris", "tänk och bli rik kurs kostnad", "framgångskurs sverige", "299 kr kurs"],
     category: 'payment'
   },
   {

@@ -355,7 +355,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               {/* Week 1-3: Foundation */}
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 relative">
                 <div className="absolute -top-3 left-6 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  Vecka 1-3: Grund
+                  Vecka 1-4: Grund
                 </div>
                 <div className="mt-4 space-y-4">
                   <div className="bg-white rounded-lg p-4 border border-blue-100">
@@ -379,88 +379,88 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
                   </div>
                   
                   <div className="bg-white rounded-lg p-4 border border-blue-100">
-                    <h4 className="font-bold text-blue-800 text-lg mb-2">Vecka 3: Autosuggestion behärskning</h4>
+                    <h4 className="font-bold text-blue-800 text-lg mb-2">Vecka 3-4: Autosuggestion & Kunskap</h4>
                     <ul className="text-sm text-blue-700 space-y-1">
-                      <li>• <strong>Lär dig:</strong> Programmering av undermedvetandet</li>
-                      <li>• <strong>Utveckla:</strong> Daglig bekräftelsepraktik</li>
-                      <li>• <strong>Förändra:</strong> Från negativ till positiv självdialog</li>
-                      <li>• <strong>Resultat:</strong> Personlig bekräftelserutin</li>
+                      <li>• <strong>Lär dig:</strong> Programmering av undermedvetandet + specialiserad kunskap</li>
+                      <li>• <strong>Utveckla:</strong> Daglig bekräftelsepraktik + lärstrategier</li>
+                      <li>• <strong>Förändra:</strong> Från negativ dialog till expertfokus</li>
+                      <li>• <strong>Resultat:</strong> Personlig bekräftelserutin + kunskapsplan</li>
                     </ul>
                   </div>
                 </div>
               </div>
 
-              {/* Week 4-8: Development */}
+              {/* Week 5-9: Development */}
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200 relative">
                 <div className="absolute -top-3 left-6 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  Vecka 4-8: Färdighetsutveckling
+                  Vecka 5-9: Färdighetsutveckling
                 </div>
                 <div className="mt-4 space-y-4">
                   <div className="bg-white rounded-lg p-4 border border-green-100">
-                    <h4 className="font-bold text-green-800 text-lg mb-2">Vecka 4-5: Kunskap & Fantasi</h4>
+                    <h4 className="font-bold text-green-800 text-lg mb-2">Vecka 5-6: Fantasi & Planering</h4>
                     <ul className="text-sm text-green-700 space-y-1">
-                      <li>• <strong>Lär dig:</strong> Specialiserad kunskapsinhämtning</li>
-                      <li>• <strong>Utveckla:</strong> Kreativa tänkandförmågor</li>
-                      <li>• <strong>Förändra:</strong> Från allmän till specialiserad expertis</li>
-                      <li>• <strong>Resultat:</strong> Personlig lärplan</li>
+                      <li>• <strong>Lär dig:</strong> Kreativ fantasi + strategisk planering</li>
+                      <li>• <strong>Utveckla:</strong> Kreativa lösningsförmågor</li>
+                      <li>• <strong>Förändra:</strong> Från slumpmässig till systematisk handling</li>
+                      <li>• <strong>Resultat:</strong> Kreativ handlingsplan</li>
                     </ul>
                   </div>
                   
                   <div className="bg-white rounded-lg p-4 border border-green-100">
-                    <h4 className="font-bold text-green-800 text-lg mb-2">Vecka 6-7: Planering & Uthållighet</h4>
+                    <h4 className="font-bold text-green-800 text-lg mb-2">Vecka 7-8: Uthållighet & Beslut</h4>
                     <ul className="text-sm text-green-700 space-y-1">
-                      <li>• <strong>Lär dig:</strong> Strategiska planeringsmetoder</li>
-                      <li>• <strong>Utveckla:</strong> Orubblig uthållighet</li>
-                      <li>• <strong>Förändra:</strong> Från spridda ansträngningar till fokuserad handling</li>
-                      <li>• <strong>Resultat:</strong> Detaljerad handlingsplan</li>
+                      <li>• <strong>Lär dig:</strong> Orubblig uthållighet + snabba beslut</li>
+                      <li>• <strong>Utveckla:</strong> Mental styrka + ledarskap</li>
+                      <li>• <strong>Förändra:</strong> Från tveksamhet till beslutsamhet</li>
+                      <li>• <strong>Resultat:</strong> Uthållighetsrutiner + beslutsramverk</li>
                     </ul>
                   </div>
                   
                   <div className="bg-white rounded-lg p-4 border border-green-100">
-                    <h4 className="font-bold text-green-800 text-lg mb-2">Vecka 8: Beslutsfattande</h4>
+                    <h4 className="font-bold text-green-800 text-lg mb-2">Vecka 9: Master Mind</h4>
                     <ul className="text-sm text-green-700 space-y-1">
-                      <li>• <strong>Lär dig:</strong> Snabba beslutsfattande färdigheter</li>
-                      <li>• <strong>Utveckla:</strong> Ledarskapsegenskaper</li>
-                      <li>• <strong>Förändra:</strong> Från prokrastination till beslutsamhet</li>
-                      <li>• <strong>Resultat:</strong> Beslutsfattande ramverk</li>
+                      <li>• <strong>Lär dig:</strong> Master Mind-gruppens kraft</li>
+                      <li>• <strong>Utveckla:</strong> Samarbetsfärdigheter + nätverk</li>
+                      <li>• <strong>Förändra:</strong> Från isolerat till kollektivt tänkande</li>
+                      <li>• <strong>Resultat:</strong> Personlig Master Mind-grupp</li>
                     </ul>
                   </div>
                 </div>
               </div>
 
-              {/* Week 9-12: Mastery */}
+              {/* Week 10-13: Mastery */}
               <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-6 border-2 border-purple-200 relative">
                 <div className="absolute -top-3 left-6 bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  Vecka 9-12: Mästerskap
+                  Vecka 10-13: Mästerskap
                 </div>
                 <div className="mt-4 space-y-4">
                   <div className="bg-white rounded-lg p-4 border border-purple-100">
-                    <h4 className="font-bold text-purple-800 text-lg mb-2">Vecka 9-10: Sinnesbehärskning</h4>
+                    <h4 className="font-bold text-purple-800 text-lg mb-2">Vecka 10-11: Sinnes- & Hjärnbehärskning</h4>
                     <ul className="text-sm text-purple-700 space-y-1">
-                      <li>• <strong>Lär dig:</strong> Kontroll över undermedvetandet</li>
-                      <li>• <strong>Utveckla:</strong> Mental disciplintekniker</li>
-                      <li>• <strong>Förändra:</strong> Från reaktivt till proaktivt tankesätt</li>
-                      <li>• <strong>Resultat:</strong> Komplett mental ritning</li>
+                      <li>• <strong>Lär dig:</strong> Kontroll över undermedvetenhet + hjärnoptimering</li>
+                      <li>• <strong>Utveckla:</strong> Mental disciplin + energihantering</li>
+                      <li>• <strong>Förändra:</strong> Från slumpmässigt till kontrollerat tänkande</li>
+                      <li>• <strong>Resultat:</strong> Komplett mental behärskning</li>
                     </ul>
                   </div>
                   
                   <div className="bg-white rounded-lg p-4 border border-purple-100">
-                    <h4 className="font-bold text-purple-800 text-lg mb-2">Vecka 11: Hjärnkraft & Energi</h4>
+                    <h4 className="font-bold text-purple-800 text-lg mb-2">Vecka 12: Energitransmutation</h4>
                     <ul className="text-sm text-purple-700 space-y-1">
-                      <li>• <strong>Lär dig:</strong> Hjärnoptimering strategier</li>
-                      <li>• <strong>Utveckla:</strong> Energiomvandlingsfärdigheter</li>
-                      <li>• <strong>Förändra:</strong> Från utmattad till energifylld tillstånd</li>
-                      <li>• <strong>Resultat:</strong> Topprestanda rutin</li>
+                      <li>• <strong>Lär dig:</strong> Energiomvandling för kreativitet</li>
+                      <li>• <strong>Utveckla:</strong> Kraftfull fokus + disciplin</li>
+                      <li>• <strong>Förändra:</strong> Från energislöseri till energibehärskning</li>
+                      <li>• <strong>Resultat:</strong> Kreativ energikälla</li>
                     </ul>
                   </div>
                   
                   <div className="bg-white rounded-lg p-4 border border-purple-100">
-                    <h4 className="font-bold text-purple-800 text-lg mb-2">Vecka 12: Sjätte sinnet & Rikedom</h4>
+                    <h4 className="font-bold text-purple-800 text-lg mb-2">Vecka 13: Sjätte sinnet & Rikedomsfilosofi</h4>
                     <ul className="text-sm text-purple-700 space-y-1">
-                      <li>• <strong>Lär dig:</strong> Intuitionsutveckling</li>
-                      <li>• <strong>Utveckla:</strong> Rikedomsmedvetenhet</li>
-                      <li>• <strong>Förändra:</strong> Från bristtankesätt till överflödstankesätt</li>
-                      <li>• <strong>Resultat:</strong> Komplett transformation</li>
+                      <li>• <strong>Lär dig:</strong> Intuitionsutveckling + rikedomsprinciper</li>
+                      <li>• <strong>Utveckla:</strong> Sjätte sinnet + komplett filosofi</li>
+                      <li>• <strong>Förändra:</strong> Från begränsad till obegränsad potential</li>
+                      <li>• <strong>Resultat:</strong> Mästerlig helhetstransformation</li>
                     </ul>
                   </div>
                 </div>
@@ -472,7 +472,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               <div className="bg-gradient-to-r from-gold-50 to-yellow-50 rounded-xl p-8 border-2 border-yellow-300 max-w-4xl mx-auto">
                 <h3 className="text-3xl font-bold text-yellow-800 mb-4">Din garanterade transformation</h3>
                 <p className="text-lg text-yellow-700 mb-6">
-                Efter medlem #100 försvinner boken för alltid och Napoleon Hills AI-mentor låses bort. Priset blir {priceText}/månad.
+                Efter 13 veckor har du bemästrat alla Napoleon Hills principer och förvandlat ditt liv för alltid. Detta är din kompletta rikedomsutbildning.
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
