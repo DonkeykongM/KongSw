@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, CheckCircle, XCircle, RotateCcw, Lightbulb, Target, Zap, AlertTriangle, ArrowRight, User, Clock, Package, StickyNote, Brain, Calendar, Play, MessageCircle, Minimize2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, CheckCircle, XCircle, RotateCcw, Lightbulb, Target, Zap, AlertTriangle, ArrowRight, User, Clock, Package, StickyNote, Brain, Calendar, Play, MessageCircle, Minimize2, X } from 'lucide-react';
 import { ModuleContent, QuizQuestion } from '../data/courseContent';
 import { ModuleSchema, BreadcrumbSchema } from './SEOComponents';
 import PostItNote from './PostItNote';
@@ -1051,15 +1051,17 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
         <button
           onClick={toggleChatbot}
           className={`bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-110 flex items-center space-x-2 ring-4 ring-blue-300/50 backdrop-blur-sm ${
-            isChatbotExpanded ? 'py-3 px-6 text-base bg-red-600 hover:bg-red-700' : 'p-5 w-16 h-16'
+            isChatbotExpanded 
+              ? 'w-14 h-14 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 border-4 border-white text-white shadow-2xl' 
+              : 'p-5 w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white'
           }`}
           title={isChatbotExpanded ? 'Minimera Napoleon Hill AI' : 'Fråga Napoleon Hill AI - Din personliga framgångsmentor'}
         >
           {isChatbotExpanded ? (
-            <>
-              <Minimize2 className="w-6 h-6" />
-              <span className="font-semibold">✕ Stäng</span>
-            </>
+            <div className="flex flex-col items-center">
+              <X className="w-6 h-6" />
+              <span className="text-xs font-bold">STÄNG</span>
+            </div>
           ) : (
             <div className="relative">
               <Brain className="w-8 h-8 text-white animate-pulse" />
@@ -1071,7 +1073,7 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
         </button>
         
         {!isChatbotExpanded && (
-          <div className="absolute -top-12 right-0 bg-gradient-to-r from-blue-900 to-indigo-900 text-white px-4 py-2 rounded-lg shadow-xl opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+          <div className="absolute -top-16 right-0 bg-gradient-to-r from-blue-900 to-indigo-900 text-white px-4 py-2 rounded-lg shadow-xl opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
             <div className="text-sm font-bold">🧠 Napoleon Hill AI</div>
             <div className="text-xs opacity-90">Din personliga framgångsmentor</div>
             <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-blue-900"></div>
