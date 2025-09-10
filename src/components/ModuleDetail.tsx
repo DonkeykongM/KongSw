@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, CheckCircle, XCircle, RotateCcw, Lightbulb, Target, Zap, AlertTriangle, ArrowRight, User, Clock, Package, StickyNote, Brain, Calendar, Play } from 'lucide-react';
+import { ArrowLeft, BookOpen, CheckCircle, XCircle, RotateCcw, Lightbulb, Target, Zap, AlertTriangle, ArrowRight, User, Clock, Package, StickyNote, Brain, Calendar, Play, MessageCircle, Minimize2 } from 'lucide-react';
 import { ModuleContent, QuizQuestion } from '../data/courseContent';
 import { ModuleSchema, BreadcrumbSchema } from './SEOComponents';
 import PostItNote from './PostItNote';
@@ -46,6 +46,7 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
   // Post-it notes state
   const [reflectionNotes, setReflectionNotes] = useState<ReflectionNote[]>([]);
   const [quizNotes, setQuizNotes] = useState<QuizNote[]>([]);
+  const [isChatbotExpanded, setIsChatbotExpanded] = useState(false);
 
   // Calculate if checklist is complete
   const isChecklistComplete = Object.values(checklist).every(Boolean);
@@ -107,12 +108,14 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
       if (!document.getElementById('VG_OVERLAY_CONTAINER')) {
         const container = document.createElement('div');
         container.id = 'VG_OVERLAY_CONTAINER';
-        container.style.width = '500px';
-        container.style.height = '500px';
+        container.style.width = '0px';
+        container.style.height = '0px';
         container.style.position = 'fixed';
         container.style.bottom = '20px';
         container.style.right = '20px';
         container.style.zIndex = '9999';
+        container.style.transition = 'width 0.3s ease, height 0.3s ease';
+        container.style.overflow = 'hidden';
         document.body.appendChild(container);
       }
 
@@ -132,6 +135,21 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
       window.VG_SCRIPT_LOADED = true;
     }
   }, []);
+
+  const toggleChatbot = () => {
+    const container = document.getElementById('VG_OVERLAY_CONTAINER');
+    if (container) {
+      if (isChatbotExpanded) {
+        container.style.width = '0px';
+        container.style.height = '0px';
+        setIsChatbotExpanded(false);
+      } else {
+        container.style.width = '500px';
+        container.style.height = '500px';
+        setIsChatbotExpanded(true);
+      }
+    }
+  };
 
   // Mark lesson as completed when user views it
   const handleLessonView = () => {
@@ -474,20 +492,6 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
       if (currentQuestion < module.quiz.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
         setSelectedAnswer(null);
-        
-        // Add click listener to header for minimizing
-        setTimeout(() => {
-          const headerElements = container.querySelectorAll('.vg-header, .vg-title, .vg-header-container, #vg-header-container');
-          headerElements.forEach(header => {
-            header.addEventListener('click', () => {
-              container.style.width = '0px';
-              container.style.height = '0px';
-              setIsChatbotExpanded(false);
-            });
-            header.style.cursor = 'pointer';
-            header.title = 'Klicka för att minimera chatten';
-          });
-        }, 1000);
       } else {
         setShowResult(true);
         
