@@ -338,14 +338,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-display font-bold mb-6 bg-gradient-to-r from-slate-800 to-blue-800 bg-clip-text text-transparent">
-              Din 12-veckors transformationsresa
+              Din 13-veckors transformationsresa
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-8">
-              Följ Napoleon Hills beprövade väg till framgång. Varje vecka bygger på den föregående och skapar ostoppbar momentum mot dina mål.
+              Följ Napoleon Hills beprövade väg till framgång. Varje av de 13 veckorna bygger på den föregående och skapar ostoppbar momentum mot dina mål.
             </p>
             <div className="bg-gradient-to-r from-blue-50 to-slate-50 rounded-xl p-6 max-w-2xl mx-auto border border-blue-200">
               <h3 className="text-2xl font-bold text-blue-800 mb-3">Veckovis personlig tillväxt</h3>
-              <p className="text-blue-700">Från tankesättsförändringar till praktiska färdigheter - se din transformation utvecklas systematiskt</p>
+              <p className="text-blue-700">Från tankesättsförändringar till praktiska färdigheter - se din 13-veckors transformation utvecklas systematiskt</p>
             </div>
           </div>
 
@@ -472,7 +472,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               <div className="bg-gradient-to-r from-gold-50 to-yellow-50 rounded-xl p-8 border-2 border-yellow-300 max-w-4xl mx-auto">
                 <h3 className="text-3xl font-bold text-yellow-800 mb-4">Din garanterade transformation</h3>
                 <p className="text-lg text-yellow-700 mb-6">
-                Efter medlem #100 försvinner boken för alltid och Napoleon Hills AI-mentor låses bort. Priset blir {priceText}/månad.
+                Efter medlem #100 försvinner boken för alltid och Napoleon Hills AI-mentor låses bort. Priset blir 299 kr/månad.
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -500,7 +500,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
                 </button>
                 
                 <p className="text-yellow-600 text-sm mt-4 font-semibold">
-                  💎 Special: Komplett 12-veckors program för bara {priceText}
+                  💎 Special: Komplett 13-veckors program för bara {priceText}
                 </p>
               </div>
             </div>
