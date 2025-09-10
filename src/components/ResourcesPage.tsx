@@ -23,7 +23,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onBack, onSignOut, user }
       icon: Gift,
       downloadUrl: "/Think and Grow Rich eBook.pdf",
       filename: "Tänk och Bli Rik - Napoleon Hill.pdf",
-      featured: true
+     downloadUrl: "/think-and-grow-rich-ebook.pdf",
     },
     {
       id: 2,
@@ -32,7 +32,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onBack, onSignOut, user }
       type: "PDF-bok", 
       size: "1.8 MB",
       icon: BookOpen,
-      downloadUrl: "/Från Dröm Till Verklighet.pdf",
+     downloadUrl: "/fran-drom-till-verklighet.pdf",
       filename: "Från Dröm Till Verklighet.pdf",
       featured: false
     },
