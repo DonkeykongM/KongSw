@@ -109,7 +109,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
       </header>
       {/* Side Banners */}
       {/* Hero Section - Elegant & Professional */}
-      <div className="relative z-10 bg-gradient-to-br from-slate-800 to-blue-900 text-white py-20 md:py-28 lg:py-36 relative overflow-hidden">
+      <div className="relative z-10 bg-gradient-to-br from-slate-800 to-blue-900 text-white py-16 sm:py-20 md:py-28 lg:py-36 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         
         {/* Minimal Hero Background */}
@@ -120,75 +120,75 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
 
         <div className="container mx-auto px-4 sm:px-6 text-center relative z-10">
           <div className="mb-8">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 leading-tight text-white px-2">
               Bemästra Napoleon Hills Rikedomsplan
             </h1>
-            <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-transparent bg-gradient-to-r from-yellow-300 via-orange-200 to-yellow-400 bg-clip-text">
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 text-transparent bg-gradient-to-r from-yellow-300 via-orange-200 to-yellow-400 bg-clip-text px-2">
               Tänk större. Väx snabbare. Lev rikare.
             </div>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-8 text-slate-200 leading-relaxed">
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold mb-6 sm:mb-8 text-slate-200 leading-relaxed px-2">
               Få Originalboken Plus Napoleon Hill I Din Ficka - För Alltid
             </h2>
           </div>
 
-          <div className="max-w-4xl mx-auto mb-12">
-            <p className="text-lg sm:text-xl md:text-2xl font-bold leading-relaxed text-white mb-6">
+          <div className="max-w-4xl mx-auto mb-8 sm:mb-12 px-4">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold leading-relaxed text-white mb-4 sm:mb-6">
               I två decennier studerade Napoleon Hill Amerikas största förmögenheter. Nu lever hans kompletta visdom i din smartphone.
             </p>
-            <p className="text-lg sm:text-xl font-bold text-blue-300 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl font-bold text-blue-300 leading-relaxed">
               Efter medlem #100 försvinner boken för alltid och Napoleon Hills AI-mentor låses bort. Priset blir 299 kr/månad.
             </p>
           </div>
           
           {/* Hero CTA */}
-          <div className="flex flex-col lg:flex-row items-center justify-center space-y-4 lg:space-y-0 lg:space-x-6">
+          <div className="flex flex-col lg:flex-row items-center justify-center space-y-4 lg:space-y-0 lg:space-x-6 px-4">
             <button
               onClick={onJoinClick}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 sm:py-5 sm:px-10 rounded-full text-lg sm:text-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 inline-flex items-center space-x-3 min-h-[44px] w-full sm:w-auto justify-center"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 sm:px-8 md:py-5 md:px-10 rounded-full text-base sm:text-lg md:text-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 inline-flex items-center space-x-2 sm:space-x-3 min-h-[48px] w-full sm:w-auto justify-center max-w-sm sm:max-w-none"
             >
-              <Trophy className="w-6 h-6" />
-              <span>Säkra Din Tillgång - {priceText}</span>
-              <ArrowRight className="w-6 h-6" />
+              <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="text-center">Säkra Din Tillgång - {priceText}</span>
+              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
             
             <div className="text-center">
-              <p className="text-green-300 font-bold text-base sm:text-lg">💚 30 dagars pengarna-tillbaka-garanti</p>
-              <p className="text-slate-300 text-sm">Riskfri investering i din framtid - full återbetalning om du inte är nöjd</p>
+              <p className="text-green-300 font-bold text-sm sm:text-base md:text-lg">💚 30 dagars pengarna-tillbaka-garanti</p>
+              <p className="text-slate-300 text-xs sm:text-sm">Riskfri investering i din framtid - full återbetalning om du inte är nöjd</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Value Proposition - Clean & Professional */}
-      <section className="py-12 bg-gradient-to-r from-slate-50 to-blue-50 relative">
+      <section className="py-8 sm:py-12 bg-gradient-to-r from-slate-50 to-blue-50 relative">
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="bg-white/90 rounded-3xl p-8 mb-16 border border-slate-200 shadow-xl">
-            <div className="text-center mb-8">
-              <h3 className="text-3xl font-display font-bold mb-4 text-slate-800">De första 100 medlemmarna får den ursprungliga "Tänk och Bli Rik"-boken plus permanent tillgång till Napoleon Hills AI-intelligens - din personliga rikedomsmentor, tillgänglig 24/7.</h3>
-              <p className="text-xl text-slate-600 font-semibold">Exklusivitet skapar excellens - precis som de rika förstår</p>
+          <div className="bg-white/90 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 mb-8 sm:mb-16 border border-slate-200 shadow-xl">
+            <div className="text-center mb-6 sm:mb-8">
+              <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-display font-bold mb-3 sm:mb-4 text-slate-800 leading-tight">De första 100 medlemmarna får den ursprungliga "Tänk och Bli Rik"-boken plus permanent tillgång till Napoleon Hills AI-intelligens - din personliga rikedomsmentor, tillgänglig 24/7.</h3>
+              <p className="text-base sm:text-lg md:text-xl text-slate-600 font-semibold">Exklusivitet skapar excellens - precis som de rika förstår</p>
             </div>
             
-            <div className="bg-gradient-to-r from-blue-50 to-slate-50 rounded-xl shadow-lg border-2 border-blue-200 p-8 mb-8 relative">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+            <div className="bg-gradient-to-r from-blue-50 to-slate-50 rounded-xl shadow-lg border-2 border-blue-200 p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 sm:px-6 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg">
                 🎁 ENDAST FÖRSTA 100
               </div>
-              <div className="text-center bg-white/70 rounded-xl p-6 backdrop-blur-sm">
-                <div className="bg-blue-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
-                  <Brain className="w-8 h-8 text-blue-600" />
+              <div className="text-center bg-white/70 rounded-xl p-4 sm:p-6 backdrop-blur-sm mt-4">
+                <div className="bg-blue-100 rounded-full p-3 sm:p-4 w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4">
+                  <Brain className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-blue-800 mb-4">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-800 mb-4">
                   Din Nya Bästa Vän:<br />
                   Napoleon Hill I Din Ficka
                 </h3>
-                <div className="bg-gradient-to-r from-slate-100 to-blue-100 rounded-lg p-6 mb-6 border-2 border-slate-300">
-                  <div className="flex items-center justify-center mb-3">
-                    <Smartphone className="w-8 h-8 text-slate-600 mr-3" />
-                    <h4 className="text-xl font-bold text-slate-800">Mästarens Visdom, Alltid Med Dig</h4>
+                <div className="bg-gradient-to-r from-slate-100 to-blue-100 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 border-2 border-slate-300">
+                  <div className="flex flex-col sm:flex-row items-center justify-center mb-3">
+                    <Smartphone className="w-6 h-6 sm:w-8 sm:h-8 text-slate-600 mb-2 sm:mb-0 sm:mr-3" />
+                    <h4 className="text-lg sm:text-xl font-bold text-slate-800 text-center sm:text-left">Mästarens Visdom, Alltid Med Dig</h4>
                   </div>
-                  <p className="text-slate-700 font-semibold text-lg mb-4">
+                  <p className="text-slate-700 font-semibold text-sm sm:text-base md:text-lg mb-4">
                     Napoleon Hills kompletta medvetenhet lever i din smartphone - redo att vägleda varje beslut
                   </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-600">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm text-slate-600">
                     <div className="flex items-start space-x-2">
                       <span className="text-green-500">✓</span>
                       <span><strong>Omedelbar Rikedomsrådgivning:</strong> Fråga vad som helst, när som helst</span>
@@ -212,40 +212,40 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
                 </p>
                 <button
                   onClick={onJoinClick}
-                  className="bg-gradient-to-r from-blue-600 to-slate-700 hover:from-blue-700 hover:to-slate-800 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center space-x-3"
+                  className="bg-gradient-to-r from-blue-600 to-slate-700 hover:from-blue-700 hover:to-slate-800 text-white font-bold py-3 sm:py-4 px-6 sm:px-10 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center space-x-2 sm:space-x-3 text-sm sm:text-base min-h-[48px] w-full sm:w-auto justify-center max-w-sm sm:max-w-none mx-auto"
                 >
                   <span>Gå Med I De Första 100 - {priceText}</span>
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
-                <p className="text-slate-600 text-sm mt-3 font-semibold">
+                <p className="text-slate-600 text-xs sm:text-sm mt-3 font-semibold">
                   ✅ Originalbok + AI Mentor • 📱 Omedelbar Tillgång För Alltid
                 </p>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center bg-white/70 rounded-xl p-6 backdrop-blur-sm">
-                <div className="bg-blue-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
-                  <BookOpen className="w-8 h-8 text-blue-600" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+              <div className="text-center bg-white/70 rounded-xl p-4 sm:p-6 backdrop-blur-sm">
+                <div className="bg-blue-100 rounded-full p-3 sm:p-4 w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4">
+                  <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
                 </div>
-                <h4 className="font-bold text-slate-800 mb-2">Beprövat system</h4>
-                <p className="text-sm text-slate-600">Har skapat fler miljonärer än något annat framgångssystem i historien. Detta är inte teorier - det är rikedomsskapande formler.</p>
+                <h4 className="font-bold text-slate-800 mb-2 text-sm sm:text-base">Beprövat system</h4>
+                <p className="text-xs sm:text-sm text-slate-600">Har skapat fler miljonärer än något annat framgångssystem i historien. Detta är inte teorier - det är rikedomsskapande formler.</p>
               </div>
               
-              <div className="text-center bg-white/70 rounded-xl p-6 backdrop-blur-sm">
-                <div className="bg-slate-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
-                  <Shield className="w-8 h-8 text-slate-600" />
+              <div className="text-center bg-white/70 rounded-xl p-4 sm:p-6 backdrop-blur-sm">
+                <div className="bg-slate-100 rounded-full p-3 sm:p-4 w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4">
+                  <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-slate-600" />
                 </div>
-                <h4 className="font-bold text-slate-800 mb-2">Noll risk</h4>
-                <p className="text-sm text-slate-600">30 dagars pengarna-tillbaka-garanti. Om du inte ser resultat får du tillbaka varje krona. Din framgång är garanterad.</p>
+                <h4 className="font-bold text-slate-800 mb-2 text-sm sm:text-base">Noll risk</h4>
+                <p className="text-xs sm:text-sm text-slate-600">30 dagars pengarna-tillbaka-garanti. Om du inte ser resultat får du tillbaka varje krona. Din framgång är garanterad.</p>
               </div>
               
-              <div className="text-center bg-white/70 rounded-xl p-6 backdrop-blur-sm">
-                <div className="bg-blue-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
-                  <Clock className="w-8 h-8 text-blue-600" />
+              <div className="text-center bg-white/70 rounded-xl p-4 sm:p-6 backdrop-blur-sm">
+                <div className="bg-blue-100 rounded-full p-3 sm:p-4 w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4">
+                  <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
                 </div>
-                <h4 className="font-bold text-slate-800 mb-2">Endast första 100</h4>
-                <p className="text-sm text-slate-600">Efter 100 medlemmar försvinner Napoleon Hills AI-mentor för alltid. Denna exklusiva möjlighet kommer aldrig återkomma.</p>
+                <h4 className="font-bold text-slate-800 mb-2 text-sm sm:text-base">Endast första 100</h4>
+                <p className="text-xs sm:text-sm text-slate-600">Efter 100 medlemmar försvinner Napoleon Hills AI-mentor för alltid. Denna exklusiva möjlighet kommer aldrig återkomma.</p>
               </div>
             </div>
           </div>
@@ -316,17 +316,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
             
             <button
               onClick={onJoinClick}
-              className="bg-gradient-to-r from-blue-500 to-slate-600 hover:from-blue-600 hover:to-slate-700 text-white font-bold py-6 px-16 rounded-full text-2xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 inline-flex items-center space-x-3"
+              className="bg-gradient-to-r from-blue-500 to-slate-600 hover:from-blue-600 hover:to-slate-700 text-white font-bold py-4 sm:py-6 px-8 sm:px-16 rounded-full text-lg sm:text-xl md:text-2xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 inline-flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-center max-w-sm sm:max-w-none mx-auto"
             >
-              <Zap className="w-6 h-6" />
+              <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
               <span>Säkra 2025-priset - {priceText}</span>
-              <ArrowRight className="w-6 h-6" />
+              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
             
             <div className="mt-6 text-center">
               <div className="bg-white/10 rounded-lg p-4 inline-block">
-                <p className="text-yellow-300 font-bold">🔥 Begränsat erbjudande</p>
-                <p className="text-white text-sm">Säkra din plats idag</p>
+                <p className="text-yellow-300 font-bold text-sm sm:text-base">🔥 Begränsat erbjudande</p>
+                <p className="text-white text-xs sm:text-sm">Säkra din plats idag</p>
               </div>
             </div>
           </div>
