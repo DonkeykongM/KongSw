@@ -144,36 +144,36 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50 flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-md mx-auto">
         {/* Back Button */}
-        <div className="text-left mb-4">
+        <div className="text-left mb-4 sm:mb-6">
           <button
             onClick={onBack}
-            className="flex items-center space-x-2 text-neutral-600 hover:text-primary-600 transition-colors min-h-[44px]"
+            className="flex items-center space-x-2 text-neutral-600 hover:text-primary-600 transition-colors min-h-[48px] text-sm sm:text-base"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>Tillbaka till hemsidan</span>
           </button>
         </div>
 
         {/* Logo and Title */}
-        <div className="text-center mb-8">
-          <img src="https://j0bzpddd4j.ufs.sh/f/bwjssIq7FWHCTuLlG8ZtZKdCcYS0qzlf2bvOgIJwexGAMR89" alt="KongMindset Logo" className="w-20 h-20 mx-auto mb-4" />
-          <h1 className="text-3xl font-display font-bold bg-gradient-to-r from-primary-700 to-primary-600 bg-clip-text text-transparent mb-2">
+        <div className="text-center mb-6 sm:mb-8">
+          <img src="https://j0bzpddd4j.ufs.sh/f/bwjssIq7FWHCTuLlG8ZtZKdCcYS0qzlf2bvOgIJwexGAMR89" alt="KongMindset Logo" className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4" />
+          <h1 className="text-2xl sm:text-3xl font-display font-bold bg-gradient-to-r from-primary-700 to-primary-600 bg-clip-text text-transparent mb-2">
             KongMindset
           </h1>
-          <p className="text-neutral-600">
+          <p className="text-neutral-600 text-sm sm:text-base px-2">
             Behärska Napoleon Hills Tänk och Bli Rik-principer
           </p>
         </div>
 
         {/* Auth Form */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 border border-white/20">
           <div className="flex rounded-lg bg-neutral-100 p-1 mb-6">
             <button
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 py-3 px-3 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-all min-h-[44px] ${
                 isLogin
                   ? 'bg-white text-primary-700 shadow-sm'
                   : 'text-neutral-600 hover:text-primary-600'
@@ -183,7 +183,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
             </button>
             <button
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 py-3 px-3 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-all min-h-[44px] ${
                 !isLogin
                   ? 'bg-white text-primary-700 shadow-sm'
                   : 'text-neutral-600 hover:text-primary-600'
@@ -200,13 +200,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
                 E-postadress
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-neutral-400" />
                 <input
                   type="email"
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[44px]"
+                  className="w-full pl-9 sm:pl-10 pr-4 py-3 sm:py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[48px]"
                   placeholder="Ange din e-postadress"
                   required
                 />
@@ -219,22 +219,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
                 Lösenord
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-neutral-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-12 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[44px]"
+                  className="w-full pl-9 sm:pl-10 pr-12 py-3 sm:py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[48px]"
                   placeholder={isLogin ? "Ange ditt lösenord" : "Skapa ett lösenord"}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 min-h-[48px] min-w-[48px] flex items-center justify-center"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                 </button>
               </div>
             </div>
@@ -246,22 +246,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
                   Bekräfta lösenord
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-neutral-400" />
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     id="confirmPassword"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-10 pr-12 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[44px]"
+                    className="w-full pl-9 sm:pl-10 pr-12 py-3 sm:py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[48px]"
                     placeholder="Bekräfta ditt lösenord"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 min-h-[48px] min-w-[48px] flex items-center justify-center"
                   >
-                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </button>
                 </div>
               </div>
@@ -286,10 +286,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
             {!isLogin && (
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
                 <div className="flex items-center space-x-2 mb-2">
-                  <CreditCard className="w-5 h-5 text-green-600" />
-                  <span className="font-semibold text-green-800">✅ Säker betalning via Stripe</span>
+                  <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                  <span className="font-semibold text-green-800 text-sm sm:text-base">✅ Säker betalning via Stripe</span>
                 </div>
-                <p className="text-sm text-green-700 mb-2">
+                <p className="text-xs sm:text-sm text-green-700 mb-2">
                   <strong>Komplett KongMindset-kurs: {coursePrice}</strong> (specialerbjudande)
                 </p>
                 <ul className="text-xs text-green-600 space-y-1">
@@ -306,14 +306,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-h-[44px] text-base"
+             className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-4 px-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-h-[48px] text-base"
             >
               {loading ? 'Bearbetar...' : (isLogin ? 'Logga in' : `🛒 Köp kurs - ${coursePrice}`)}
             </button>
           </form>
 
           {/* Footer */}
-          <div className="text-center mt-6 text-sm text-neutral-600">
+         <div className="text-center mt-6 text-sm text-neutral-600 px-2">
             {isLogin ? "Redo att förvandla ditt liv? " : "Har du redan ett konto? "}
             <button
               onClick={() => setIsLogin(!isLogin)}
@@ -325,8 +325,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         </div>
 
         {/* Course Preview */}
-        <div className="text-center mt-8">
-          <p className="text-neutral-600 text-sm">
+       <div className="text-center mt-6 sm:mt-8 px-4">
+         <p className="text-neutral-600 text-xs sm:text-sm">
             {isLogin ? 'Logga in på ditt konto för att fortsätta din framgångsresa' : 'Efter betalning får du automatiskt ett konto med livstidsåtkomst'}
           </p>
         </div>
