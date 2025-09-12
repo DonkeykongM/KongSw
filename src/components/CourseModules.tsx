@@ -138,7 +138,7 @@ const CourseModules: React.FC<CourseModulesProps> = ({ onModuleStart }) => {
             13 Veckors Transformation: Napoleon Hills Framgångsprinciper
           </h1>
           <p className="text-lg md:text-xl text-neutral-600 max-w-3xl mx-auto font-light mb-6">
-            Transformera ditt liv genom 13 veckors systematisk träning baserad på Napoleon Hills tidlösa visdom från "Tänk och Bli Rik." Varje vecka fokuserar på en princip som ska integreras i ditt dagliga liv.
+            Transformera ditt liv genom 13 veckors systematisk träning baserad på Napoleon Hills tidlösa visdom från "Tänk och Bli Rik." Varje vecka fokuserar på en princip som ska integreras djupt i ditt dagliga liv.
           </p>
           
           <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-6 max-w-4xl mx-auto border-2 border-amber-200 mb-8">

@@ -122,7 +122,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
                 <Target className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">Personlig Utvecklingsplan</h3>
-              <p className="text-slate-600 mb-4">12-veckors strukturerat program med reflektioner och uppföljning</p>
+              <p className="text-slate-600 mb-4">13 veckors strukturerat program med reflektioner och uppföljning</p>
               <div className="text-sm text-yellow-600 font-semibold">Inkluderat</div>
             </div>
 
@@ -194,8 +194,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
                 <span className="text-3xl font-bold text-white">2</span>
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">Lär & Tillämpa i 12 Veckor</h3>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">Lär & Tillämpa i 13 Veckor</h3>
               <p className="text-slate-600 leading-relaxed">
-                Följ det strukturerade programmet, en princip per vecka, med praktiska övningar
+                Följ det strukturerade programmet, en princip per vecka, med praktiska övningar och djup reflektion
               </p>
             </div>
 

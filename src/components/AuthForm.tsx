@@ -150,7 +150,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         <div className="text-left mb-4 sm:mb-6">
           <button
             onClick={onBack}
-            className="flex items-center space-x-2 text-neutral-600 hover:text-primary-600 transition-colors min-h-[48px] text-sm sm:text-base"
+            className="flex items-center space-x-2 text-neutral-600 hover:text-primary-600 transition-colors min-h-[48px] text-sm sm:text-base bg-white/80 px-4 py-2 rounded-lg shadow-sm hover:shadow-md border border-gray-200"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>Tillbaka till hemsidan</span>
