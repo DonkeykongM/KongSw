@@ -1,261 +1,352 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
+import { Brain, BookOpen, Star, Trophy, Users, CheckCircle, Play, Download, Gift, Target, Clock, Shield, HelpCircle, ChevronDown, ChevronUp, ArrowRight, Zap, Award, Sparkles } from 'lucide-react';
+import FAQSection from './FAQSection';
 
-interface FAQ {
-  id: number;
-  question: string;
-  answer: string;
-  keywords: string[];
-  category: 'course' | 'payment' | 'results' | 'technical';
-}
-
-const faqs: FAQ[] = [
-  {
-    id: 1,
-    question: "Vad är Napoleon Hills 13 framgångsprinciper från Tänk och Bli Rik?",
-    answer: "Napoleon Hills 13 framgångsprinciper från 'Tänk och Bli Rik' är: 1) Önskans kraft, 2) Tro och övertygelse, 3) Autosuggestion, 4) Specialiserad kunskap, 5) Kreativ fantasi, 6) Organiserad planering, 7) Uthållighet, 8) Beslutsamhet, 9) Master Mind-principen, 10) Hjärnans kraft, 11) Transmutation av sexuell energi, 12) Det sjätte sinnet, och 13) Rikedomsfilosofin. Dessa principer har skapat fler miljonärer än något annat framgångssystem i historien och baseras på Hills 20-åriga studie av över 500 amerikanska miljonärer.",
-    keywords: ["napoleon hill principer", "tänk och bli rik principer", "13 framgångsprinciper"],
-    category: 'course'
-  },
-  {
-    id: 2,
-    question: "Hur lång tid tar det att slutföra KongMindset-kursen?",
-    answer: "KongMindset-kursen är designad som ett 12-veckors transformationsprogram med 13 interaktiva moduler. Du kan studera i din egen takt - vissa elever slutför kursen på 8 veckor medan andra tar 16 veckor. Varje modul innehåller lektion, reflektionsövningar och kunskapsquiz som tar cirka 2-3 timmar att slutföra. Den genomsnittliga eleven spenderar 30-45 minuter per dag och ser betydande resultat inom de första 4 veckorna.",
-    keywords: ["napoleon hill kurs tid", "tänk och bli rik kurs längd", "framgångskurs duration"],
-    category: 'course'
-  },
-  {
-    id: 3,
-    question: "Får jag verkligen den ursprungliga Tänk och Bli Rik-boken gratis?",
-    answer: "Ja, alla KongMindset-medlemmar får den kompletta ursprungliga 'Think and Grow Rich'-boken som gratis PDF-nedladdning omedelbart efter registrering. Detta är den autentiska texten som Napoleon Hill publicerade 1937, samma bok som har sålt över 100 miljoner exemplar världen över. Boken är värd 299 kr separat men inkluderas kostnadsfritt för alla kursmedlemmar som en exklusiv bonus under vår 2025-kampanj.",
-    keywords: ["tänk och bli rik bok gratis", "napoleon hill bok nedladdning", "think and grow rich pdf svenska"],
-    category: 'course'
-  },
-  {
-    id: 4,
-    question: "Vad gör Napoleon Hills AI-hjärna så speciell?",
-    answer: "Napoleon Hills AI-hjärna är världens första personliga framgångsmentor som innehåller komplett kunskap från alla Hills verk och studier av 500+ miljonärer. AI-mentorn är tillgänglig 24/7 i din smartphone och kan svara på alla frågor om rikedomsbyggande, företagsutveckling och personlig framgång. Den är tränad på Hills originaltexter, intervjuer och opublicerat material - vilket gör den till den mest autentiska källan till Hills visdom som någonsin skapats. Efter de första 100 medlemmarna blir denna AI-mentor permanent otillgänglig.",
-    keywords: ["napoleon hill ai mentor", "ai hjärna framgång", "personlig framgångscoach"],
-    category: 'course'
-  },
-  {
-    id: 5,
-    question: "Kostar kursen verkligen bara 299 kr?",
-    answer: "Ja, vårt specialerbjudande ger dig fullständig kurstillgång för endast 299 kr som en engångskostnad! Det här är otroligt värde jämfört med traditionell framgångscoaching som kostar 2,000-5,000 kr per månad. Du får 13 interaktiva moduler, Napoleon Hills AI-mentor, den ursprungliga boken plus livstidsåtkomst till alla uppdateringar - ett totalt värde på över 1,400 kr för endast 299 kr! Efter de första 100 medlemmarna blir priset 299 kr per månad.",
-    keywords: ["napoleon hill kurs pris", "tänk och bli rik kurs kostnad", "framgångskurs sverige", "299 kr kurs"],
-    category: 'payment'
-  },
-  {
-    id: 6,
-    question: "Fungerar Napoleon Hills principer verkligen i Sverige 2025?",
-    answer: "Absolut! Napoleon Hills principer är tidlösa och kulturoberoende eftersom de baseras på universella psykologiska och ekonomiska lagar. Svenska entreprenörer som Ingvar Kamprad (IKEA), Stefan Persson (H&M) och många andra har tillämpat dessa principer framgångsrikt. Principerna fungerar lika bra i dagens digitala ekonomi som de gjorde på 1930-talet. KongMindset-kursen anpassar Hills klassiska lärdomar för moderna svenska förhållanden med exempel från svensk affärsvärd och teknologisektorn.",
-    keywords: ["napoleon hill sverige", "framgångsprinciper fungerar 2025", "svenska entreprenörer napoleon hill"],
-    category: 'results'
-  },
-  {
-    id: 7,
-    question: "Vad händer om jag inte ser resultat inom 30 dagar?",
-    answer: "KongMindset erbjuder 100% pengarna-tillbaka-garanti inom 30 dagar, inga frågor ställda. Om du följer kursen och inte ser mätbara förbättringar i ditt tankesätt, självförtroende eller handlingsförmåga får du full återbetalning. Över 94% av våra elever rapporterar positiva förändringar inom de första 3 veckorna, men vi står bakom vår kurs så starkt att vi tar all risk. Din framgång är vår prioritet - därför har vi denna riskfria garanti.",
-    keywords: ["pengarna tillbaka garanti", "napoleon hill kurs riskfri", "framgångskurs garanti sverige"],
-    category: 'payment'
-  },
-  {
-    id: 8,
-    question: "Kan jag få tillgång till kursen direkt efter betalning?",
-    answer: "Ja! Du får omedelbar tillgång till alla 13 moduler, Napoleon Hills AI-mentor och den gratis bokkedladdningen direkt efter slutförd betalning. Ditt konto skapas automatiskt och du kan börja din första modul inom 2 minuter. All kursinnehåll är tillgängligt dygnet runt från vilken enhet som helst - dator, surfplatta eller smartphone. Du kan studera när det passar dig bäst och återkomma till materialet när som helst under din livstid.",
-    keywords: ["omedelbar tillgång kurs", "instant access napoleon hill", "när kan jag börja kursen"],
-    category: 'technical'
-  },
-  {
-    id: 9,
-    question: "Vilka resultat kan jag förvänta mig efter kursen?",
-    answer: "Studenter som slutför KongMindset-kursen rapporterar: 73% ökning av självförtroende inom 4 veckor, 89% förbättring av målsättningsförmåga, 67% ökning av inkomst inom 6 månader, och 94% rapporterar klarare fokus på sina mål. Du kommer att utveckla orubblig mental styrka, praktiska rikedomsbyggande färdigheter och ett framgångsorienterat tankesätt. Många elever startar nya företag, får befordringar eller når personliga mål de tidigare trodde var omöjliga. Resultaten kommer från systematisk tillämpning av Hills beprövade principer.",
-    keywords: ["napoleon hill kurs resultat", "framgångskurs utfall", "tänk och bli rik transformation"],
-    category: 'results'
-  },
-  {
-    id: 10,
-    question: "Är KongMindset lämplig för nybörjare inom personlig utveckling?",
-    answer: "Absolut! KongMindset är designad för alla nivåer, från kompletta nybörjare till erfarna entreprenörer. Kursen börjar med grundläggande begrepp och bygger systematiskt upp din kunskap modul för modul. Napoleon Hills principer presenteras på ett enkelt, lättförstått sätt med moderna svenska exempel. AI-mentorn anpassar sig till din kunskapsnivå och ger personliga råd baserat på dina svar och framsteg. Över 60% av våra studenter är nybörjare som aldrig tidigare studerat framgångsprinciper.",
-    keywords: ["napoleon hill nybörjare", "framgångskurs början", "personlig utveckling första gången"],
-    category: 'course'
-  },
-  {
-    id: 11,
-    question: "Hur skiljer sig KongMindset från att bara läsa boken själv?",
-    answer: "Medan boken ger kunskap, ger KongMindset transformation genom: 1) Interaktiva övningar som programmerar ditt undermedvetna, 2) Napoleon Hills AI-mentor för personlig vägledning 24/7, 3) Progressspårning som säkerställer att du implementerar varje princip, 4) Reflektionsverktyg som fördjupar din förståelse, 5) Kunskapsquiz som befäster lärandet, och 6) Strukturerad 12-veckors plan istället för att bara läsa passivt. 95% av människor som läser boken själva ser aldrig resultat - KongMindset säkerställer att du tillämpar principerna systematiskt.",
-    keywords: ["napoleon hill kurs vs bok", "interaktiv vs läsa själv", "varför behövs kurs"],
-    category: 'course'
-  },
-  {
-    id: 12,
-    question: "Finns det några dolda kostnader eller återkommande avgifter?",
-    answer: "Nej, absolut inga dolda kostnader! Du betalar endast 299 kr en gång och får sedan livstidsåtkomst till hela kursen. Det finns inga månadsavgifter, årsavgifter eller andra dolda kostnader. Din enda kostnad är 299 kr för komplett tillgång till alla 13 moduler, Napoleon Hills AI-mentor, originalboken och alla framtida uppdateringar. Det här är en engångsinvestering som kan förändra ditt liv.",
-    keywords: ["inga dolda kostnader", "engångskostnad", "livstidsåtkomst", "ingen månadsavgift"],
-    category: 'payment'
-  }
-];
-
-interface FAQSectionProps {
+interface LandingPageProps {
   onJoinClick: () => void;
-  coursePrice: string;
 }
 
-const FAQSection: React.FC<FAQSectionProps> = ({ onJoinClick, coursePrice }) => {
-  const [openItems, setOpenItems] = useState<Set<number>>(new Set());
-
-  const toggleItem = (id: number) => {
-    const newOpenItems = new Set(openItems);
-    if (newOpenItems.has(id)) {
-      newOpenItems.delete(id);
-    } else {
-      newOpenItems.add(id);
-    }
-    setOpenItems(newOpenItems);
-  };
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'course': return 'bg-blue-100 text-blue-800';
-      case 'payment': return 'bg-green-100 text-green-800';
-      case 'results': return 'bg-purple-100 text-purple-800';
-      case 'technical': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getCategoryLabel = (category: string) => {
-    switch (category) {
-      case 'course': return 'Kurs';
-      case 'payment': return 'Betalning';
-      case 'results': return 'Resultat';
-      case 'technical': return 'Teknisk';
-      default: return 'Allmänt';
-    }
-  };
+const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
+  const coursePrice = "299 kr";
+  const originalPrice = "1,400 kr";
 
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-br from-slate-50 to-blue-50 relative">
-      {/* SEO Schema Markup */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": faqs.map(faq => ({
-              "@type": "Question",
-              "name": faq.question,
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": faq.answer,
-                "speakable": {
-                  "@type": "SpeakableSpecification",
-                  "cssSelector": [".faq-answer"]
-                }
-              }
-            }))
-          })
-        }}
-      />
-
-      <div className="container mx-auto px-4 sm:px-6">
-        <div className="text-center mb-16">
-          <div className="bg-gradient-to-r from-blue-600 to-slate-700 rounded-full p-4 w-16 h-16 mx-auto mb-6">
-            <HelpCircle className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 bg-gradient-to-r from-slate-800 to-blue-800 bg-clip-text text-transparent">
-            Vanliga frågor om Napoleon Hills framgångsprinciper
-          </h2>
-          <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">
-            Svar på de vanligaste frågorna om vår interaktiva "Tänk och Bli Rik"-kurs, AI-mentor och transformationsprogram
-          </p>
-        </div>
-
-        <div className="max-w-4xl mx-auto">
-          <div className="space-y-4">
-            {faqs.map((faq) => {
-              const isOpen = openItems.has(faq.id);
-              return (
-                <div 
-                  key={faq.id}
-                  className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300"
-                  itemScope
-                  itemType="https://schema.org/Question"
-                >
-                  <button
-                    type="button"
-                    onClick={() => toggleItem(faq.id)}
-                    className="w-full px-4 sm:px-6 py-4 sm:py-6 text-left flex items-center justify-between hover:bg-slate-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset active:bg-slate-100 min-h-[56px]"
-                    aria-expanded={isOpen}
-                    aria-controls={`faq-answer-${faq.id}`}
-                  >
-                    <div className="flex-grow">
-                      <div className="flex items-center space-x-2 sm:space-x-3 mb-1 sm:mb-2">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(faq.category)}`}>
-                          {getCategoryLabel(faq.category)}
-                        </span>
-                      </div>
-                      <h3 
-                        className="text-base sm:text-lg md:text-xl font-semibold text-slate-800 leading-tight pr-2"
-                        itemProp="name"
-                      >
-                        {faq.question}
-                      </h3>
-                    </div>
-                    <div className="flex-shrink-0 ml-2 sm:ml-4 p-1">
-                      {isOpen ? (
-                        <ChevronUp className="w-5 h-5 sm:w-6 sm:h-6 text-slate-600" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-slate-600" />
-                      )}
-                    </div>
-                  </button>
-                  
-                  <div
-                    id={`faq-answer-${faq.id}`}
-                    className={`px-4 sm:px-6 pb-4 sm:pb-6 transition-all duration-300 ease-in-out ${
-                      isOpen ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 overflow-hidden'
-                    }`}
-                    itemScope
-                    itemType="https://schema.org/Answer"
-                    aria-hidden={!isOpen}
-                  >
-                    <div className="pt-2 sm:pt-3 border-t border-slate-200">
-                      <p 
-                        className="faq-answer text-slate-700 leading-relaxed text-sm sm:text-base md:text-lg"
-                        itemProp="text"
-                      >
-                        {faq.answer}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* CTA efter FAQ */}
-        <div className="text-center mt-16">
-          <div className="bg-gradient-to-r from-blue-50 to-slate-50 rounded-xl p-6 sm:p-8 border-2 border-blue-200 max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold text-blue-800 mb-4">
-              Har du fler frågor? Napoleon Hills AI hjälper dig!
-            </h3>
-            <p className="text-blue-700 mb-6">
-              Få personliga svar från Napoleon Hills AI-mentor som känner till alla detaljer om framgångsprinciperna
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden pt-20 pb-16 md:pt-32 md:pb-24">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/5 via-transparent to-yellow-900/5"></div>
+        <div className="container mx-auto px-4 sm:px-6 relative">
+          <div className="text-center max-w-5xl mx-auto mb-16">
+            <div className="flex items-center justify-center space-x-3 mb-6">
+              <img src="https://j0bzpddd4j.ufs.sh/f/bwjssIq7FWHCTuLlG8ZtZKdCcYS0qzlf2bvOgIJwexGAMR89" alt="KongMindset Logo" className="w-16 h-16 md:w-20 md:h-20" />
+              <span className="text-3xl md:text-4xl font-display font-bold bg-gradient-to-r from-blue-700 to-indigo-600 bg-clip-text text-transparent">
+                KongMindset
+              </span>
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold mb-6 bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-900 bg-clip-text text-transparent leading-tight">
+              Bemästra Napoleon Hills<br />
+              <span className="text-yellow-600">Rikedomsplan</span>
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-3xl mx-auto font-light leading-relaxed">
+              Få <strong>originalboken GRATIS</strong> plus <strong>Napoleon Hill i din ficka</strong> - världens första AI-mentor baserad på "Tänk och Bli Rik"
             </p>
+            
+            {/* Special Offer Badge */}
+            <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-3 rounded-full inline-block mb-8 shadow-2xl animate-pulse">
+              <span className="font-bold text-lg">🔥 BEGRÄNSAT: Första 100 medlemmar endast {coursePrice}/år!</span>
+            </div>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              <button
+                onClick={onJoinClick}
+                className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 px-8 rounded-full text-lg shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-105 active:scale-95 inline-flex items-center space-x-3 min-h-[56px]"
+              >
+                <Brain className="w-6 h-6" />
+                <span>Börja Din Transformation - {coursePrice}</span>
+              </button>
+              
+              <div className="text-center">
+                <p className="text-sm text-slate-500 line-through">{originalPrice}</p>
+                <p className="text-green-600 font-bold">Du sparar 1,101 kr!</p>
+              </div>
+            </div>
+            
+            {/* Trust Signals */}
+            <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-slate-600">
+              <div className="flex items-center space-x-2">
+                <Shield className="w-5 h-5 text-green-500" />
+                <span>30 dagars pengarna tillbaka</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Clock className="w-5 h-5 text-blue-500" />
+                <span>Livstidsåtkomst</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Users className="w-5 h-5 text-purple-500" />
+                <span>Begränsat till 100 medlemmar</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What You Get Section */}
+      <section className="py-16 md:py-24 bg-white/50">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-display font-bold mb-6 bg-gradient-to-r from-slate-800 to-blue-800 bg-clip-text text-transparent">
+              Vad du får för {coursePrice}
+            </h2>
+            <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">
+              Allt du behöver för att bemästra Napoleon Hills 13 framgångsprinciper och transformera ditt liv
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {/* Feature 1 */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-full p-4 w-16 h-16 mb-6 shadow-lg">
+                <BookOpen className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">13 Interaktiva Moduler</h3>
+              <p className="text-slate-600 mb-4">Strukturerad genomgång av varje princip med moderna tillämpningar för 2025</p>
+              <div className="text-sm text-blue-600 font-semibold">Värde: 1,200 kr</div>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+              <div className="bg-gradient-to-r from-purple-600 to-pink-700 rounded-full p-4 w-16 h-16 mb-6 shadow-lg">
+                <Brain className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">Napoleon Hill AI-Mentor</h3>
+              <p className="text-slate-600 mb-4">Din personliga framgångscoach 24/7 - världens första Napoleon Hill AI</p>
+              <div className="text-sm text-purple-600 font-semibold">Värde: OVÄRDERLIG</div>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+              <div className="bg-gradient-to-r from-green-600 to-emerald-700 rounded-full p-4 w-16 h-16 mb-6 shadow-lg">
+                <Gift className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">GRATIS Originalbok</h3>
+              <p className="text-slate-600 mb-4">Komplett PDF av "Tänk och Bli Rik" - din att behålla för alltid</p>
+              <div className="text-sm text-green-600 font-semibold">Värde: 200 kr</div>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="bg-gradient-to-br from-yellow-50 to-orange-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+              <div className="bg-gradient-to-r from-yellow-600 to-orange-700 rounded-full p-4 w-16 h-16 mb-6 shadow-lg">
+                <Target className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">Personlig Utvecklingsplan</h3>
+              <p className="text-slate-600 mb-4">12-veckors strukturerat program med reflektioner och uppföljning</p>
+              <div className="text-sm text-yellow-600 font-semibold">Inkluderat</div>
+            </div>
+
+            {/* Feature 5 */}
+            <div className="bg-gradient-to-br from-red-50 to-rose-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+              <div className="bg-gradient-to-r from-red-600 to-rose-700 rounded-full p-4 w-16 h-16 mb-6 shadow-lg">
+                <Trophy className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">Kunskapsquiz & Certifiering</h3>
+              <p className="text-slate-600 mb-4">Testa din förståelse och få certifiering när du slutför kursen</p>
+              <div className="text-sm text-red-600 font-semibold">Inkluderat</div>
+            </div>
+
+            {/* Feature 6 */}
+            <div className="bg-gradient-to-br from-teal-50 to-cyan-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+              <div className="bg-gradient-to-r from-teal-600 to-cyan-700 rounded-full p-4 w-16 h-16 mb-6 shadow-lg">
+                <Clock className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">Livstidsåtkomst</h3>
+              <p className="text-slate-600 mb-4">Komma tillbaka när som helst, alla framtida uppdateringar inkluderade</p>
+              <div className="text-sm text-teal-600 font-semibold">För alltid</div>
+            </div>
+          </div>
+
+          {/* Value Proposition */}
+          <div className="text-center mt-16">
+            <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl p-8 border-4 border-yellow-300 max-w-2xl mx-auto shadow-2xl">
+              <h3 className="text-3xl font-bold text-yellow-800 mb-4">
+                Totalt värde: 1,400+ kr
+              </h3>
+              <p className="text-2xl text-yellow-700 mb-4">
+                Du betalar endast: <span className="text-4xl font-bold text-green-600">{coursePrice}</span>
+              </p>
+              <p className="text-yellow-600 font-semibold">
+                Det är 79% rabatt på en livsförändrande investering! 🎯
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-16 md:py-24 bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-display font-bold mb-6 bg-gradient-to-r from-slate-800 to-blue-800 bg-clip-text text-transparent">
+              Så fungerar det
+            </h2>
+            <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">
+              Tre enkla steg till din transformation
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Step 1 */}
+            <div className="text-center group">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-2xl transform transition-all duration-300 group-hover:scale-110">
+                <span className="text-3xl font-bold text-white">1</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">Köp & Få Omedelbar Tillgång</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Betala {coursePrice} och få direkt tillgång till alla 13 moduler plus Napoleon Hills AI-mentor
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="text-center group">
+              <div className="bg-gradient-to-r from-purple-600 to-pink-700 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-2xl transform transition-all duration-300 group-hover:scale-110">
+                <span className="text-3xl font-bold text-white">2</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">Lär & Tillämpa i 12 Veckor</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Följ det strukturerade programmet, en princip per vecka, med praktiska övningar
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="text-center group">
+              <div className="bg-gradient-to-r from-green-600 to-emerald-700 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-2xl transform transition-all duration-300 group-hover:scale-110">
+                <span className="text-3xl font-bold text-white">3</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">Transformera Ditt Liv</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Se konkreta resultat i ditt tankesätt, självförtroende och ekonomiska framgång
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof Section */}
+      <section className="py-16 md:py-24 bg-white/50">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-display font-bold mb-6 bg-gradient-to-r from-slate-800 to-blue-800 bg-clip-text text-transparent">
+              Vad våra elever säger
+            </h2>
+            <p className="text-lg md:text-xl text-slate-600">
+              Riktiga resultat från riktiga människor
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {/* Testimonial 1 */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 hover:shadow-2xl transition-all duration-300">
+              <div className="flex items-center mb-4">
+                <div className="flex text-yellow-400 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-current" />
+                  ))}
+                </div>
+              </div>
+              <p className="text-slate-600 mb-6 italic">
+                "Inom 4 veckor hade jag ett helt nytt tankesätt om pengar och framgång. Napoleon Hills AI-mentor är som att ha världens bästa coach i fickan!"
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                  M
+                </div>
+                <div className="ml-4">
+                  <div className="font-semibold text-slate-800">Marcus Andersson</div>
+                  <div className="text-slate-500 text-sm">Företagare, Stockholm</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 2 */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 hover:shadow-2xl transition-all duration-300">
+              <div className="flex text-yellow-400 mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-current" />
+                ))}
+              </div>
+              <p className="text-slate-600 mb-6 italic">
+                "Jag ökade min inkomst med 67% på 6 månader genom att tillämpa principerna. Detta är den bästa investeringen jag någonsin gjort!"
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-teal-500 rounded-full flex items-center justify-center text-white font-bold">
+                  S
+                </div>
+                <div className="ml-4">
+                  <div className="font-semibold text-slate-800">Sara Lindqvist</div>
+                  <div className="text-slate-500 text-sm">Säljchef, Göteborg</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 3 */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 hover:shadow-2xl transition-all duration-300">
+              <div className="flex text-yellow-400 mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-current" />
+                ))}
+              </div>
+              <p className="text-slate-600 mb-6 italic">
+                "Strukturen är perfekt! Jag hade läst boken 3 gånger tidigare men första gången jag verkligen förstod och tillämpade principerna."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
+                  J
+                </div>
+                <div className="ml-4">
+                  <div className="font-semibold text-slate-800">Johan Eriksson</div>
+                  <div className="text-slate-500 text-sm">Coach, Malmö</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <FAQSection onJoinClick={onJoinClick} coursePrice={coursePrice} />
+
+      {/* Final CTA Section */}
+      <section className="py-16 md:py-24 bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="container mx-auto px-4 sm:px-6 relative">
+          <div className="text-center max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
+              Din resa mot framgång börjar nu
+            </h2>
+            <p className="text-xl md:text-2xl mb-8 text-blue-100">
+              Gå med i de första 100 medlemmarna och få livstidsåtkomst för endast {coursePrice}
+            </p>
+            
+            <div className="bg-red-500/20 backdrop-blur border border-red-300 rounded-2xl p-6 mb-8 max-w-2xl mx-auto">
+              <div className="flex items-center justify-center space-x-2 mb-2">
+                <Clock className="w-6 h-6 text-red-300" />
+                <span className="text-red-200 font-bold text-lg">BEGRÄNSAT ERBJUDANDE</span>
+              </div>
+              <p className="text-red-100">
+                Efter de första 100 medlemmarna ökar priset till <span className="font-bold">{coursePrice}/månad</span>
+              </p>
+            </div>
+
             <button
               onClick={onJoinClick}
-              className="bg-gradient-to-r from-blue-600 to-slate-700 hover:from-blue-700 hover:to-slate-800 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 inline-flex items-center space-x-2 sm:space-x-3 text-sm sm:text-base min-h-[48px]"
+              className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-black font-bold py-4 px-8 rounded-full text-xl shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-105 active:scale-95 inline-flex items-center space-x-3 mb-8"
             >
-              <span className="text-center">Börja chatta med Napoleon Hill - 299 kr</span>
+              <Sparkles className="w-6 h-6" />
+              <span>Säkra Din Plats Nu - {coursePrice}</span>
+              <ArrowRight className="w-6 h-6" />
             </button>
+
+            <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-blue-200">
+              <div className="flex items-center space-x-2">
+                <Shield className="w-5 h-5 text-green-400" />
+                <span>30 dagars garanti</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>Omedelbar tillgång</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Award className="w-5 h-5 text-green-400" />
+                <span>Livstidsåtkomst</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 };
 
-export default FAQSection;
+export default LandingPage;
