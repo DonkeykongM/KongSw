@@ -150,7 +150,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
 
           {/* Value Proposition */}
           <div className="text-center mt-16">
-            <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl p-8 border-4 border-yellow-300 max-w-2xl mx-auto shadow-2xl">
+            <button
+              onClick={onJoinClick}
+              className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl p-8 border-4 border-yellow-300 max-w-2xl mx-auto shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer w-full"
+            >
               <h3 className="text-3xl font-bold text-yellow-800 mb-4">
                 Totalt värde: 1,400+ kr
               </h3>
@@ -160,7 +163,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               <p className="text-yellow-600 font-semibold">
                 Det är 79% rabatt på en livsförändrande investering! 🎯
               </p>
-            </div>
+            </button>
           </div>
         </div>
       </section>
