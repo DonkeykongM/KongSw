@@ -34,9 +34,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
             </p>
             
             {/* Special Offer Badge */}
-            <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-3 rounded-full inline-block mb-8 shadow-2xl animate-pulse">
+            <button
+              onClick={onJoinClick}
+              className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-6 py-3 rounded-full inline-block mb-8 shadow-2xl animate-pulse transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+            >
               <span className="font-bold text-lg">🔥 2025 KAMPANJ: 299 kr specialpris!</span>
-            </div>
+            </button>
             
             {/* Savings Text */}
             <div className="text-center mb-8">
@@ -44,19 +47,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               <p className="text-green-600 font-bold">Du sparar 1,101 kr!</p>
             </div>
             
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <button
-                onClick={onJoinClick}
-                className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 px-8 rounded-full text-lg shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-105 active:scale-95 inline-flex items-center space-x-3 min-h-[56px]"
-              >
-                <Brain className="w-6 h-6" />
-                <span>Börja Din Transformation - {coursePrice}</span>
-              </button>
-            </div>
-            
-            {/* Guarantee & Campaign Info - Moved up */}
-            <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-slate-600 mb-8">
+            {/* Guarantee & Campaign Info */}
+            <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-slate-600 mb-12">
               <div className="flex items-center space-x-2">
                 <Shield className="w-5 h-5 text-green-500" />
                 <span>30 dagars pengarna tillbaka</span>
