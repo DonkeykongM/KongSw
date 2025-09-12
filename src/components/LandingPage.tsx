@@ -55,8 +55,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               </button>
             </div>
             
-            {/* Trust Signals */}
-            <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-slate-600">
+            {/* Guarantee & Campaign Info - Moved up */}
+            <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-slate-600 mb-8">
               <div className="flex items-center space-x-2">
                 <Shield className="w-5 h-5 text-green-500" />
                 <span>30 dagars pengarna tillbaka</span>
@@ -64,6 +64,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               <div className="flex items-center space-x-2">
                 <Users className="w-5 h-5 text-purple-500" />
                 <span>kampanjen gäller endast för de första 100 medlemmar</span>
+              </div>
+            </div>
+            
+            {/* Trust Signals */}
+            <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-slate-600">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5 text-blue-500" />
+                <span>Säker betalning via Stripe</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Shield className="w-5 h-5 text-gray-500" />
+                <span>SSL-krypterad webbplats</span>
               </div>
             </div>
           </div>
