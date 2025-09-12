@@ -35,7 +35,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
             
             {/* Special Offer Badge */}
             <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-3 rounded-full inline-block mb-8 shadow-2xl animate-pulse">
-              <span className="font-bold text-lg">🔥 BEGRÄNSAT: Första 100 medlemmar endast {coursePrice}/år!</span>
+              <span className="font-bold text-lg">🔥 2025 KAMPANJ: 299 kr specialpris!</span>
             </div>
             
             {/* CTA Buttons */}
@@ -139,11 +139,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
             {/* Feature 6 */}
             <div className="bg-gradient-to-br from-teal-50 to-cyan-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
               <div className="bg-gradient-to-r from-teal-600 to-cyan-700 rounded-full p-4 w-16 h-16 mb-6 shadow-lg">
-                <Clock className="w-8 h-8 text-white" />
+                <Gift className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">Livstidsåtkomst</h3>
-              <p className="text-slate-600 mb-4">Komma tillbaka när som helst, alla framtida uppdateringar inkluderade</p>
-              <div className="text-sm text-teal-600 font-semibold">För alltid</div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">Exklusiv Medlemsgåva</h3>
+              <p className="text-slate-600 mb-4">Gratis gåva som alltid tidigare visats för värdiga medlemmar - något du kommer att älska garanterat</p>
+              <div className="text-sm text-teal-600 font-semibold">Endast för medlemmar: OVÄRDERLIGT</div>
             </div>
           </div>
 
@@ -193,10 +193,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               <div className="bg-gradient-to-r from-purple-600 to-pink-700 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-2xl transform transition-all duration-300 group-hover:scale-110">
                 <span className="text-3xl font-bold text-white">2</span>
               </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">Lär & Tillämpa i 12 Veckor</h3>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">Lär & Tillämpa i 13 Veckor</h3>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">Studera & Tillämpa i 13 Veckor</h3>
               <p className="text-slate-600 leading-relaxed">
-                Följ det strukturerade programmet, en princip per vecka, med praktiska övningar och djup reflektion
+                Följ det strukturerade 13-veckors programmet, en princip per vecka, med praktiska övningar och djup reflektion
               </p>
             </div>
 
