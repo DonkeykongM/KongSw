@@ -142,7 +142,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
                 <Gift className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">Exklusiv Medlemsgåva</h3>
-              <p className="text-slate-600 mb-4">Gratis gåva som alltid tidigare visats för värdiga medlemmar - något du kommer att älska garanterat</p>
+              <p className="text-slate-600 mb-4">Gratis gåva som alltid tidigare visats för världen - något du kommer att älska garanterat</p>
               <div className="text-sm text-teal-600 font-semibold">Endast för medlemmar: OVÄRDERLIGT</div>
             </div>
           </div>
