@@ -1,4 +1,32 @@
-return (
+import React from 'react';
+import { CheckCircle, Lock } from 'lucide-react';
+
+interface ModuleCardProps {
+  module: {
+    id: number;
+    title: string;
+    description: string;
+    icon: React.ComponentType<any>;
+  };
+  onModuleStart: (moduleId: number) => void;
+  progress?: {
+    quizScore?: number;
+    completed?: boolean;
+  };
+  isLocked?: boolean;
+  isCompleted?: boolean;
+}
+
+export default function ModuleCard({ 
+  module, 
+  onModuleStart, 
+  progress, 
+  isLocked = false, 
+  isCompleted = false 
+}: ModuleCardProps) {
+  const { id, title, description, icon: IconComponent } = module;
+
+  return (
     <div className={`bg-white/90 backdrop-blur-sm shadow-lg rounded-xl p-4 sm:p-6 flex flex-col items-center transform transition-all duration-300 border w-full max-w-sm relative ${
       isLocked ? 'opacity-60 border-gray-300' : 
       isCompleted ? 'border-green-300 bg-green-50/50 hover:scale-105 hover:shadow-2xl' : 
@@ -74,3 +102,4 @@ return (
       </button>
     </div>
   );
+}
