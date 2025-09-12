@@ -194,9 +194,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
                 <span className="text-3xl font-bold text-white">2</span>
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">Lär & Tillämpa i 12 Veckor</h3>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">Studera & Transformera</h3>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">Lär & Tillämpa i 13 Veckor</h3>
               <p className="text-slate-600 leading-relaxed">
-                Följ det strukturerade programmet med praktiska övningar och djup reflektion för bestående resultat
+                Följ det strukturerade programmet, en princip per vecka, med praktiska övningar och djup reflektion
               </p>
             </div>
 
@@ -316,7 +316,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
                 <span className="text-red-200 font-bold text-lg">BEGRÄNSAT ERBJUDANDE</span>
               </div>
               <p className="text-red-100">
-                2025 års kampanjpris - normalpris 1,400 kr. <span className="font-bold">Endast under 2025!</span>
+                Efter de första 100 medlemmarna ökar priset till <span className="font-bold">{coursePrice}/månad</span>
               </p>
             </div>
 
