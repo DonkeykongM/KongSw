@@ -41,6 +41,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               <span className="font-bold text-lg">🔥 2025 KAMPANJ: 299 kr specialpris!</span>
             </button>
             
+            {/* Login Button */}
+            <div className="mb-8">
+              <button
+                onClick={onJoinClick}
+                className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 inline-flex items-center space-x-2"
+              >
+                <span>Redan medlem? Logga in</span>
+              </button>
+            </div>
+            
             {/* Savings Text */}
             <div className="text-center mb-8">
               <p className="text-sm text-slate-500 line-through">1,400 kr</p>
