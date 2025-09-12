@@ -61,12 +61,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
                 <span>30 dagars pengarna tillbaka</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Clock className="w-5 h-5 text-blue-500" />
-                <span>Livstidsåtkomst</span>
-              </div>
-              <div className="flex items-center space-x-2">
                 <Users className="w-5 h-5 text-purple-500" />
-                <span>Begränsat till 100 medlemmar</span>
+                <span>kampanjen gäller endast för de första 100 medlemmar</span>
               </div>
             </div>
           </div>
