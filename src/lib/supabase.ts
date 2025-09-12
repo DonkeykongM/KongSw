@@ -15,8 +15,11 @@ const isSupabaseConfigured = supabaseUrl &&
 export const supabase = isSupabaseConfigured 
   ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
-        persistSession: false, // Disable persistence when not configured
-        autoRefreshToken: false, // Disable auto refresh when not configured
+        persistSession: true, // Enable persistence when configured
+        autoRefreshToken: true, // Enable auto refresh when configured
+        storage: window.localStorage, // Use localStorage for persistence
+        storageKey: 'sb-auth-token',
+        flowType: 'pkce'
       }
     })
   : createClient('https://placeholder.supabase.co', 'placeholder-anon-key', {

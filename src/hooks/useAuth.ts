@@ -35,9 +35,13 @@ export const useAuth = () => {
 
     // Listen for auth changes with error handling
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+      console.log('Auth event:', event, session?.user?.email || 'no user')
+      
+      if (event === 'SIGNED_OUT') {
         setUser(session?.user ?? null)
-      } else if (event === 'SIGNED_IN') {
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        setUser(session?.user ?? null)
+      } else if (event === 'INITIAL_SESSION') {
         setUser(session?.user ?? null)
       }
       setLoading(false)
