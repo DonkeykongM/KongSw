@@ -163,6 +163,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               <p className="text-yellow-600 font-semibold">
                 Det är 79% rabatt på en livsförändrande investering! 🎯
               </p>
+              <div className="mt-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-full mx-auto inline-block font-bold text-lg shadow-lg">
+                👆 Klicka nu
+              </div>
             </button>
           </div>
         </div>
