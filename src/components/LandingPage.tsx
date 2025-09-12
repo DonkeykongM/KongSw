@@ -171,6 +171,55 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
         </div>
       </section>
 
+      {/* Final CTA Section - Moved up 2 sections */}
+      <section className="py-16 md:py-24 bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="container mx-auto px-4 sm:px-6 relative">
+          <div className="text-center max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
+              Din resa mot framgång börjar nu
+            </h2>
+            <p className="text-xl md:text-2xl mb-8 text-blue-100">
+              Gå med i de första 100 medlemmarna och få livstidsåtkomst för endast {coursePrice}
+            </p>
+            
+            <div className="bg-red-500/20 backdrop-blur border border-red-300 rounded-2xl p-6 mb-8 max-w-2xl mx-auto">
+              <div className="flex items-center justify-center space-x-2 mb-2">
+                <Clock className="w-6 h-6 text-red-300" />
+                <span className="text-red-200 font-bold text-lg">BEGRÄNSAT ERBJUDANDE</span>
+              </div>
+              <p className="text-red-100">
+                Efter de första 100 medlemmarna ökar priset till <span className="font-bold">{coursePrice}/månad</span>
+              </p>
+            </div>
+
+            <button
+              onClick={onJoinClick}
+              className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-black font-bold py-4 px-8 rounded-full text-xl shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-105 active:scale-95 inline-flex items-center space-x-3 mb-8"
+            >
+              <Sparkles className="w-6 h-6" />
+              <span>Säkra Din Plats Nu - {coursePrice}</span>
+              <ArrowRight className="w-6 h-6" />
+            </button>
+
+            <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-blue-200">
+              <div className="flex items-center space-x-2">
+                <Shield className="w-5 h-5 text-green-400" />
+                <span>30 dagars garanti</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>Omedelbar tillgång</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Award className="w-5 h-5 text-green-400" />
+                <span>2025 års kampanj</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works Section */}
       <section className="py-16 md:py-24 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="container mx-auto px-4 sm:px-6">
@@ -304,54 +353,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
       {/* FAQ Section */}
       <FAQSection onJoinClick={onJoinClick} coursePrice={coursePrice} />
 
-      {/* Final CTA Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="container mx-auto px-4 sm:px-6 relative">
-          <div className="text-center max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
-              Din resa mot framgång börjar nu
-            </h2>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100">
-              Gå med i de första 100 medlemmarna och få livstidsåtkomst för endast {coursePrice}
-            </p>
-            
-            <div className="bg-red-500/20 backdrop-blur border border-red-300 rounded-2xl p-6 mb-8 max-w-2xl mx-auto">
-              <div className="flex items-center justify-center space-x-2 mb-2">
-                <Clock className="w-6 h-6 text-red-300" />
-                <span className="text-red-200 font-bold text-lg">BEGRÄNSAT ERBJUDANDE</span>
-              </div>
-              <p className="text-red-100">
-                Efter de första 100 medlemmarna ökar priset till <span className="font-bold">{coursePrice}/månad</span>
-              </p>
-            </div>
-
-            <button
-              onClick={onJoinClick}
-              className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-black font-bold py-4 px-8 rounded-full text-xl shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-105 active:scale-95 inline-flex items-center space-x-3 mb-8"
-            >
-              <Sparkles className="w-6 h-6" />
-              <span>Säkra Din Plats Nu - {coursePrice}</span>
-              <ArrowRight className="w-6 h-6" />
-            </button>
-
-            <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-blue-200">
-              <div className="flex items-center space-x-2">
-                <Shield className="w-5 h-5 text-green-400" />
-                <span>30 dagars garanti</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-green-400" />
-                <span>Omedelbar tillgång</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Award className="w-5 h-5 text-green-400" />
-                <span>Livstidsåtkomst</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
