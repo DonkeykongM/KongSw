@@ -38,6 +38,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               <span className="font-bold text-lg">🔥 2025 KAMPANJ: 299 kr specialpris!</span>
             </div>
             
+            {/* Savings Text */}
+            <div className="text-center mb-8">
+              <p className="text-sm text-slate-500 line-through">1,400 kr</p>
+              <p className="text-green-600 font-bold">Du sparar 1,101 kr!</p>
+            </div>
+            
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <button
@@ -47,11 +53,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
                 <Brain className="w-6 h-6" />
                 <span>Börja Din Transformation - {coursePrice}</span>
               </button>
-              
-              <div className="text-center">
-                <p className="text-sm text-slate-500 line-through">{originalPrice}</p>
-                <p className="text-green-600 font-bold">Du sparar 1,101 kr!</p>
-              </div>
             </div>
             
             {/* Trust Signals */}
