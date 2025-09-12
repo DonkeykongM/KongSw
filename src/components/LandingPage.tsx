@@ -70,6 +70,27 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
                 <span>SSL-krypterad webbplats</span>
               </div>
             </div>
+
+            {/* Value Proposition - Moved up from What You Get section */}
+            <div className="text-center mt-16">
+              <button
+                onClick={onJoinClick}
+                className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl p-8 border-4 border-yellow-300 max-w-2xl mx-auto shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer w-full"
+              >
+                <h3 className="text-3xl font-bold text-yellow-800 mb-4">
+                  Totalt värde: 1,400+ kr
+                </h3>
+                <p className="text-2xl text-yellow-700 mb-4">
+                  Du betalar endast: <span className="text-4xl font-bold text-green-600">{coursePrice}</span>
+                </p>
+                <p className="text-yellow-600 font-semibold">
+                  Det är 79% rabatt på en livsförändrande investering! 🎯
+                </p>
+                <div className="mt-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-full mx-auto inline-block font-bold text-lg shadow-lg">
+                  👆 Klicka nu
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -146,27 +167,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               <p className="text-slate-600 mb-4">Gratis gåva som alltid tidigare visats för världen - något du kommer att älska garanterat</p>
               <div className="text-sm text-teal-600 font-semibold">Endast för medlemmar: OVÄRDERLIGT</div>
             </div>
-          </div>
-
-          {/* Value Proposition */}
-          <div className="text-center mt-16">
-            <button
-              onClick={onJoinClick}
-              className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl p-8 border-4 border-yellow-300 max-w-2xl mx-auto shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer w-full"
-            >
-              <h3 className="text-3xl font-bold text-yellow-800 mb-4">
-                Totalt värde: 1,400+ kr
-              </h3>
-              <p className="text-2xl text-yellow-700 mb-4">
-                Du betalar endast: <span className="text-4xl font-bold text-green-600">{coursePrice}</span>
-              </p>
-              <p className="text-yellow-600 font-semibold">
-                Det är 79% rabatt på en livsförändrande investering! 🎯
-              </p>
-              <div className="mt-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-full mx-auto inline-block font-bold text-lg shadow-lg">
-                👆 Klicka nu
-              </div>
-            </button>
           </div>
         </div>
       </section>
@@ -346,7 +346,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
               </div>
               <div className="flex items-center space-x-2">
                 <Award className="w-5 h-5 text-green-400" />
-                <span>Livstidsåtkomst</span>
+                <span>2025 års kampanj</span>
               </div>
             </div>
           </div>
