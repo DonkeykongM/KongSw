@@ -101,18 +101,18 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-lg z-50 max-h-screen overflow-y-auto">
-            <div className="px-4 py-6 space-y-3">
+          <div className="lg:hidden fixed top-full left-0 right-0 bg-white border-b border-gray-100 shadow-lg z-50 max-h-[calc(100vh-80px)] overflow-y-auto">
+            <div className="px-4 py-4 space-y-2">
               {navItems.map(item => {
                 const Icon = item.icon;
                 return (
                   <button
                     key={item.id}
                     onClick={() => handleNavigation(item.id)}
-                    className={`w-full flex items-center space-x-4 px-4 py-4 rounded-lg text-left font-medium transition-all duration-200 min-h-[48px] text-base ${
+                    className={`w-full flex items-center space-x-4 px-4 py-4 rounded-xl text-left font-medium transition-all duration-200 min-h-[52px] text-base active:scale-95 ${
                       currentPage === item.id
-                        ? 'text-primary-600 bg-primary-50'
-                        : 'text-neutral-600 hover:text-primary-600 hover:bg-neutral-50'
+                        ? 'text-primary-600 bg-primary-50 border-2 border-primary-200'
+                        : 'text-neutral-600 hover:text-primary-600 hover:bg-neutral-50 border-2 border-transparent'
                     }`}
                   >
                     <Icon className="w-6 h-6 flex-shrink-0" />
@@ -121,12 +121,12 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
                 );
               })}
               
-              <div className="border-t border-gray-200 pt-4 mt-4">
-                <div className="px-4 py-3 bg-gray-50 rounded-lg mb-3">
+              <div className="border-t border-gray-200 pt-3 mt-3">
+                <div className="px-4 py-3 bg-gray-50 rounded-xl mb-3">
                   <div>
                     <span className="text-sm font-medium text-neutral-700">Välkommen, {profile?.display_name || user?.email?.split('@')[0] || 'Elev'}</span>
                     {hasAccess && activeProduct && (
-                      <div className="text-xs text-green-600 font-medium mt-2">
+                      <div className="text-xs text-green-600 font-medium mt-1">
                         ✅ {activeProduct.name}
                       </div>
                     )}
@@ -137,7 +137,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
                     onSignOut();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center space-x-4 px-4 py-4 rounded-lg text-left font-medium text-red-600 hover:bg-red-50 transition-colors min-h-[48px] text-base"
+                  className="w-full flex items-center space-x-4 px-4 py-4 rounded-xl text-left font-medium text-red-600 hover:bg-red-50 transition-colors min-h-[52px] text-base active:scale-95 border-2 border-transparent"
                 >
                   <LogOut className="w-6 h-6 flex-shrink-0" />
                   <span>Logga ut</span>

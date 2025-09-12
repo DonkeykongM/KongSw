@@ -1015,7 +1015,7 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
       {/* Tab Navigation */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 sm:px-6">
-          <nav className="flex space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto scrollbar-hide">
+          <nav className="flex space-x-1 sm:space-x-2 md:space-x-4 lg:space-x-8 overflow-x-auto scrollbar-hide pb-1">
             {[
               { id: 'lesson', label: 'Lektion' },
               { id: 'reflection', label: 'Reflektion' },
@@ -1025,7 +1025,7 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`py-4 px-3 sm:px-4 border-b-2 font-medium text-sm sm:text-base transition-all duration-200 whitespace-nowrap min-h-[44px] flex items-center ${
+                className={`py-3 sm:py-4 px-2 sm:px-3 md:px-4 border-b-2 font-medium text-xs sm:text-sm lg:text-base transition-all duration-200 whitespace-nowrap min-h-[44px] flex items-center flex-shrink-0 active:bg-gray-100 ${
                   activeTab === tab.id
                     ? 'border-primary-600 text-primary-600'
                     : 'border-transparent text-neutral-500 hover:text-neutral-700'
@@ -1038,8 +1038,16 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
         </div>
       </div>
 
+      {/* Mobile Progress Indicator */}
+      <div className="sm:hidden bg-white border-b px-4 py-2">
+        <div className="flex items-center justify-between text-xs text-gray-600">
+          <span>Modul {module.id} av 13</span>
+          <span>{activeTab === 'lesson' ? 'Lektion' : activeTab === 'reflection' ? 'Reflektion' : activeTab === 'quiz' ? 'Quiz' : 'Översikt'}</span>
+        </div>
+      </div>
+
       {/* Content */}
-      <div className="container mx-auto px-4 sm:px-6 py-8">
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-8">
         {activeTab === 'lesson' && renderLesson()}
         {activeTab === 'reflection' && renderReflection()}
         {activeTab === 'quiz' && renderQuiz()}

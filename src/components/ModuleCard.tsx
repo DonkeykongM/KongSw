@@ -26,51 +26,54 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, onModuleStart }) => {
       isLocked ? 'opacity-60 border-gray-300' : 
       isCompleted ? 'border-green-300 bg-green-50/50 hover:scale-105 hover:shadow-2xl' : 
       'border-white/20 hover:scale-105 hover:shadow-2xl'
+    } ${
+      // Enhanced mobile touch experience
+      'active:scale-95 touch-manipulation'
     }`}>
       {isCompleted && (
-        <div className="absolute top-4 right-4 bg-green-500 rounded-full p-1">
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-green-500 rounded-full p-1">
           <CheckCircle className="w-5 h-5 text-white" />
         </div>
       )}
       
       {isLocked && (
-        <div className="absolute top-4 right-4 bg-gray-500 rounded-full p-1">
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-gray-500 rounded-full p-1">
           <Lock className="w-5 h-5 text-white" />
         </div>
       )}
       
       {/* Week Number Badge */}
-      <div className="absolute top-3 left-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold">
+      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold">
         Vecka {id}
       </div>
       
       {IconComponent && (
-        <div className={`rounded-full p-4 mb-6 ${
+        <div className={`rounded-full p-3 sm:p-4 mb-4 sm:mb-6 ${
           isLocked ? 'bg-gradient-to-r from-gray-100 to-gray-200' :
           isCompleted 
             ? 'bg-gradient-to-r from-green-100 to-green-200' 
             : 'bg-gradient-to-r from-primary-100 to-primary-200'
         }`}>
-          <IconComponent className={`h-6 w-6 sm:h-8 sm:w-8 ${
+          <IconComponent className={`h-7 w-7 sm:h-8 sm:w-8 ${
             isLocked ? 'text-gray-500' :
             isCompleted ? 'text-green-600' : 'text-primary-600'
           }`} />
         </div>
       )}
-      <h3 className="text-lg sm:text-xl font-display font-semibold mb-3 text-primary-800 text-center leading-tight px-2">{title}</h3>
-      <p className={`text-center mb-4 sm:mb-6 text-xs sm:text-sm leading-relaxed flex-grow px-2 ${
+      <h3 className="text-base sm:text-lg lg:text-xl font-display font-semibold mb-2 sm:mb-3 text-primary-800 text-center leading-tight px-2">{title}</h3>
+      <p className={`text-center mb-3 sm:mb-4 lg:mb-6 text-xs sm:text-sm leading-relaxed flex-grow px-2 ${
         isLocked ? 'text-gray-500' : 'text-neutral-600'
       }`}>{description}</p>
       
       {isLocked && (
-        <div className="mb-4 text-center">
+        <div className="mb-3 sm:mb-4 text-center">
           <p className="text-gray-500 text-xs sm:text-sm font-semibold">🔒 Låst</p>
           <p className="text-gray-400 text-xs">Slutför vecka {module.id - 1} först</p>
         </div>
       )}
       
       {isCompleted && (
-        <div className="mb-4 text-center">
+        <div className="mb-3 sm:mb-4 text-center">
           <p className="text-green-600 text-xs sm:text-sm font-semibold">✅ Modul slutförd</p>
           {progress?.quizScore && (
             <p className="text-green-500 text-xs">Quizresultat: {progress.quizScore}%</p>
@@ -81,7 +84,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, onModuleStart }) => {
       <button 
         onClick={() => !isLocked && onModuleStart(module.id)}
         disabled={isLocked}
-        className={`font-semibold py-3 px-4 sm:px-6 rounded-full transition-all duration-300 shadow-lg text-sm sm:text-base min-h-[48px] w-full sm:w-auto ${
+        className={`font-semibold py-3 px-4 sm:px-6 rounded-full transition-all duration-300 shadow-lg text-sm sm:text-base min-h-[48px] w-full active:scale-95 ${
           isLocked
             ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
             : 

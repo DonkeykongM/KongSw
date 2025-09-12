@@ -186,44 +186,44 @@ const FAQSection: React.FC<FAQSectionProps> = ({ onJoinClick, coursePrice }) => 
                   <button
                     type="button"
                     onClick={() => toggleItem(faq.id)}
-                    className="w-full px-6 py-6 text-left flex items-center justify-between hover:bg-slate-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                    className="w-full px-4 sm:px-6 py-4 sm:py-6 text-left flex items-center justify-between hover:bg-slate-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset active:bg-slate-100 min-h-[56px]"
                     aria-expanded={isOpen}
                     aria-controls={`faq-answer-${faq.id}`}
                   >
                     <div className="flex-grow">
-                      <div className="flex items-center space-x-3 mb-2">
+                      <div className="flex items-center space-x-2 sm:space-x-3 mb-1 sm:mb-2">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(faq.category)}`}>
                           {getCategoryLabel(faq.category)}
                         </span>
                       </div>
                       <h3 
-                        className="text-lg md:text-xl font-semibold text-slate-800 leading-tight"
+                        className="text-base sm:text-lg md:text-xl font-semibold text-slate-800 leading-tight pr-2"
                         itemProp="name"
                       >
                         {faq.question}
                       </h3>
                     </div>
-                    <div className="flex-shrink-0 ml-4">
+                    <div className="flex-shrink-0 ml-2 sm:ml-4 p-1">
                       {isOpen ? (
-                        <ChevronUp className="w-6 h-6 text-slate-600" />
+                        <ChevronUp className="w-5 h-5 sm:w-6 sm:h-6 text-slate-600" />
                       ) : (
-                        <ChevronDown className="w-6 h-6 text-slate-600" />
+                        <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-slate-600" />
                       )}
                     </div>
                   </button>
                   
                   <div
                     id={`faq-answer-${faq.id}`}
-                    className={`px-6 pb-6 transition-all duration-300 ease-in-out ${
+                    className={`px-4 sm:px-6 pb-4 sm:pb-6 transition-all duration-300 ease-in-out ${
                       isOpen ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 overflow-hidden'
                     }`}
                     itemScope
                     itemType="https://schema.org/Answer"
                     aria-hidden={!isOpen}
                   >
-                    <div className="pt-2 border-t border-slate-200">
+                    <div className="pt-2 sm:pt-3 border-t border-slate-200">
                       <p 
-                        className="faq-answer text-slate-700 leading-relaxed text-base md:text-lg"
+                        className="faq-answer text-slate-700 leading-relaxed text-sm sm:text-base md:text-lg"
                         itemProp="text"
                       >
                         {faq.answer}
@@ -238,7 +238,7 @@ const FAQSection: React.FC<FAQSectionProps> = ({ onJoinClick, coursePrice }) => 
 
         {/* CTA efter FAQ */}
         <div className="text-center mt-16">
-          <div className="bg-gradient-to-r from-blue-50 to-slate-50 rounded-xl p-8 border-2 border-blue-200 max-w-2xl mx-auto">
+          <div className="bg-gradient-to-r from-blue-50 to-slate-50 rounded-xl p-6 sm:p-8 border-2 border-blue-200 max-w-2xl mx-auto">
             <h3 className="text-2xl font-bold text-blue-800 mb-4">
               Har du fler frågor? Napoleon Hills AI hjälper dig!
             </h3>
@@ -247,9 +247,9 @@ const FAQSection: React.FC<FAQSectionProps> = ({ onJoinClick, coursePrice }) => 
             </p>
             <button
               onClick={onJoinClick}
-              className="bg-gradient-to-r from-blue-600 to-slate-700 hover:from-blue-700 hover:to-slate-800 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center space-x-3"
+              className="bg-gradient-to-r from-blue-600 to-slate-700 hover:from-blue-700 hover:to-slate-800 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 inline-flex items-center space-x-2 sm:space-x-3 text-sm sm:text-base min-h-[48px]"
             >
-              <span>Börja chatta med Napoleon Hill - 299 kr</span>
+              <span className="text-center">Börja chatta med Napoleon Hill - 299 kr</span>
             </button>
           </div>
         </div>

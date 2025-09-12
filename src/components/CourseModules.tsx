@@ -378,6 +378,19 @@ const CourseModules: React.FC<CourseModulesProps> = ({ onModuleStart }) => {
             />
           ))}
         </div>
+
+        {/* Mobile-Specific Help Section */}
+        <div className="mt-12 sm:hidden">
+          <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+            <h3 className="text-lg font-bold text-blue-800 mb-3">📱 Mobilhjälp</h3>
+            <div className="space-y-2 text-sm text-blue-700">
+              <p>• Tryck på modulkorten för att starta lektioner</p>
+              <p>• Swipa åt sidor för att navigera i lektioner</p>
+              <p>• Använd AI-mentorn (blå knapp nederst) för hjälp</p>
+              <p>• Rotera din telefon för bättre videovisning</p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
