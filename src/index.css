@@ -1,129 +1,471 @@
-@@ .. @@
- /* Ensure minimum touch targets */
- @layer base {
-   button, [role="button"] {
--    min-height: 44px;
--    min-width: 44px;
-+    min-height: 48px;
-+    min-width: 48px;
-   }
-   
-   input, select, textarea {
-     font-size: 16px; /* Prevents zoom on iOS */
-   }
-   
-   /* Enhanced mobile touch targets */
-   @media (max-width: 768px) {
-     button, [role="button"], a {
--      min-height: 48px;
--      min-width: 48px;
-+      min-height: 52px;
-+      min-width: 52px;
-     }
-     
-     /* Better mobile form controls */
-     input, select, textarea {
--      padding: 12px 16px;
-+      padding: 14px 16px;
-       border-radius: 12px;
-+      font-size: 16px; /* Prevents zoom on mobile Safari */
-     }
-     
-     /* Improved mobile typography */
-     h1 {
--      font-size: 1.875rem; /* 30px */
-+      font-size: 1.75rem; /* 28px */
-       line-height: 1.2;
-     }
-     
-     h2 {
--      font-size: 1.5rem; /* 24px */
-+      font-size: 1.375rem; /* 22px */
-       line-height: 1.3;
-     }
-     
-     h3 {
--      font-size: 1.25rem; /* 20px */
-+      font-size: 1.125rem; /* 18px */
-       line-height: 1.4;
-     }
-     
-     /* Better mobile spacing */
-     .container {
--      padding-left: 1rem;
--      padding-right: 1rem;
-+      padding-left: 0.75rem;
-+      padding-right: 0.75rem;
-     }
-+    
-+    /* Mobile-specific layout adjustments */
-+    .mobile-stack {
-+      flex-direction: column;
-+      gap: 0.75rem;
-+    }
-+    
-+    .mobile-center {
-+      text-align: center;
-+      align-items: center;
-+    }
-   }
-   
-+  /* Performance optimizations for mobile */
-+  @media (max-width: 768px) {
-+    /* Reduce animations on mobile for performance */
-+    * {
-+      animation-duration: 0.2s !important;
-+      transition-duration: 0.2s !important;
-+    }
-+    
-+    /* Improve scroll performance */
-+    body {
-+      -webkit-overflow-scrolling: touch;
-+      overflow-scrolling: touch;
-+    }
-+  }
-+  
-   /* Add touch-friendly interactions */
-   @media (hover: none) and (pointer: coarse) {
-     /* This targets touch devices */
-@@ -52,7 +86,7 @@
-     }
-     
-     button:active {
--      transform: scale(0.95);
-+      transform: scale(0.96);
-       transition: transform 0.1s;
-     }
-   }
-+  
-+  /* Improve text readability on mobile */
-+  @media (max-width: 768px) {
-+    p {
-+      line-height: 1.6;
-+      font-size: 0.9rem;
-+    }
-+    
-+    .text-xs {
-+      font-size: 0.75rem;
-+    }
-+    
-+    .text-sm {
-+      font-size: 0.875rem;
-+    }
-+  }
-+  
-+  /* Line clamping for mobile cards */
-+  .line-clamp-2 {
-+    display: -webkit-box;
-+    -webkit-line-clamp: 2;
-+    -webkit-box-orient: vertical;
-+    overflow: hidden;
-+  }
-+  
-+  .line-clamp-3 {
-+    display: -webkit-box;
-+    -webkit-line-clamp: 3;
-+    -webkit-box-orient: vertical;
-+    overflow: hidden;
-+  }
- }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hide scrollbar but keep functionality */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
+  }
+}
+
+/* Ensure minimum touch targets */
+@layer base {
+  button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  input, select, textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  /* Enhanced mobile touch targets */
+  @media (max-width: 768px) {
+    button, [role="button"], a {
+      min-height: 48px;
+      min-width: 48px;
+    }
+    
+    /* Better mobile form controls */
+    input, select, textarea {
+      padding: 12px 16px;
+      border-radius: 12px;
+    }
+    
+    /* Improved mobile typography */
+    h1 {
+      font-size: 1.875rem; /* 30px */
+      line-height: 1.2;
+    }
+    
+    h2 {
+      font-size: 1.5rem; /* 24px */
+      line-height: 1.3;
+    }
+    
+    h3 {
+      font-size: 1.25rem; /* 20px */
+      line-height: 1.4;
+    }
+    
+    /* Better mobile spacing */
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+  
+  /* Add touch-friendly interactions */
+  @media (hover: none) and (pointer: coarse) {
+    /* This targets touch devices */
+    button:hover {
+      /* Remove hover effects on touch devices */
+      transform: none;
+    }
+    
+    button:active {
+      transform: scale(0.95);
+      transition: transform 0.1s;
+    }
+  }
+}
+
+/* Napoleon Hill AI Brain Chatbot Custom Styling */
+#VG_OVERLAY_CONTAINER {
+  /* Improve chatbot visibility and readability */
+  --vg-primary: #1e3a8a !important;
+  --vg-primary-50: #eff6ff !important;
+  --vg-primary-100: #dbeafe !important;
+  --vg-background: #ffffff !important;
+  --vg-foreground: #1f2937 !important;
+}
+
+/* Chatbot Container Styling */
+#VG_OVERLAY_CONTAINER .vg-chat-container {
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Input Field Styling */
+#VG_OVERLAY_CONTAINER .vg-footer-input-wrapper {
+  background: #ffffff !important;
+  border: 2px solid #d1d5db !important;
+  color: #1f2937 !important;
+}
+
+#VG_OVERLAY_CONTAINER .vg-footer-input-wrapper:hover {
+  border-color: #1e3a8a !important;
+  background: #ffffff !important;
+}
+
+#VG_OVERLAY_CONTAINER .vg-footer-input-wrapper:focus-within {
+  border-color: #1e3a8a !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1) !important;
+}
+
+/* Input Text Styling */
+#VG_OVERLAY_CONTAINER input,
+#VG_OVERLAY_CONTAINER textarea {
+  color: #1f2937 !important;
+  background: transparent !important;
+}
+
+#VG_OVERLAY_CONTAINER input::placeholder,
+#VG_OVERLAY_CONTAINER textarea::placeholder {
+  color: #6b7280 !important;
+  opacity: 1 !important;
+}
+
+/* Button Styling */
+#VG_OVERLAY_CONTAINER button {
+  background: linear-gradient(45deg, #0891b2, #06b6d4, #10b981, #0891b2) !important;
+  background-size: 300% 300% !important;
+  animation: gradientShift 3s ease infinite !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 600 !important; 
+  border-radius: 9999px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Animated gradient keyframes */
+@keyframes gradientShift {
+  0% {
+  animation: tealGradientShift 4s ease infinite !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Add a subtle shimmer effect */
+#VG_OVERLAY_CONTAINER .vg-header-container::before,
+#VG_OVERLAY_CONTAINER #vg-header-container::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+  animation: shimmer 3s ease-in-out infinite !important;
+  z-index: 1 !important;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100% !important;
+  }
+  50% {
+    left: 100% !important;
+  }
+  100% {
+    left: 100% !important;
+  }
+}
+
+/* Ensure text stays readable */
+#VG_OVERLAY_CONTAINER .vg-header-container *,
+#VG_OVERLAY_CONTAINER #vg-header-container * {
+  position: relative !important;
+  z-index: 2 !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+}
+
+#VG_OVERLAY_CONTAINER button:hover {
+  background: linear-gradient(to right, #0369a1, #075985) !important;
+  transform: scale(1.05) translateY(-1px) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Message Bubbles */
+#VG_OVERLAY_CONTAINER .vg-message-user {
+  background: #1e3a8a !important;
+  color: #ffffff !important;
+}
+
+#VG_OVERLAY_CONTAINER .vg-message-ai {
+  background: #f8fafc !important;
+  color: #1f2937 !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+/* Header/Title */
+#VG_OVERLAY_CONTAINER .vg-header,
+#VG_OVERLAY_CONTAINER .vg-title {
+  color: #1f2937 !important;
+  font-weight: 700 !important;
+}
+
+/* Footer Container */
+#VG_OVERLAY_CONTAINER .vg-footer-mother-container {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+/* Text Elements */
+#VG_OVERLAY_CONTAINER * {
+  color: inherit !important;
+}
+
+/* Ensure all text is readable */
+#VG_OVERLAY_CONTAINER .vg-text-foreground {
+  color: #1f2937 !important;
+}
+
+#VG_OVERLAY_CONTAINER .vg-text-primary {
+  color: #1e3a8a !important;
+}
+
+/* Trigger Button (Floating Button) */
+#VG_OVERLAY_CONTAINER .vg-trigger-button {
+  background: linear-gradient(135deg, #1e3a8a, #f59e0b) !important;
+  box-shadow: 0 8px 32px rgba(30, 58, 138, 0.3) !important;
+}
+
+#VG_OVERLAY_CONTAINER .vg-trigger-button:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 12px 40px rgba(30, 58, 138, 0.4) !important;
+}
+
+/* Improve element visibility and labeling */
+#VG_OVERLAY_CONTAINER .vg-footer-input-wrapper {
+  position: relative !important;
+}
+
+#VG_OVERLAY_CONTAINER .vg-footer-input-wrapper::before {
+  content: "Ask Napoleon Hill anything..." !important;
+  position: absolute !important;
+  top: -24px !important;
+  left: 4px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #374151 !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Better button labels */
+#VG_OVERLAY_CONTAINER button[type="submit"]::after {
+  content: " Send" !important;
+  font-size: 12px !important;
+  margin-left: 4px !important;
+}
+
+/* Improve icon buttons with tooltips */
+#VG_OVERLAY_CONTAINER button:not([type="submit"]) {
+  position: relative !important;
+}
+
+#VG_OVERLAY_CONTAINER button:not([type="submit"]):hover::after {
+  content: attr(title) !important;
+  position: absolute !important;
+  bottom: 100% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: #374151 !important;
+  color: #ffffff !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  font-size: 11px !important;
+  white-space: nowrap !important;
+  z-index: 1000 !important;
+  margin-bottom: 4px !important;
+}
+
+/* Message type indicators */
+#VG_OVERLAY_CONTAINER .vg-message-user::before {
+  content: "You:" !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  display: block !important;
+  margin-bottom: 4px !important;
+}
+
+#VG_OVERLAY_CONTAINER .vg-message-ai::before {
+  content: "Napoleon Hill:" !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  color: #1e3a8a !important;
+  display: block !important;
+  margin-bottom: 4px !important;
+}
+
+/* Header improvement */
+#VG_OVERLAY_CONTAINER .vg-header::after {
+  content: " - Your Personal Success Mentor" !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  color: #6b7280 !important;
+}
+
+/* Input field placeholder improvement */
+#VG_OVERLAY_CONTAINER input::placeholder,
+#VG_OVERLAY_CONTAINER textarea::placeholder {
+  color: #9ca3af !important;
+  font-style: italic !important;
+}
+
+/* Add visual feedback for interactive elements */
+#VG_OVERLAY_CONTAINER button {
+  transition: all 0.2s ease !important;
+}
+
+#VG_OVERLAY_CONTAINER button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Clear visual separation between elements */
+#VG_OVERLAY_CONTAINER .vg-chat-container {
+  border: 2px solid #e5e7eb !important;
+}
+
+#VG_OVERLAY_CONTAINER .vg-footer-mother-container {
+  border-top: 2px solid #e5e7eb !important;
+}
+
+/* Force button labels and tooltips with stronger selectors */
+#VG_OVERLAY_CONTAINER button,
+#VG_OVERLAY_CONTAINER [role="button"],
+#VG_OVERLAY_CONTAINER .vg-button,
+#VG_OVERLAY_CONTAINER .button {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Add labels directly to common button patterns */
+#VG_OVERLAY_CONTAINER button:nth-of-type(1):not([type="submit"])::after,
+#VG_OVERLAY_CONTAINER .vg-footer button:nth-child(1)::after {
+  content: "📎 Attach" !important;
+  position: absolute !important;
+  bottom: -20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: #374151 !important;
+  color: #ffffff !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-size: 10px !important;
+  white-space: nowrap !important;
+  z-index: 9999 !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s !important;
+  pointer-events: none !important;
+}
+
+#VG_OVERLAY_CONTAINER button:nth-of-type(2):not([type="submit"])::after,
+#VG_OVERLAY_CONTAINER .vg-footer button:nth-child(2)::after {
+  content: "🎤 Voice" !important;
+  position: absolute !important;
+  bottom: -20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: #374151 !important;
+  color: #ffffff !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-size: 10px !important;
+  white-space: nowrap !important;
+  z-index: 9999 !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s !important;
+  pointer-events: none !important;
+}
+
+#VG_OVERLAY_CONTAINER button[type="submit"]::after,
+#VG_OVERLAY_CONTAINER .vg-send-button::after,
+#VG_OVERLAY_CONTAINER .send-button::after {
+  content: "➤ Send to Napoleon Hill" !important;
+  position: absolute !important;
+  bottom: -20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: #f59e0b !important;
+  color: #1f2937 !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  z-index: 9999 !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s !important;
+  pointer-events: none !important;
+}
+
+/* Show labels on hover */
+#VG_OVERLAY_CONTAINER button:hover::after,
+#VG_OVERLAY_CONTAINER [role="button"]:hover::after {
+  opacity: 1 !important;
+}
+
+/* Make sure footer has enough space for labels */
+#VG_OVERLAY_CONTAINER .vg-footer,
+#VG_OVERLAY_CONTAINER .vg-footer-mother-container {
+  padding-bottom: 30px !important;
+  overflow: visible !important;
+}
+
+/* Alternative approach: Add text inside buttons */
+#VG_OVERLAY_CONTAINER button:not([type="submit"]) {
+  min-width: 50px !important;
+  height: 40px !important;
+}
+
+/* Make send button more obvious */
+#VG_OVERLAY_CONTAINER button[type="submit"],
+#VG_OVERLAY_CONTAINER .vg-send-button {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  color: #1f2937 !important;
+  font-weight: 700 !important;
+  min-width: 60px !important;
+  border: 2px solid #92400e !important;
+}
+
+#VG_OVERLAY_CONTAINER button[type="submit"]:hover,
+#VG_OVERLAY_CONTAINER .vg-send-button:hover {
+  background: linear-gradient(135deg, #d97706, #b45309) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Force visible container */
+#VG_OVERLAY_CONTAINER {
+  z-index: 999999 !important;
+}
+
+/* Try to catch any button with data attributes */
+#VG_OVERLAY_CONTAINER [data-action]::before {
+  content: attr(data-action) !important;
+  position: absolute !important;
+  top: -18px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: #374151 !important;
+  color: #ffffff !important;
+  padding: 2px 6px !important;
+  border-radius: 3px !important;
+  font-size: 9px !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s !important;
+}
+
+#VG_OVERLAY_CONTAINER [data-action]:hover::before {
+  opacity: 1 !important;
+}
