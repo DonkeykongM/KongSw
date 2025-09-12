@@ -12,8 +12,31 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50">
+      {/* Header with Login */}
+      <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+            {/* Logo */}
+            <div className="flex items-center space-x-3">
+              <img src="https://j0bzpddd4j.ufs.sh/f/bwjssIq7FWHCTuLlG8ZtZKdCcYS0qzlf2bvOgIJwexGAMR89" alt="KongMindset Logo" className="w-8 h-8 sm:w-10 sm:h-10" />
+              <span className="text-xl sm:text-2xl font-display font-bold bg-gradient-to-r from-primary-700 to-primary-600 bg-clip-text text-transparent">
+                KongMindset
+              </span>
+            </div>
+            
+            {/* Login Button */}
+            <button
+              onClick={onJoinClick}
+              className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 inline-flex items-center space-x-2 min-h-[48px]"
+            >
+              <span>🔑 Logga in</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-16 md:pt-32 md:pb-24">
+      <section className="relative overflow-hidden pt-8 pb-16 md:pt-16 md:pb-24">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/5 via-transparent to-yellow-900/5"></div>
         <div className="container mx-auto px-4 sm:px-6 relative">
           <div className="text-center max-w-5xl mx-auto mb-16">
@@ -42,15 +65,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
             </button>
             
             {/* Login Button - Prominent */}
-            <div className="mb-8">
-              <button
-                onClick={onJoinClick}
-                className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 inline-flex items-center space-x-2 text-lg"
-              >
-                <span>🔑 Redan medlem? Logga in här</span>
-              </button>
-            </div>
-            
             {/* Savings Text */}
             <div className="text-center mb-8">
               <p className="text-sm text-slate-500 line-through">1,400 kr</p>
