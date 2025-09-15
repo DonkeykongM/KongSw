@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { Brain, BookOpen, Star, Trophy, Users, CheckCircle, Play, Download, Gift, Target, Clock, Shield, HelpCircle, ChevronDown, ChevronUp, ArrowRight, Zap, Award, Sparkles } from 'lucide-react';
 import FAQSection from './FAQSection';
 import Footer from './Footer';
+import ContactPage from './ContactPage';
+import PrivacyPolicy from './PrivacyPolicy';
+import CookiePolicy from './CookiePolicy';
+import TermsOfService from './TermsOfService';
 
 interface LandingPageProps {
   onJoinClick: () => void;
@@ -10,6 +14,60 @@ interface LandingPageProps {
 export default function LandingPage({ onJoinClick }: LandingPageProps) {
   const coursePrice = "299 kr";
   const originalPrice = "1,400 kr";
+  const [currentView, setCurrentView] = useState<'landing' | 'contact' | 'privacy' | 'cookies' | 'terms'>('landing');
+
+  const handleNavigate = (page: string) => {
+    switch (page) {
+      case 'home':
+        setCurrentView('landing');
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        break;
+      case 'modules':
+        // Trigger authentication for protected content
+        onJoinClick();
+        break;
+      case 'resources':
+        // Trigger authentication for protected content
+        onJoinClick();
+        break;
+      case 'contact':
+        setCurrentView('contact');
+        break;
+      case 'privacy-policy':
+        setCurrentView('privacy');
+        break;
+      case 'cookie-policy':
+        setCurrentView('cookies');
+        break;
+      case 'terms-of-service':
+        setCurrentView('terms');
+        break;
+      default:
+        setCurrentView('landing');
+    }
+  };
+
+  const handleBackToLanding = () => {
+    setCurrentView('landing');
+  };
+
+  // Render different views based on current selection
+  if (currentView === 'contact') {
+    return <ContactPage onBack={handleBackToLanding} onSignOut={() => Promise.resolve({ error: null })} />;
+  }
+
+  if (currentView === 'privacy') {
+    return <PrivacyPolicy onBack={handleBackToLanding} />;
+  }
+
+  if (currentView === 'cookies') {
+    return <CookiePolicy onBack={handleBackToLanding} />;
+  }
+
+  if (currentView === 'terms') {
+    return <TermsOfService onBack={handleBackToLanding} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50">
@@ -379,7 +437,7 @@ export default function LandingPage({ onJoinClick }: LandingPageProps) {
       <FAQSection onJoinClick={onJoinClick} coursePrice={coursePrice} />
 
       {/* Footer */}
-      <Footer />
+      <Footer onNavigate={handleNavigate} />
     </div>
   );
 }
