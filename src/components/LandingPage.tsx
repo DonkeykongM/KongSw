@@ -379,3 +379,4 @@ export default function LandingPage({ onJoinClick }: LandingPageProps) {
 
     </div>
   );
+}
