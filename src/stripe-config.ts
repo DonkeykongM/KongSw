@@ -15,8 +15,8 @@ export const stripeProducts: StripeProduct[] = [
     name: 'Paid Main Course offer',
     description: 'Komplett tillgång till Napoleon Hills Tänk och Bli Rik kurs med 13 interaktiva moduler, Napoleon Hill AI-mentor och gratis originalbok nedladdning.',
     mode: 'payment',
-    price: 299.00,
-    currency: 'sek'
+    price: 299,
+    currency: 'SEK'
   }
 ];
 
