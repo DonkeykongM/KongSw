@@ -11,7 +11,7 @@ export interface StripeProduct {
 export const stripeProducts: StripeProduct[] = [
   {
     id: 'prod_R5drGXUdEEyZmu',
-    priceId: 'price_1S4mL9Bu2e08097PVWyceE43',
+    priceId: 'price_1S4mL9Bu2e08097PVWyceE44',
     name: 'Paid Main Course offer',
     description: 'Komplett tillgång till Napoleon Hills Tänk och Bli Rik kurs med 13 interaktiva moduler, Napoleon Hill AI-mentor och gratis originalbok nedladdning.',
     mode: 'payment',
