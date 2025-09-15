@@ -166,6 +166,7 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack, onSignOut }) => {
                     disabled={submitting}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Ange ditt fullständiga namn"
+                     autoComplete="name"
                   />
                 </div>
 
@@ -183,19 +184,19 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack, onSignOut }) => {
                     disabled={submitting}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Ange din e-postadress"
+                     autoComplete="email"
                   />
                 </div>
 
                 <div>
                   <label htmlFor="subject" className="block text-sm font-medium text-neutral-700 mb-2">
-                    Ämne *
+                    Ämne
                   </label>
                   <select
                     id="subject"
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
-                    required
                     disabled={submitting}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -223,13 +224,41 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack, onSignOut }) => {
                     rows={6}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Beskriv din fråga eller ditt bekymmer i detalj..."
+                     maxLength={2000}
                   />
+                   <div className="text-right text-sm text-gray-500 mt-1">
+                     {formData.message.length}/2000 tecken
+                   </div>
                 </div>
+
+                 {/* GDPR Consent */}
+                 <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                   <div className="flex items-start space-x-3">
+                     <input
+                       type="checkbox"
+                       id="gdpr-consent"
+                       required
+                       disabled={submitting}
+                       className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                     />
+                     <label htmlFor="gdpr-consent" className="text-sm text-blue-800 cursor-pointer">
+                       Jag samtycker till att KongMindset behandlar mina personuppgifter enligt vår{' '}
+                       <button
+                         type="button"
+                         className="underline hover:no-underline font-medium"
+                         onClick={() => window.open('#privacy-policy', '_blank')}
+                       >
+                         integritetspolicy
+                       </button>
+                       . Uppgifterna används endast för att svara på din förfrågan. *
+                     </label>
+                   </div>
+                 </div>
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-h-[48px]"
                 >
                   <Send className="w-5 h-5" />
                   <span>{submitting ? 'Skickar...' : 'Skicka meddelande'}</span>
@@ -237,8 +266,12 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack, onSignOut }) => {
               </form>
 
               <div className="mt-6 text-center text-sm text-gray-500">
-                <p>* Obligatoriska fält</p>
-                <p>Vi svarar vanligtvis inom 24 timmar</p>
+                <p className="mb-2">* Obligatoriska fält</p>
+                <div className="space-y-1">
+                  <p>📧 Vi svarar vanligtvis inom 24 timmar</p>
+                  <p>🔒 Dina uppgifter behandlas säkert enligt GDPR</p>
+                  <p>🇸🇪 Support på svenska och engelska</p>
+                </div>
               </div>
             </div>
           </div>

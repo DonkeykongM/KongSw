@@ -9,6 +9,9 @@ import ModuleDetail from './components/ModuleDetail';
 import ResourcesPage from './components/ResourcesPage';
 import ContactPage from './components/ContactPage';
 import ProfilePage from './components/ProfilePage';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import CookiePolicy from './components/CookiePolicy';
+import TermsOfService from './components/TermsOfService';
 import Footer from './components/Footer';
 import SuccessPage from './components/SuccessPage';
 import { courseContent } from './data/courseContent';
@@ -143,6 +146,30 @@ function App() {
     );
   }
 
+  if (currentPage === 'privacy-policy') {
+    return (
+      <LanguageProvider>
+        <PrivacyPolicy onBack={handleBackToHome} />
+      </LanguageProvider>
+    );
+  }
+
+  if (currentPage === 'cookie-policy') {
+    return (
+      <LanguageProvider>
+        <CookiePolicy onBack={handleBackToHome} />
+      </LanguageProvider>
+    );
+  }
+
+  if (currentPage === 'terms-of-service') {
+    return (
+      <LanguageProvider>
+        <TermsOfService onBack={handleBackToHome} />
+      </LanguageProvider>
+    );
+  }
+
   return (
     <LanguageProvider>
       <div className="flex flex-col min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50">
@@ -152,7 +179,7 @@ function App() {
             <CourseModules onModuleStart={handleModuleStart} />
           )}
         </main>
-        <Footer />
+        <Footer onNavigate={handleNavigation} />
       </div>
     </LanguageProvider>
   );

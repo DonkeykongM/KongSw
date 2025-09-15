@@ -380,5 +380,3 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
     </div>
   );
 };
-
-export default LandingPage;
