@@ -3,7 +3,7 @@ import { Clock, Trophy, Star, ArrowRight, CheckCircle, Target, Users, BookOpen, 
 import ModuleCard from './ModuleCard';
 import { courseContent } from '../data/courseContent';
 import SEOHead from './SEOHead';
-import { getCompletedWeeksCount } from '../utils/progressStorage';
+import { getCompletedWeeksCount, getModuleProgress } from '../utils/progressStorage';
 
 interface CourseModulesProps {
   onModuleStart: (moduleId: number) => void;
@@ -352,6 +352,9 @@ const CourseModules: React.FC<CourseModulesProps> = ({ onModuleStart }) => {
               key={module.id} 
               module={module} 
               onModuleStart={onModuleStart}
+              isLocked={module.id > 1 && completedWeeks < module.id - 1}
+              isCompleted={completedWeeks >= module.id}
+              progress={getModuleProgress(module.id)}
             />
           ))}
         </div>
