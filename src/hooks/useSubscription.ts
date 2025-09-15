@@ -84,43 +84,35 @@ export const useSubscription = (user: User | null) => {
   }, [user]);
 
   const getActiveProduct = () => {
+    if (subscription?.price_id) {
+      return getProductByPriceId(subscription.price_id);
+    }
+    
     // Check if user has completed orders (for one-time payments)
     const completedOrder = orders.find(order => 
       order.payment_status === 'paid' && order.order_status === 'completed'
     );
     
     if (completedOrder) {
-      // For one-time payments, return the main course product
-      const mainCourseProduct = getProductByPriceId('price_1S4mL9Bu2e08097PVWyceE43');
-      if (mainCourseProduct) {
-        return mainCourseProduct;
-      }
-    }
-    
-    // Check for active subscription (fallback)
-    if (subscription?.price_id) {
-      return getProductByPriceId(subscription.price_id);
+      // For one-time payments, we assume they have access to the main course
+      return getProductByPriceId('price_1S4mL9Bu2e08097PVWyceE43');
     }
     
     return null;
   };
 
   const hasActiveAccess = () => {
+    // Check for active subscription
+    if (subscription?.subscription_status === 'active') {
+      return true;
+    }
+    
     // Check for completed one-time payment
     const completedOrder = orders.find(order => 
       order.payment_status === 'paid' && order.order_status === 'completed'
     );
     
-    if (completedOrder) {
-      return true;
-    }
-    
-    // Check for active subscription (fallback)
-    if (subscription?.subscription_status === 'active') {
-      return true;
-    }
-    
-    return false;
+    return !!completedOrder;
   };
 
   return {

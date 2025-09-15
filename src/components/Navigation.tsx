@@ -70,9 +70,8 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
                 <div className="text-right">
                   <span className="text-sm text-neutral-600">Välkommen, {profile?.display_name || user?.email?.split('@')[0] || 'Användare'}</span>
                   {hasAccess && activeProduct && (
-                    <div className="text-xs text-green-600 font-medium flex items-center space-x-1">
-                      <span className="text-green-500">✅</span>
-                      <span>{activeProduct.name}</span>
+                    <div className="text-xs text-green-600 font-medium">
+                      ✅ {activeProduct.name}
                     </div>
                   )}
                 </div>
@@ -127,9 +126,8 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
                   <div>
                     <span className="text-sm font-medium text-neutral-700">Välkommen, {profile?.display_name || user?.email?.split('@')[0] || 'Elev'}</span>
                     {hasAccess && activeProduct && (
-                      <div className="text-xs text-green-600 font-medium mt-1 flex items-center space-x-1">
-                        <span className="text-green-500">✅</span>
-                        <span>{activeProduct.name}</span>
+                      <div className="text-xs text-green-600 font-medium mt-1">
+                        ✅ {activeProduct.name}
                       </div>
                     )}
                   </div>

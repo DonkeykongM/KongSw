@@ -40,9 +40,9 @@ const faqs: FAQ[] = [
   },
   {
     id: 5,
-    question: "Kostar kursen verkligen bara 299 SEK?",
-    answer: "Ja, vårt specialerbjudande ger dig fullständig kurstillgång för endast 299 SEK som en engångskostnad! Det här är otroligt värde jämfört med traditionell framgångscoaching som kostar 2 000-5 000 SEK per månad. Du får 13 interaktiva moduler, Napoleon Hills AI-mentor, den ursprungliga boken plus livstidsåtkomst till alla uppdateringar - ett totalt värde på över 1 400 SEK för endast 299 SEK! Efter de första 100 medlemmarna blir priset 299 SEK per månad.",
-    keywords: ["napoleon hill kurs pris", "tänk och bli rik kurs kostnad", "framgångskurs sverige", "299 sek"],
+    question: "Kostar kursen verkligen bara 299 kr?",
+    answer: "Ja, vårt specialerbjudande ger dig fullständig kurstillgång för endast 299 kr som en engångskostnad! Det här är otroligt värde jämfört med traditionell framgångscoaching som kostar 2,000-5,000 kr per månad. Du får 13 interaktiva moduler, Napoleon Hills AI-mentor, den ursprungliga boken plus livstidsåtkomst till alla uppdateringar - ett totalt värde på över 1,400 kr för endast 299 kr! Efter de första 100 medlemmarna blir priset 299 kr per månad.",
+    keywords: ["napoleon hill kurs pris", "tänk och bli rik kurs kostnad", "framgångskurs sverige", "299 kr kurs"],
     category: 'payment'
   },
   {
@@ -249,7 +249,7 @@ const FAQSection: React.FC<FAQSectionProps> = ({ onJoinClick, coursePrice }) => 
               onClick={onJoinClick}
               className="bg-gradient-to-r from-blue-600 to-slate-700 hover:from-blue-700 hover:to-slate-800 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center space-x-3"
             >
-              <span>Börja chatta med Napoleon Hill - {coursePrice}</span>
+              <span>Börja chatta med Napoleon Hill - 299 kr</span>
             </button>
           </div>
         </div>
