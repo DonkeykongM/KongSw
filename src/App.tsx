@@ -61,7 +61,11 @@ function App() {
   };
 
   const handleSuccessContinue = () => {
-    setCurrentPage('home');
+    if (user) {
+      setCurrentPage('home');
+    } else {
+      setShowAuthForm(true);
+    }
   };
 
   // Show loading spinner while checking auth
@@ -73,6 +77,15 @@ function App() {
           <p className="text-neutral-600">Loading...</p>
         </div>
       </div>
+    );
+  }
+
+  // Check for payment success first, before user authentication
+  if (currentPage === 'success') {
+    return (
+      <LanguageProvider>
+        <SuccessPage onContinue={handleSuccessContinue} user={user} />
+      </LanguageProvider>
     );
   }
 
@@ -92,13 +105,6 @@ function App() {
     );
   }
 
-  if (currentPage === 'success') {
-    return (
-      <LanguageProvider>
-        <SuccessPage onContinue={handleSuccessContinue} />
-      </LanguageProvider>
-    );
-  }
   if (currentPage === 'module-detail' && selectedModule) {
     return (
       <LanguageProvider>

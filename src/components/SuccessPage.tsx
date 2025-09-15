@@ -1,12 +1,14 @@
 import React from 'react';
 import { CheckCircle, Download, Brain, BookOpen, ArrowRight, Mail, Gift, Star, Trophy } from 'lucide-react';
+import { User as SupabaseUser } from '@supabase/supabase-js';
 import { stripeProducts } from '../stripe-config';
 
 interface SuccessPageProps {
   onContinue: () => void;
+  user: SupabaseUser | null;
 }
 
-const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue }) => {
+const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
   const mainCourse = stripeProducts.find(p => p.name === 'Paid Main Course offer');
   const coursePrice = mainCourse ? `${mainCourse.price} kr` : '299 kr';
   
@@ -26,10 +28,17 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue }) => {
               <h2 className="text-2xl font-bold text-green-800 mb-4">
                 Tack för din investering på 299 kr!
               </h2>
-              <p className="text-lg text-green-700 leading-relaxed">
-                Du har nu gjort den viktigaste investeringen i ditt liv - en investering i dig själv och din framtid. 
-                Ditt konto har skapats automatiskt med den e-postadress och det lösenord du angav.
-              </p>
+              {user ? (
+                <p className="text-lg text-green-700 leading-relaxed">
+                  Du har nu gjort den viktigaste investeringen i ditt liv - en investering i dig själv och din framtid. 
+                  Du är redan inloggad och redo att börja din transformationsresa!
+                </p>
+              ) : (
+                <p className="text-lg text-green-700 leading-relaxed">
+                  Du har nu gjort den viktigaste investeringen i ditt liv - en investering i dig själv och din framtid. 
+                  Ditt konto har skapats automatiskt med den e-postadress och det lösenord du angav vid köpet.
+                </p>
+              )}
             </div>
             
             {/* Welcome Message */}
