@@ -12,8 +12,9 @@ interface LandingPageProps {
 }
 
 export default function LandingPage({ onJoinClick }: LandingPageProps) {
-  const coursePrice = "299 kr";
-  const originalPrice = "1,400 kr";
+  const mainCourse = stripeProducts.find(p => p.name === 'Paid Main Course offer');
+  const coursePrice = mainCourse ? `${mainCourse.price} ${mainCourse.currency}` : '299 SEK';
+  const originalPrice = "1 400 SEK";
   const [currentView, setCurrentView] = useState<'landing' | 'contact' | 'privacy' | 'cookies' | 'terms'>('landing');
 
   const handleNavigate = (page: string) => {
@@ -120,14 +121,14 @@ export default function LandingPage({ onJoinClick }: LandingPageProps) {
               onClick={onJoinClick}
               className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-6 py-3 rounded-full inline-block mb-8 shadow-2xl animate-pulse transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
             >
-              <span className="font-bold text-lg">🔥 2025 KAMPANJ: 299 kr specialpris!</span>
+              <span className="font-bold text-lg">🔥 2025 KAMPANJ: {coursePrice} specialpris!</span>
             </button>
             
             {/* Login Button - Prominent */}
             {/* Savings Text */}
             <div className="text-center mb-8">
               <p className="text-sm text-slate-500 line-through">1,400 kr</p>
-              <p className="text-green-600 font-bold">Du sparar 1,101 kr!</p>
+              <p className="text-green-600 font-bold">Du sparar 1 101 SEK!</p>
             </div>
             
             {/* Guarantee & Campaign Info */}
@@ -195,9 +196,9 @@ export default function LandingPage({ onJoinClick }: LandingPageProps) {
               <div className="bg-gradient-to-r from-green-600 to-emerald-700 rounded-full p-4 w-16 h-16 mb-6 shadow-lg">
                 <Gift className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">GRATIS Originalbok</h3>
-              <p className="text-slate-600 mb-4">Komplett PDF av "Tänk och Bli Rik" - din att behålla för alltid</p>
-              <div className="text-sm text-green-600 font-semibold">Värde: 200 kr</div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">{mainCourse?.name}</h3>
+              <p className="text-slate-600 mb-4">{mainCourse?.description}</p>
+              <div className="text-sm text-green-600 font-semibold">Pris: {coursePrice}</div>
             </div>
 
             {/* Feature 4 */}
@@ -238,7 +239,7 @@ export default function LandingPage({ onJoinClick }: LandingPageProps) {
               className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl p-8 border-4 border-yellow-300 max-w-2xl mx-auto shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer w-full"
             >
               <h3 className="text-3xl font-bold text-yellow-800 mb-4">
-                Totalt värde: 1,400+ kr
+                Totalt värde: {originalPrice}+
               </h3>
               <p className="text-2xl text-yellow-700 mb-4">
                 Du betalar endast: <span className="text-4xl font-bold text-green-600">{coursePrice}</span>

@@ -10,7 +10,7 @@ interface SuccessPageProps {
 
 const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
   const mainCourse = stripeProducts.find(p => p.name === 'Paid Main Course offer');
-  const coursePrice = mainCourse ? `${mainCourse.price} kr` : '299 kr';
+  const coursePrice = mainCourse ? `${mainCourse.price} ${mainCourse.currency}` : '299 SEK';
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
@@ -26,7 +26,7 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-green-200 max-w-4xl mx-auto">
             <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-xl p-6 mb-8">
               <h2 className="text-2xl font-bold text-green-800 mb-4">
-                Tack för din investering på 299 kr!
+                Tack för din investering på {coursePrice}!
               </h2>
               {user ? (
                 <p className="text-lg text-green-700 leading-relaxed">
@@ -98,7 +98,7 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
               Totalt värde: 1 400+ kr
             </h3>
             <p className="text-xl text-yellow-700">
-              Du betalade endast: <span className="text-3xl font-bold text-green-600">299 kr</span>
+              Du betalade endast: <span className="text-3xl font-bold text-green-600">{coursePrice}</span>
             </p>
             <p className="text-yellow-600 font-semibold mt-2">
               Det är 79% rabatt - din bästa investering någonsin! 🎯
