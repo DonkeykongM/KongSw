@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Brain, BookOpen, Star, Trophy, Users, CheckCircle, Play, Download, Gift, Target, Clock, Shield, HelpCircle, ChevronDown, ChevronUp, ArrowRight, Zap, Award, Sparkles } from 'lucide-react';
 import FAQSection from './FAQSection';
+import Footer from './Footer';
 
 interface LandingPageProps {
   onJoinClick: () => void;
@@ -377,6 +378,8 @@ export default function LandingPage({ onJoinClick }: LandingPageProps) {
       {/* FAQ Section */}
       <FAQSection onJoinClick={onJoinClick} coursePrice={coursePrice} />
 
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

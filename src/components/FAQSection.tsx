@@ -90,8 +90,8 @@ const faqs: FAQ[] = [
   {
     id: 12,
     question: "Finns det några dolda kostnader eller återkommande avgifter?",
-    answer: "Nej, absolut inga dolda kostnader! Du betalar endast 10 kr en gång och får sedan livstidsåtkomst till hela kursen. Det finns inga månadsavgifter, årsavgifter eller andra dolda kostnader. Din enda kostnad är 10 kr för komplett tillgång till alla 13 moduler, Napoleon Hills AI-mentor, originalboken och alla framtida uppdateringar. Det här är en engångsinvestering som kan förändra ditt liv.",
-    keywords: ["inga dolda kostnader", "engångskostnad", "livstidsåtkomst", "ingen månadsavgift"],
+    answer: "Nej, absolut inga dolda kostnader! Du betalar endast 299 kr en gång och får sedan livstidsåtkomst till hela kursen. Det finns inga månadsavgifter, årsavgifter eller andra dolda kostnader. Din enda kostnad är 299 kr för komplett tillgång till alla 13 moduler, Napoleon Hills AI-mentor, originalboken och alla framtida uppdateringar. Det här är en engångsinvestering som kan förändra ditt liv.",
+    keywords: ["inga dolda kostnader", "engångskostnad", "livstidsåtkomst", "ingen månadsavgift", "299 kr"],
     category: 'payment'
   }
 ];

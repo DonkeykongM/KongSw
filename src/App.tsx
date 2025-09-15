@@ -179,7 +179,6 @@ function App() {
             <CourseModules onModuleStart={handleModuleStart} />
           )}
         </main>
-        <Footer onNavigate={handleNavigation} />
       </div>
     </LanguageProvider>
   );
