@@ -204,7 +204,7 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4 max-w-md mx-auto">
               <p className="text-green-700 font-semibold text-sm">
                 💚 30 dagars pengarna-tillbaka-garanti<br/>
-                📧 Support: support@kongmindset.com
+                📧 Support: support@kongmindset.se
               </p>
             </div>
           </div>

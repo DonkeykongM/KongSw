@@ -188,8 +188,7 @@ This project is licensed under the MIT License. See LICENSE file for details.
 ## Support
 
 For questions or support:
-- Email: support@kongmindet.com
-- Email: support@kongmindset.com
+- Email: support@kongmindset.se
 - Phone: +1 (555) 123-4567
 
 ## Acknowledgments

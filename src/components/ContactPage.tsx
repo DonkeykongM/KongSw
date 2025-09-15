@@ -138,7 +138,7 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack, onSignOut }) => {
                   <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-sm text-green-600 font-medium">Meddelande skickat!</p>
-                    <p className="text-sm text-green-600">Vi återkommer till dig inom 24 timmar.</p>
+                    <p className="text-neutral-600">support@kongmindset.se</p>
                   </div>
                 </div>
               )}
