@@ -97,35 +97,9 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack, onSignOut }) => {
                       <p className="text-neutral-600">support@kongmindset.com</p>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-4">
-                    <div className="bg-primary-100 p-3 rounded-full">
-                      <Phone className="w-5 h-5 text-primary-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-neutral-800">Telefon</p>
-                      <p className="text-neutral-600">+46 8 123 456 78</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-4">
-                    <div className="bg-primary-100 p-3 rounded-full">
-                      <MapPin className="w-5 h-5 text-primary-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-neutral-800">Adress</p>
-                      <p className="text-neutral-600">Framgångsgatan 123<br />123 45 Stockholm, Sverige</p>
-                    </div>
-                  </div>
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-xl font-display font-semibold text-primary-800 mb-4">Kurssupporttider</h3>
-                <div className="bg-primary-50 rounded-lg p-4">
-                  <p className="text-primary-800 font-medium">Måndag - Fredag: 09:00 - 18:00 CET</p>
-                  <p className="text-primary-600">Lördag: 10:00 - 16:00 CET</p>
-                  <p className="text-primary-600">Söndag: Stängt</p>
-                </div>
-              </div>
             </div>
 
             {/* Contact Form */}
