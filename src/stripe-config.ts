@@ -11,12 +11,12 @@ export interface StripeProduct {
 export const stripeProducts: StripeProduct[] = [
   {
     id: 'prod_R5drGXUdEEyZmu',
-    priceId: 'price_1S4mL9Bu2e08097PVWyceE44',
+    priceId: 'price_1S4mL9Bu2e08097PVWyceE43',
     name: 'Paid Main Course offer',
-    description: 'Komplett tillgång till Napoleon Hills Tänk och Bli Rik kurs med 13 interaktiva moduler, Napoleon Hill AI-mentor och gratis originalbok nedladdning.',
+    description: 'Komplett KongMindset-kurs med livstidsåtkomst till alla 13 moduler, Napoleon Hill AI-mentor och gratis originalbok. Transformera ditt tankesätt och lär dig Napoleon Hills beprövade framgångsprinciper.',
     mode: 'payment',
-    price: 299.00,
-    currency: 'sek'
+    price: 299,
+    currency: 'SEK'
   }
 ];
 
