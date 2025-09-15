@@ -146,8 +146,8 @@ const CourseModules: React.FC<CourseModulesProps> = ({ onModuleStart }) => {
               <Clock className="w-8 h-8 text-amber-600" />
               <h2 className="text-2xl font-bold text-amber-800">13 Veckor Per Princip - Ingen Genväg Till Framgång</h2>
             </div>
-            <p className="text-amber-700 text-lg mb-4 max-w-2xl mx-auto">
-              Napoleon Hill studerade 500+ miljonärer i 20 år och upptäckte att bestående framgång kräver tid och repetition för att varje princip ska sätta sig i undermedvetandet. 13 veckor ger dig tid att verkligen internalisera varje princip.
+            <p className="text-lg md:text-xl text-neutral-600 max-w-3xl mx-auto font-light mb-6">
+              Bemästra Napoleon Hills 13 framgångsprinciper genom strukturerade veckomoduler.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-amber-600">
               <div className="bg-white/60 rounded-lg p-3">
