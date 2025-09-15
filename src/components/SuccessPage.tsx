@@ -50,7 +50,7 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
               <div className="text-blue-700 space-y-3">
                 <p className="flex items-start">
                   <span className="text-green-500 mr-2 text-xl">✅</span>
-                  <span><strong>Ditt konto är redo:</strong> Du kan nu logga in med din e-post och det lösenord du valde</span>
+                  <span><strong>Ditt konto är redo:</strong> {user ? 'Du är redan inloggad och kan börja direkt!' : 'Du kan nu logga in med din e-post och det lösenord du valde'}</span>
                 </p>
                 <p className="flex items-start">
                   <span className="text-green-500 mr-2 text-xl">✅</span>
@@ -118,8 +118,8 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
               <div className="flex items-start space-x-4 bg-blue-50 rounded-lg p-4">
                 <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">1</div>
                 <div>
-                  <h3 className="font-bold text-blue-800">Logga in på ditt konto</h3>
-                  <p className="text-blue-700">Använd din e-post och lösenord som du angav vid köpet</p>
+                  <h3 className="font-bold text-blue-800">{user ? 'Du är redan inloggad!' : 'Logga in på ditt konto'}</h3>
+                  <p className="text-blue-700">{user ? 'Perfekt! Du kan börja med modulerna direkt.' : 'Använd din e-post och lösenord som du angav vid köpet'}</p>
                 </div>
               </div>
               
@@ -192,10 +192,11 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
             onClick={onContinue}
             className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-4 px-12 rounded-full text-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 inline-flex items-center space-x-3"
           >
-            <span>Starta din transformation nu</span>
+            <span>{user ? 'Starta din transformation nu' : 'Logga in och börja'}</span>
             <ArrowRight className="w-6 h-6" />
           </button>
           
+          {!user && (
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               <strong>Påminnelse:</strong> Logga in med e-posten och lösenordet du använde vid köpet
@@ -207,6 +208,7 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
               </p>
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>
