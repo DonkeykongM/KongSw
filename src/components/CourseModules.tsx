@@ -134,9 +134,6 @@ const CourseModules: React.FC<CourseModulesProps> = ({ onModuleStart }) => {
       
       <div className="container mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-6 bg-gradient-to-r from-primary-700 to-primary-600 bg-clip-text text-transparent">
-            13 Veckors Transformation: Napoleon Hills Framgångsprinciper
-          </h1>
           <p className="text-lg md:text-xl text-neutral-600 max-w-3xl mx-auto font-light mb-6">
             Transformera ditt liv genom 13 veckors systematisk träning baserad på Napoleon Hills tidlösa visdom från "Tänk och Bli Rik." Varje vecka fokuserar på en princip som ska integreras djupt i ditt dagliga liv.
           </p>
