@@ -6,7 +6,7 @@ interface LandingPageProps {
   onJoinClick: () => void;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
+export default function LandingPage({ onJoinClick }: LandingPageProps) {
   const coursePrice = "299 kr";
   const originalPrice = "1,400 kr";
 
@@ -379,4 +379,3 @@ const LandingPage: React.FC<LandingPageProps> = ({ onJoinClick }) => {
 
     </div>
   );
-};
