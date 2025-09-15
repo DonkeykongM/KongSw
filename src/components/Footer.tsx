@@ -20,10 +20,6 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               Transformera ditt tankesätt och bygga rikedom med Napoleon Hills tidlösa principer. 
               Bemästra de 13 framgångsprinciperna från "Tänk och Bli Rik."
             </p>
-            <div className="text-neutral-400 text-sm">
-              <p>KongMindset AB</p>
-              <p>Org.nr: 559123-4567</p>
-            </div>
           </div>
 
           {/* Quick Links */}
@@ -92,26 +88,6 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   support@kongmindset.se
                 </a>
               </div>
-              <div className="flex items-center space-x-2 text-neutral-300 text-sm">
-                <Phone className="w-4 h-4 flex-shrink-0" />
-                <a href="tel:+46812345678" className="hover:text-white transition-colors">
-                  +46 8 123 456 78
-                </a>
-              </div>
-              <div className="flex items-start space-x-2 text-neutral-300 text-sm">
-                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p>Framgångsgatan 123</p>
-                  <p>123 45 Stockholm</p>
-                  <p>Sverige</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="text-neutral-400 text-sm">
-              <p className="font-semibold">Supporttider:</p>
-              <p>Mån-Fre: 09:00-18:00 CET</p>
-              <p>Lör: 10:00-16:00 CET</p>
             </div>
           </div>
         </div>
@@ -128,13 +104,6 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <span>💳 Säkra betalningar</span>
               <span>🛡️ GDPR-kompatibel</span>
             </div>
-          </div>
-          
-          <div className="mt-4 text-center text-neutral-400 text-xs">
-            <p>
-              KongMindset bygger på Napoleon Hills klassiska verk "Think and Grow Rich" (1937) som är i public domain. 
-              Vårt kursinnehåll och AI-mentor är originalverk skyddade av upphovsrätt.
-            </p>
           </div>
         </div>
       </div>
