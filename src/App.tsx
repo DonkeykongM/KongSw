@@ -57,6 +57,7 @@ function App() {
   };
 
   const handleBackToLanding = () => {
+   setCurrentPage('home');
     setShowAuthForm(false);
   };
 
@@ -64,6 +65,7 @@ function App() {
     if (user) {
       setCurrentPage('home');
     } else {
+     setCurrentPage('auth'); // Reset current page to allow auth form to show
       setShowAuthForm(true);
     }
   };
@@ -91,6 +93,15 @@ function App() {
 
   // Show auth form if not logged in
   if (!user) {
+   // Handle auth form after success page
+   if (currentPage === 'auth' || showAuthForm) {
+     return (
+       <LanguageProvider>
+         <AuthForm onSignIn={signIn} onSignUp={signUp} onBack={handleBackToLanding} />
+       </LanguageProvider>
+     );
+   }
+   
     if (!showAuthForm) {
       return (
         <LanguageProvider>
@@ -98,11 +109,6 @@ function App() {
         </LanguageProvider>
       );
     }
-    return (
-      <LanguageProvider>
-        <AuthForm onSignIn={signIn} onSignUp={signUp} onBack={handleBackToLanding} />
-      </LanguageProvider>
-    );
   }
 
   if (currentPage === 'module-detail' && selectedModule) {
