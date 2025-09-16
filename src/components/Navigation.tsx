@@ -127,7 +127,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
                     <span className="text-sm font-medium text-neutral-700">Välkommen, {profile?.display_name || user?.email?.split('@')[0] || 'Elev'}</span>
                     {hasAccess && activeProduct && (
                       <div className="text-xs text-green-600 font-medium mt-1">
-                        ✅ {activeProduct.name}
+                        ✅ KongMindset Premium - Livstidsåtkomst
                       </div>
                     )}
                   </div>

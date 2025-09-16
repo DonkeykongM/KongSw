@@ -93,16 +93,25 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
             </div>
           </div>
           
-          <div className="text-center mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 border-2 border-yellow-300">
-            <h3 className="text-2xl font-bold text-yellow-800 mb-2">
-              Totalt värde: 1 400+ kr
+          <div className="text-center mt-8 bg-gradient-to-r from-orange-100 to-yellow-100 rounded-xl p-6 border-2 border-orange-300">
+            <h3 className="text-2xl font-bold text-orange-800 mb-2">
+              Fantastiskt värde för {coursePrice}:
             </h3>
-            <p className="text-xl text-yellow-700">
-              Du betalade endast: <span className="text-3xl font-bold text-green-600">299 kr</span>
-            </p>
-            <p className="text-yellow-600 font-semibold mt-2">
-              Det är 79% rabatt - din bästa investering någonsin! 🎯
-            </p>
+            {mainCourse?.features && (
+              <ul className="text-orange-700 space-y-2">
+                {mainCourse.features.map((feature, index) => (
+                  <li key={index} className="flex items-center">
+                    <span className="text-green-600 mr-2">✅</span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="mt-4 bg-green-100 rounded-lg p-3">
+              <p className="text-green-800 font-bold text-center">
+                Allt detta för endast {coursePrice} - din bästa investering någonsin! 🎯
+              </p>
+            </div>
           </div>
         </div>
 

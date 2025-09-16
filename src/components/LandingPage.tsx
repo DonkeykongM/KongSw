@@ -171,33 +171,42 @@ export default function LandingPage({ onJoinClick }: LandingPageProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {/* Feature 1 */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative">
+              <div className="absolute top-4 right-4 bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-bold">
+                INKLUDERAT
+              </div>
               <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-full p-4 w-16 h-16 mb-6 shadow-lg">
                 <BookOpen className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">13 Interaktiva Moduler</h3>
               <p className="text-slate-600 mb-4">Strukturerad genomgång av varje princip med moderna tillämpningar för 2025</p>
-              <div className="text-sm text-blue-600 font-semibold">Värde: 1,200 kr</div>
+              <div className="text-sm text-blue-600 font-semibold">12 veckors transformationsprogram</div>
             </div>
 
             {/* Feature 2 */}
-            <div className="bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+            <div className="bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative">
+              <div className="absolute top-4 right-4 bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-bold">
+                EXKLUSIVT
+              </div>
               <div className="bg-gradient-to-r from-purple-600 to-pink-700 rounded-full p-4 w-16 h-16 mb-6 shadow-lg">
                 <Brain className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">Napoleon Hill AI-Mentor</h3>
               <p className="text-slate-600 mb-4">Din personliga framgångscoach 24/7 - världens första Napoleon Hill AI</p>
-              <div className="text-sm text-purple-600 font-semibold">Värde: OVÄRDERLIG</div>
+              <div className="text-sm text-purple-600 font-semibold">Personlig vägledning när som helst</div>
             </div>
 
             {/* Feature 3 */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative">
+              <div className="absolute top-4 right-4 bg-green-600 text-white px-2 py-1 rounded-full text-xs font-bold">
+                BONUS
+              </div>
               <div className="bg-gradient-to-r from-green-600 to-emerald-700 rounded-full p-4 w-16 h-16 mb-6 shadow-lg">
                 <Gift className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">GRATIS Originalbok</h3>
               <p className="text-slate-600 mb-4">Komplett PDF av "Tänk och Bli Rik" - din att behålla för alltid</p>
-              <div className="text-sm text-green-600 font-semibold">Värde: 200 kr</div>
+              <div className="text-sm text-green-600 font-semibold">Omedelbar nedladdning efter köp</div>
             </div>
 
             {/* Feature 4 */}
