@@ -27,6 +27,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
     setError('');
     setSuccess('Förbereder säker betalning...');
 
+    // Debug environment variables
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    console.log('Environment check:', {
+      hasUrl: !!supabaseUrl,
+      hasKey: !!supabaseKey,
+      urlPreview: supabaseUrl ? supabaseUrl.substring(0, 20) + '...' : 'MISSING'
+    });
+
+    if (!supabaseUrl || !supabaseKey) {
+      setError('Supabase configuration is missing. Please check your .env file.');
+      setLoading(false);
+      return;
+    }
+
     try {
       // Validate form first
       if (!email || !password) {
@@ -45,11 +61,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
       }
 
       // Create checkout session (account will be created after payment)
+      const checkoutUrl = `${supabaseUrl}/functions/v1/stripe-checkout`;
+      console.log('Calling checkout URL:', checkoutUrl);
+      
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${supabaseKey}`,
         },
         body: JSON.stringify({
           email: email,
@@ -60,21 +79,31 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         }),
       });
 
+      console.log('Stripe checkout response:', {
+        status: response.status,
+        ok: response.ok,
+        statusText: response.statusText
+      });
+
       const responseText = await response.text();
+      console.log('Response text:', responseText);
       
       if (!response.ok) {
-        console.error('Stripe checkout error response:', response.status, responseText);
+        console.error('Stripe checkout error:', response.status, responseText);
         
-        let errorMessage = 'Failed to create checkout session';
+        let errorMessage = `Failed to create checkout session (${response.status})`;
+        
+        if (response.status === 404) {
+          errorMessage = 'Stripe checkout function not found. Please deploy the stripe-checkout Edge Function to Supabase first.';
+        } else if (response.status === 500) {
+          errorMessage = 'Server error. Please check that your Stripe keys are configured in Supabase Edge Function environment variables.';
+        }
+        
         try {
           const errorData = JSON.parse(responseText);
           errorMessage = errorData.error || errorMessage;
         } catch {
-          // If response isn't JSON, use default message
-        }
-        
-        if (response.status === 500) {
-          errorMessage = 'Payment system temporarily unavailable. Please try again in a moment.';
+          // If response isn't JSON, keep our status-specific message
         }
         
         throw new Error(errorMessage);
@@ -107,7 +136,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
       
       // Check if it's a network error
       if (err instanceof TypeError && err.message.includes('fetch')) {
-        errorMessage = 'Nätverksfel. Kontrollera din anslutning och försök igen.';
+        errorMessage = `Network error: Cannot connect to Supabase Edge Function. 
+        
+This usually means:
+1. The stripe-checkout Edge Function is not deployed to Supabase
+2. Your Supabase project URL is incorrect
+3. Network connectivity issues
+
+Next steps:
+1. Go to your Supabase Dashboard → Edge Functions
+2. Deploy the stripe-checkout function
+3. Add your Stripe keys to Edge Function environment variables
+4. Try again
+
+Supabase URL: ${supabaseUrl || 'MISSING'}`;
       }
       
       setError(errorMessage);
