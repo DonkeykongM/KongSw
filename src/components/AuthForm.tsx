@@ -64,20 +64,55 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
       const checkoutUrl = `${supabaseUrl}/functions/v1/stripe-checkout`;
       console.log('Calling checkout URL:', checkoutUrl);
       
-      const response = await fetch(checkoutUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseKey}`,
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-          priceId: mainCourse?.priceId || 'price_1S7zDfBu2e08097PaQ5APyYq',
-          success_url: `${window.location.origin}?payment=success`,
-          cancel_url: `${window.location.origin}?payment=cancelled`,
-        }),
-      });
+      let response;
+      try {
+        response = await fetch(checkoutUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseKey}`,
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+            priceId: mainCourse?.priceId || 'price_1S7zDfBu2e08097PaQ5APyYq',
+            success_url: `${window.location.origin}?payment=success`,
+            cancel_url: `${window.location.origin}?payment=cancelled`,
+          }),
+        });
+      } catch (fetchError) {
+        console.error('Fetch error:', fetchError);
+        throw new Error(`🚨 STRIPE CHECKOUT FUNKTION INTE DEPLOYAD
+
+Din stripe-checkout Edge Function är inte deployad till Supabase.
+
+STEG FÖR ATT FIXA:
+
+1. 📂 Öppna Supabase Dashboard:
+   https://supabase.com/dashboard/project/acdwexqoonauzzjtoexx
+
+2. 🔧 Gå till "Edge Functions" i vänstra menyn
+
+3. ➕ Klicka "Create a new function"
+
+4. 📝 Namnge funktionen: "stripe-checkout"
+
+5. 💾 Kopiera koden från: supabase/functions/stripe-checkout/index.ts
+
+6. 🔑 Gå till "Settings" → "Environment Variables" och lägg till:
+   - STRIPE_SECRET_KEY (från Stripe Dashboard → Developers → API keys)
+   - STRIPE_WEBHOOK_SECRET (skapa webhook i Stripe först)
+   - SUPABASE_SERVICE_ROLE_KEY (från Supabase Settings → API)
+
+7. 🚀 Spara och deploya funktionen
+
+8. 🧪 Testa betalningen igen här
+
+ALTERNATIVT: Om du har Supabase CLI installerat:
+supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx
+
+Fel: ${fetchError instanceof Error ? fetchError.message : 'Network error'}`);
+      }
 
       console.log('Stripe checkout response:', {
         status: response.status,
