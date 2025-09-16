@@ -27,40 +27,25 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
     setError('');
     setSuccess('Förbereder säker betalning...');
 
-    // Check if Supabase is configured
-    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY || 
-        import.meta.env.VITE_SUPABASE_URL === 'your_supabase_project_url_here' ||
-        import.meta.env.VITE_SUPABASE_ANON_KEY === 'your_supabase_anon_key_here') {
-      setError('Supabase är inte konfigurerat. Kontakta support för hjälp med betalningar.');
-      setLoading(false);
-      return;
-    }
-
     try {
       // Validate form first
       if (!email || !password) {
         setError('Vänligen fyll i både e-post och lösenord.');
-        setLoading(false);
         return;
       }
 
       if (!isLogin && password !== confirmPassword) {
         setError('Lösenorden stämmer inte överens.');
-        setLoading(false);
         return;
       }
 
       if (!isLogin && password.length < 6) {
         setError('Lösenordet måste vara minst 6 tecken långt.');
-        setLoading(false);
         return;
       }
 
       // Create checkout session (account will be created after payment)
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`;
-      console.log('Calling Stripe checkout at:', apiUrl);
-      
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,34 +54,28 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         body: JSON.stringify({
           email: email,
           password: password,
-          priceId: mainCourse?.priceId,
           success_url: `${window.location.origin}?payment=success`,
           cancel_url: `${window.location.origin}?payment=cancelled`,
         }),
       });
 
-      console.log('Stripe checkout response status:', response.status);
       const responseText = await response.text();
-      console.log('Stripe checkout response:', responseText);
       
       if (!response.ok) {
         console.error('Stripe checkout error response:', response.status, responseText);
         
         let errorMessage = 'Failed to create checkout session';
-        
-        // Handle specific error cases
-        if (response.status === 404) {
-          errorMessage = 'Betalningssystemet är inte aktiverat än. Edge Function "stripe-checkout" behöver deployas till Supabase.';
-        } else if (response.status === 500) {
-          errorMessage = 'Betalningssystemet är tillfälligt otillgängligt. Kontrollera att Stripe-nycklar är konfigurerade i Supabase.';
-        } else {
-          try {
-            const errorData = JSON.parse(responseText);
-            errorMessage = errorData.error || errorMessage;
-          } catch {
-            // If response isn't JSON, use default message
-          }
+        try {
+          const errorData = JSON.parse(responseText);
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // If response isn't JSON, use default message
         }
+        
+        if (response.status === 500) {
+          errorMessage = 'Payment system temporarily unavailable. Please try again in a moment.';
+        }
+        
         throw new Error(errorMessage);
       }
 
@@ -119,33 +98,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
       window.location.href = url;
     } catch (err) {
       console.error('Payment error:', err);
-      let errorMessage = 'Kunde inte ansluta till betalningssystemet.';
+      let errorMessage = 'Kunde inte ansluta till betalningssystemet. Försök igen.';
       
       if (err instanceof Error) {
         errorMessage = err.message;
       }
       
       // Check if it's a network error
-      if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
-        errorMessage = `
-BETALNINGSSYSTEM BEHÖVER KONFIGURERAS:
-
-1. Gå till din Supabase Dashboard: https://supabase.com/dashboard/project/acdwexqoonauzzjtoexx
-
-2. Deploy Edge Function:
-   - Gå till "Edge Functions" i sidomenyn
-   - Klicka "Create a new function" 
-   - Namn: "stripe-checkout"
-   - Kopiera kod från ditt lokala projekt: supabase/functions/stripe-checkout/index.ts
-
-3. Konfigurera miljövariabler i Supabase:
-   - Gå till Edge Functions → Environment variables
-   - Lägg till: STRIPE_SECRET_KEY (från din Stripe dashboard)
-   - Lägg till: SUPABASE_SERVICE_ROLE_KEY (från Supabase API settings)
-
-4. Testa igen efter deployment.
-
-Kontakta support@kongmindset.se om du behöver hjälp!`;
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        errorMessage = 'Nätverksfel. Kontrollera din anslutning och försök igen.';
       }
       
       setError(errorMessage);
