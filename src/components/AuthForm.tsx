@@ -25,22 +25,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
   const handleStripeCheckout = async () => {
     setLoading(true);
     setError('');
-    setSuccess('Redirecting to secure payment...');
+    setSuccess('Förbereder säker betalning...');
 
     try {
       // Validate form first
       if (!email || !password) {
-        setError('Please fill in both email and password.');
+        setError('Vänligen fyll i både e-post och lösenord.');
         return;
       }
 
       if (!isLogin && password !== confirmPassword) {
-        setError('Passwords do not match.');
+        setError('Lösenorden stämmer inte överens.');
         return;
       }
 
       if (!isLogin && password.length < 6) {
-        setError('Password must be at least 6 characters long.');
+        setError('Lösenordet måste vara minst 6 tecken långt.');
         return;
       }
 
