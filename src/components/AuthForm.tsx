@@ -27,6 +27,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
     setError('');
     setSuccess('Förbereder säker betalning...');
 
+    // Check if Supabase is configured
+    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY || 
+        import.meta.env.VITE_SUPABASE_URL === 'your_supabase_project_url_here' ||
+        import.meta.env.VITE_SUPABASE_ANON_KEY === 'your_supabase_anon_key_here') {
+      setError('Supabase är inte konfigurerat. Kontakta support för hjälp med betalningar.');
+      setLoading(false);
+      return;
+    }
+
     try {
       // Validate form first
       if (!email || !password) {
@@ -45,7 +54,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
       }
 
       // Create checkout session (account will be created after payment)
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`, {
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`;
+      console.log('Calling Stripe checkout at:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +72,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         }),
       });
 
+      console.log('Stripe checkout response status:', response.status);
       const responseText = await response.text();
+      console.log('Stripe checkout response:', responseText);
       
       if (!response.ok) {
         console.error('Stripe checkout error response:', response.status, responseText);
@@ -106,8 +120,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
       }
       
       // Check if it's a network error
-      if (err instanceof TypeError && err.message.includes('fetch')) {
-        errorMessage = 'Nätverksfel. Kontrollera din anslutning och försök igen.';
+      if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
+        if (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL === 'your_supabase_project_url_here') {
+          errorMessage = 'Supabase är inte konfigurerat. Vänligen konfigurera .env filen med dina Supabase-inställningar.';
+        } else {
+          errorMessage = 'Kan inte ansluta till betalningsservern. Kontrollera att Supabase Edge Functions är deploerade.';
+        }
       }
       
       setError(errorMessage);
