@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Brain, Mail, Lock, Eye, EyeOff, CreditCard, AlertCircle, ArrowLeft } from 'lucide-react';
-import { stripeProducts } from '../stripe-config';
+import { stripeProducts, getProductByPriceId } from '../stripe-config';
 
 interface AuthFormProps {
   onSignIn: (email: string, password: string) => Promise<{ error: any }>;
@@ -54,6 +54,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         body: JSON.stringify({
           email: email,
           password: password,
+          priceId: mainCourse?.priceId || 'price_1S7zDfBu2e08097PaQ5APyYq',
           success_url: `${window.location.origin}?payment=success`,
           cancel_url: `${window.location.origin}?payment=cancelled`,
         }),
