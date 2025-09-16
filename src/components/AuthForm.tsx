@@ -191,15 +191,11 @@ Kontrollera också att ditt Stripe-konto har produkten med price_id: ${mainCours
       window.location.href = url;
     } catch (err) {
       console.error('Payment error:', err);
-      let errorMessage = 'Kunde inte ansluta till betalningssystemet. Försök igen.';
+      let errorMessage = '';
       
       if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-      
-      // Check if it's a network error
-      if (err instanceof TypeError && err.message.includes('fetch')) {
-        errorMessage = `🌐 EDGE FUNCTION INTE TILLGÄNGLIG
+        if (err.message.includes('fetch') || err.message.includes('Failed to fetch')) {
+          errorMessage = `🌐 EDGE FUNCTION INTE TILLGÄNGLIG
 
 Din stripe-checkout Edge Function är inte deployad till Supabase.
 
@@ -215,6 +211,11 @@ Alternativt om du har Supabase CLI:
 supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx
 
 Nuvarande Supabase URL: ${supabaseUrl}`;
+        } else {
+          errorMessage = err.message;
+        }
+      } else {
+        errorMessage = 'Kunde inte ansluta till betalningssystemet. Försök igen.';
       }
       
       setError(errorMessage);
