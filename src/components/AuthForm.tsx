@@ -64,7 +64,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
       const checkoutUrl = `${supabaseUrl}/functions/v1/stripe-checkout`;
       console.log('Calling checkout URL:', checkoutUrl);
       
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`, {
+      const response = await fetch(checkoutUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,9 +94,37 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         let errorMessage = `Failed to create checkout session (${response.status})`;
         
         if (response.status === 404) {
-          errorMessage = 'Stripe checkout function not found. Please deploy the stripe-checkout Edge Function to Supabase first.';
+          errorMessage = `🚨 STRIPE CHECKOUT FUNKTION INTE DEPLOYAD
+
+Stegen för att fixa detta:
+
+1. Gå till din Supabase Dashboard: https://supabase.com/dashboard
+2. Välj projekt: acdwexqoonauzzjtoexx
+3. Gå till "Edge Functions" i sidomenyn
+4. Klicka "New Function" och välj "Upload from existing files"
+5. Ladda upp filerna från: supabase/functions/stripe-checkout/
+6. Gå till "Environment Variables" och lägg till:
+   - STRIPE_SECRET_KEY: sk_test_... (från Stripe Dashboard)
+   - STRIPE_WEBHOOK_SECRET: whsec_... (från Stripe Dashboard) 
+   - SUPABASE_SERVICE_ROLE_KEY: (från Supabase Settings → API)
+7. Spara och deploya funktionen
+8. Kom tillbaka och testa betalningen igen
+
+Alternativt: Om du har Supabase CLI installerat, kör:
+supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`;
         } else if (response.status === 500) {
-          errorMessage = 'Server error. Please check that your Stripe keys are configured in Supabase Edge Function environment variables.';
+          errorMessage = `🔑 STRIPE-NYCKLAR SAKNAS I SUPABASE
+
+Edge Function:en är deployad men Stripe-nycklarna saknas:
+
+1. Gå till Supabase Dashboard → Edge Functions → Environment Variables
+2. Lägg till dessa variabler:
+   - STRIPE_SECRET_KEY: Hämta från Stripe Dashboard → Developers → API keys
+   - STRIPE_WEBHOOK_SECRET: Skapa i Stripe Dashboard → Developers → Webhooks
+   - SUPABASE_SERVICE_ROLE_KEY: Från Supabase Settings → API → service_role key
+3. Spara och testa igen
+
+Kontrollera också att ditt Stripe-konto har produkten med price_id: ${mainCourse?.priceId}`;
         }
         
         try {
@@ -136,20 +164,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
       
       // Check if it's a network error
       if (err instanceof TypeError && err.message.includes('fetch')) {
-        errorMessage = `Network error: Cannot connect to Supabase Edge Function. 
-        
-This usually means:
-1. The stripe-checkout Edge Function is not deployed to Supabase
-2. Your Supabase project URL is incorrect
-3. Network connectivity issues
+        errorMessage = `🌐 EDGE FUNCTION INTE TILLGÄNGLIG
 
-Next steps:
-1. Go to your Supabase Dashboard → Edge Functions
-2. Deploy the stripe-checkout function
-3. Add your Stripe keys to Edge Function environment variables
-4. Try again
+Din stripe-checkout Edge Function är inte deployad till Supabase.
 
-Supabase URL: ${supabaseUrl || 'MISSING'}`;
+SNABB LÖSNING:
+1. Öppna Supabase Dashboard: https://supabase.com/dashboard/project/acdwexqoonauzzjtoexx
+2. Gå till "Edge Functions" → "New Function"
+3. Skapa function med namn: "stripe-checkout"
+4. Kopiera koden från: supabase/functions/stripe-checkout/index.ts
+5. Lägg till miljövariabler (STRIPE_SECRET_KEY, etc.)
+6. Testa betalningen igen
+
+Alternativt om du har Supabase CLI:
+supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx
+
+Nuvarande Supabase URL: ${supabaseUrl}`;
       }
       
       setError(errorMessage);
