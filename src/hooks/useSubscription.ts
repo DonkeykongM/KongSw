@@ -95,7 +95,7 @@ export const useSubscription = (user: User | null) => {
     
     if (completedOrder) {
       // For one-time payments, we assume they have access to the main course
-      return getProductByPriceId('price_1S4mL9Bu2e08097PVWyceE43');
+      return getProductByPriceId('price_1S7zDfBu2e08097PaQ5APyYq');
     }
     
     return null;

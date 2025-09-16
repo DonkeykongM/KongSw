@@ -12,7 +12,7 @@ export interface StripeProduct {
 export const stripeProducts: StripeProduct[] = [
   {
     id: 'prod_R5drGXUdEEyZmu',
-    priceId: 'price_1S4mL9Bu2e08097PVWyceE43',
+    priceId: 'price_1S7zDfBu2e08097PaQ5APyYq',
     name: 'Paid Main Course offer',
     description: 'Komplett KongMindset-kurs med livstidsåtkomst till alla 13 interaktiva moduler baserade på Napoleon Hills "Tänk och Bli Rik". Inkluderar personlig AI-mentor tillgänglig 24/7 och gratis nedladdning av originalboken. Transformera ditt tankesätt och bemästra de 13 framgångsprinciperna som har skapat fler miljonärer än något annat system i historien.',
     mode: 'payment',
