@@ -82,7 +82,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         });
       } catch (fetchError) {
         console.error('Fetch error:', fetchError);
-        throw new Error(`🚨 STRIPE CHECKOUT FUNKTION INTE DEPLOYAD
+        setError(`🚨 STRIPE CHECKOUT FUNKTION INTE DEPLOYAD
 
 Din stripe-checkout Edge Function är inte deployad till Supabase.
 
@@ -112,6 +112,9 @@ ALTERNATIVT: Om du har Supabase CLI installerat:
 supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx
 
 Fel: ${fetchError instanceof Error ? fetchError.message : 'Network error'}`);
+        setSuccess('');
+        setLoading(false);
+        return;
       }
 
       console.log('Stripe checkout response:', {
