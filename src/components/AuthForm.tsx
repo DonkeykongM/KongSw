@@ -31,16 +31,26 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
       // Validate form first
       if (!email || !password) {
         setError('Vänligen fyll i både e-post och lösenord.');
+        setLoading(false);
         return;
       }
 
       if (!isLogin && password !== confirmPassword) {
         setError('Lösenorden stämmer inte överens.');
+        setLoading(false);
         return;
       }
 
       if (!isLogin && password.length < 6) {
         setError('Lösenordet måste vara minst 6 tecken långt.');
+        setLoading(false);
+        return;
+      }
+
+      // Ensure we have the correct product and price ID
+      if (!mainCourse || !mainCourse.priceId) {
+        setError('Produktinformation saknas. Försök igen senare.');
+        setLoading(false);
         return;
       }
 
@@ -54,7 +64,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         body: JSON.stringify({
           email: email,
           password: password,
-          priceId: mainCourse?.priceId || 'price_1S7zDfBu2e08097PaQ5APyYq',
           priceId: mainCourse.priceId,
           success_url: `${window.location.origin}?payment=success`,
           cancel_url: `${window.location.origin}?payment=cancelled`,
@@ -100,21 +109,52 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
       window.location.href = url;
     } catch (err) {
       console.error('Payment error:', err);
-      let errorMessage = 'Kunde inte ansluta till betalningssystemet. Försök igen.';
       
-      if (err instanceof Error) {
-        errorMessage = err.message;
+      // Handle fetch errors (Edge Function not deployed)
+      if (err instanceof TypeError && err.message && err.message.includes('Failed to fetch')) {
+        setError(`🚨 STRIPE CHECKOUT FUNKTION INTE DEPLOYAD
+
+Din stripe-checkout Edge Function är inte deployad till Supabase.
+
+STEG FÖR ATT FIXA:
+
+1. 📂 Öppna Supabase Dashboard:
+   https://supabase.com/dashboard/project/acdwexqoonauzzjtoexx
+
+2. 🔧 Gå till "Edge Functions" i vänstra menyn
+
+3. ➕ Klicka "Create a new function"
+
+4. 📝 Namnge funktionen: "stripe-checkout"
+
+5. 💾 Kopiera koden från: supabase/functions/stripe-checkout/index.ts
+
+6. 🔑 Gå till "Settings" → "Environment Variables" och lägg till:
+   - STRIPE_SECRET_KEY (från Stripe Dashboard → Developers → API keys)
+   - STRIPE_WEBHOOK_SECRET (skapa webhook i Stripe först)
+   - SUPABASE_SERVICE_ROLE_KEY (från Supabase Settings → API)
+
+7. 🚀 Spara och deploya funktionen
+
+8. 🧪 Testa betalningen igen här
+
+ALTERNATIVT: Om du har Supabase CLI installerat lokalt:
+supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
+      } else {
+        // Handle other errors
+        let errorMessage = 'Kunde inte ansluta till betalningssystemet. Försök igen.';
+        
+        if (err instanceof Error && err.message) {
+          errorMessage = err.message;
+        }
+        
+        setError(errorMessage);
       }
       
-      // Check if it's a network error
-      if (err instanceof TypeError && err.message.includes('fetch')) {
-        errorMessage = 'Nätverksfel. Kontrollera din anslutning och försök igen.';
-      }
-      
-      setError(errorMessage);
       setSuccess('');
-    } finally {
       setLoading(false);
+    } finally {
+      // setLoading(false); is now handled in each error case above
     }
   };
 
