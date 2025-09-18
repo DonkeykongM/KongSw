@@ -54,6 +54,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         body: JSON.stringify({
           email: email,
           password: password,
+          priceId: mainCourse.priceId,
           success_url: `${window.location.origin}?payment=success`,
           cancel_url: `${window.location.origin}?payment=cancelled`,
         }),
