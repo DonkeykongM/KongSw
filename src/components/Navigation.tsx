@@ -115,12 +115,12 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white shadow-lg z-50 border-t border-gray-200">
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white shadow-2xl z-50 border-t border-gray-200 border-l border-r border-b rounded-b-lg">
             {/* Mobile User Info Header */}
-            <div className="px-4 py-4 bg-gray-50">
+            <div className="px-4 py-4 bg-gray-50 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-base font-medium text-neutral-700">
+                  <span className="text-base font-medium text-gray-900">
                     {profile?.display_name || user?.email?.split('@')[0] || 'Elev'}
                   </span>
                   {hasAccess && activeProduct && (
@@ -136,7 +136,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
                     onSignOut();
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center space-x-2 px-4 py-3 rounded-xl text-white bg-red-600 hover:bg-red-700 transition-all duration-200 min-h-[52px] text-base font-medium shadow-lg active:scale-95"
+                  className="flex items-center space-x-2 px-4 py-3 rounded-xl text-white bg-red-600 hover:bg-red-700 transition-all duration-200 min-h-[52px] text-base font-bold shadow-lg active:scale-95"
                 >
                   <LogOut className="w-5 h-5 flex-shrink-0" />
                   <span>Logga ut</span>
@@ -144,20 +144,22 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
               </div>
             </div>
             
-            <div className="px-4 py-4 space-y-2">
+            <div className="px-4 py-4 space-y-2 bg-white">
               {navItems.map(item => {
                 const Icon = item.icon;
                 return (
                   <button
                     key={item.id}
                     onClick={() => handleNavigation(item.id)}
-                    className={`w-full flex items-center space-x-4 px-4 py-4 rounded-xl text-left font-medium transition-all duration-200 min-h-[56px] text-base active:scale-95 ${
+                    className={`w-full flex items-center space-x-4 px-4 py-4 rounded-xl text-left font-bold transition-all duration-200 min-h-[56px] text-base active:scale-95 ${
                       currentPage === item.id
-                        ? 'text-primary-600 bg-primary-50'
-                        : 'text-neutral-600 hover:text-primary-600 hover:bg-neutral-50'
+                        ? 'text-blue-700 bg-blue-50 border border-blue-200'
+                        : 'text-gray-900 hover:text-blue-700 hover:bg-blue-50 border border-transparent'
                     }`}
                   >
-                    <Icon className="w-6 h-6 flex-shrink-0" />
+                    <Icon className={`w-6 h-6 flex-shrink-0 ${
+                      currentPage === item.id ? 'text-blue-600' : 'text-gray-700'
+                    }`} />
                     <span>{item.label}</span>
                   </button>
                 );
