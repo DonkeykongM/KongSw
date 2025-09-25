@@ -94,7 +94,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => onSignOut()}
-                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-all duration-200 min-h-[48px] min-w-[48px] shadow-md active:scale-95"
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-all duration-200 min-h-[48px] min-w-[48px] shadow-md active:scale-95 border border-red-500"
                 title="Logga ut"
               >
                 <LogOut className="w-5 h-5" />
@@ -104,10 +104,10 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
               {/* Menu Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-3 rounded-lg text-gray-800 bg-gray-100 hover:bg-gray-200 border border-gray-300 shadow-sm transition-all duration-200 min-h-[48px] min-w-[48px] flex items-center justify-center active:scale-95"
+                className="p-3 rounded-lg text-gray-900 bg-gray-200 hover:bg-gray-300 border-2 border-gray-400 shadow-lg transition-all duration-200 min-h-[48px] min-w-[48px] flex items-center justify-center active:scale-95"
                 aria-label="Öppna meny"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6 text-gray-700" /> : <Menu className="w-6 h-6 text-gray-700" />}
+                {mobileMenuOpen ? <X className="w-6 h-6 text-gray-900 font-bold" /> : <Menu className="w-6 h-6 text-gray-900 font-bold" />}
               </button>
             </div>
           </div>
@@ -115,16 +115,16 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white shadow-2xl z-50 border-t border-gray-200 border-l border-r border-b rounded-b-lg">
+          <div className="lg:hidden fixed top-[64px] left-0 right-0 bg-white shadow-2xl z-[9999] border-t border-gray-200 max-h-[calc(100vh-64px)] overflow-y-auto">
             {/* Mobile User Info Header */}
-            <div className="px-4 py-4 bg-gray-50 border-b border-gray-200">
+            <div className="px-4 py-4 bg-gray-100 border-b border-gray-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-base font-medium text-gray-900">
+                  <span className="text-base font-bold text-gray-900">
                     {profile?.display_name || user?.email?.split('@')[0] || 'Elev'}
                   </span>
                   {hasAccess && activeProduct && (
-                    <div className="text-sm text-green-600 font-medium mt-1">
+                    <div className="text-sm text-green-700 font-bold mt-1">
                       ✅ Premium tillgång
                     </div>
                   )}
@@ -136,7 +136,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
                     onSignOut();
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center space-x-2 px-4 py-3 rounded-xl text-white bg-red-600 hover:bg-red-700 transition-all duration-200 min-h-[52px] text-base font-bold shadow-lg active:scale-95"
+                  className="flex items-center space-x-2 px-4 py-3 rounded-xl text-white bg-red-600 hover:bg-red-700 transition-all duration-200 min-h-[52px] text-base font-bold shadow-lg active:scale-95 border-2 border-red-500"
                 >
                   <LogOut className="w-5 h-5 flex-shrink-0" />
                   <span>Logga ut</span>
@@ -144,23 +144,23 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
               </div>
             </div>
             
-            <div className="px-4 py-4 space-y-2 bg-white">
+            <div className="px-4 py-4 space-y-3 bg-white">
               {navItems.map(item => {
                 const Icon = item.icon;
                 return (
                   <button
                     key={item.id}
                     onClick={() => handleNavigation(item.id)}
-                    className={`w-full flex items-center space-x-4 px-4 py-4 rounded-xl text-left font-bold transition-all duration-200 min-h-[56px] text-base active:scale-95 ${
+                    className={`w-full flex items-center space-x-4 px-4 py-4 rounded-xl text-left font-bold transition-all duration-200 min-h-[56px] text-base active:scale-95 border-2 shadow-sm ${
                       currentPage === item.id
-                        ? 'text-blue-700 bg-blue-50 border border-blue-200'
-                        : 'text-gray-900 hover:text-blue-700 hover:bg-blue-50 border border-transparent'
+                        ? 'text-blue-800 bg-blue-100 border-blue-300'
+                        : 'text-gray-900 hover:text-blue-700 hover:bg-blue-50 border-gray-200 bg-gray-50'
                     }`}
                   >
                     <Icon className={`w-6 h-6 flex-shrink-0 ${
-                      currentPage === item.id ? 'text-blue-600' : 'text-gray-700'
+                      currentPage === item.id ? 'text-blue-700' : 'text-gray-800'
                     }`} />
-                    <span>{item.label}</span>
+                    <span className="font-bold">{item.label}</span>
                   </button>
                 );
               })}
