@@ -23,6 +23,8 @@ serve(async (req) => {
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
+    console.log('Webhook event received:', event.type, event.id)
+    
 
     let event
     try {
@@ -46,10 +48,13 @@ serve(async (req) => {
     // Handle successful payment
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session
-      
-      console.log('Processing completed checkout session:', session.id)
+      console.log('Processing checkout session:', session.id)
       console.log('Customer email:', session.customer_details?.email)
-      console.log('Payment status:', session.payment_status)
+      console.log('Metadata:', session.metadata)
+      
+      // Extract user credentials from metadata with better error handling
+      const email = session.metadata?.email || session.customer_details?.email
+      const password = session.metadata?.password
 
       if (session.payment_status === 'paid') {
         // Get customer details including metadata with password
@@ -148,46 +153,107 @@ serve(async (req) => {
           console.error('Order storage failed:', error)
         }
 
+        console.error('No email found in session:', session.id)
         // Send notification to Make.com webhook
         try {
           const webhookPayload = {
             event_type: 'course_purchased',
+        console.error('No password found in metadata for session:', session.id)
             customer_email: customerEmail,
             customer_name: session.customer_details?.name || customerEmail?.split('@')[0] || 'Unknown',
             amount: session.amount_total ? (session.amount_total / 100) : 0,
+      console.log('Attempting to create account for:', email)
+      
             currency: session.currency?.toUpperCase() || 'SEK',
             payment_status: session.payment_status,
             stripe_session_id: session.id,
             purchase_date: new Date().toISOString(),
             product_name: 'KongMindset Course - Think and Grow Rich',
+        user_metadata: {
+          created_via: 'stripe_checkout',
+          stripe_customer_id: session.customer,
+          stripe_session_id: session.id,
+          display_name: email.split('@')[0]
+        }
             special_price: session.amount_total === 29900, // 299 kr in öre
             stripe_customer_id: session.customer,
             source: 'stripe_webhook',
-            purchase_method: 'stripe_checkout'
+        console.error('Failed to create user account:', authError)
+        
+        // If user already exists, that's OK - they might have signed up manually first
+        if (authError.message?.includes('already_registered') || authError.message?.includes('already exists')) {
+          console.log('User already exists, proceeding with customer creation')
+          // Try to get the existing user
+          const { data: existingUser } = await supabase.auth.admin.getUserByEmail(email)
+          if (existingUser?.user) {
+            console.log('Found existing user:', existingUser.user.id)
+            // Continue with customer record creation below
+          } else {
+            return new Response('User exists but could not retrieve', { status: 500, headers: corsHeaders })
           }
+        } else {
+          return new Response(`Failed to create user: ${authError.message}`, { status: 500, headers: corsHeaders })
+        }
+      } else {
+        console.log('Successfully created user account:', authData.user.id)
 
           console.log('Sending webhook notification to Make.com')
           
-          const webhookResponse = await fetch('https://hook.eu2.make.com/3wp7eyx3z2h9v9u50mbqlz3bg4j1wd4r', {
+      const userId = authData?.user?.id || (await supabase.auth.admin.getUserByEmail(email)).data?.user?.id
+      
+      if (!userId) {
+        console.error('Could not get user ID for email:', email)
+        return new Response('Could not get user ID', { status: 500, headers: corsHeaders })
+      }
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(webhookPayload)
+        .upsert([{
           })
 
           if (webhookResponse.ok) {
             console.log('Webhook notification sent successfully')
-          } else {
+        }], {
+          onConflict: 'user_id'
+        })
             console.error('Webhook notification failed:', webhookResponse.status)
           }
         } catch (webhookError) {
-          console.error('Failed to send webhook notification:', webhookError)
+        // Don't fail the webhook if customer record fails, user account is more important
+        console.log('Warning: Customer record creation failed but user account exists')
+      } else {
+        console.log('Successfully created customer record for user:', userId)
           // Don't fail the whole process if webhook fails
         }
+      // Create user profile with default values
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .upsert([{
+          user_id: userId,
+          display_name: email.split('@')[0],
+          bio: 'Behärskar Napoleon Hills framgångsprinciper',
+          goals: 'Bygger rikedom genom tankesättstransformation',
+          favorite_module: 'Önskans kraft',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }], {
+          onConflict: 'user_id'
+        })
+
+      if (profileError) {
+        console.error('Profile creation error:', profileError)
+        // Don't fail webhook for profile creation error
+        console.log('Warning: Profile creation failed but user account exists')
+      } else {
+        console.log('Successfully created user profile for:', userId)
+      }
+
+      console.log('Webhook processing completed successfully for:', email)
       }
     }
 
+    console.log('Webhook event type not handled:', event.type)
     return new Response(JSON.stringify({ received: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })

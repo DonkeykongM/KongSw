@@ -104,7 +104,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         return;
       }
 
-      console.log('Redirecting to Stripe checkout with credentials saved for:', email);
+      console.log('Redirecting to Stripe checkout. Account will be created after payment for:', email);
+      setSuccess('🎯 Omdirigerar till säker betalning. Ditt konto skapas automatiskt efter lyckad betalning!');
       // Redirect to Stripe Checkout
       window.location.href = url;
     } catch (err) {
