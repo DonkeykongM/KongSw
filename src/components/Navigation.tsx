@@ -104,10 +104,10 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
               {/* Menu Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-lg text-neutral-600 hover:text-primary-600 hover:bg-neutral-50 transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center active:scale-95"
+                className="p-3 rounded-lg text-gray-800 bg-gray-100 hover:bg-gray-200 border border-gray-300 shadow-sm transition-all duration-200 min-h-[48px] min-w-[48px] flex items-center justify-center active:scale-95"
                 aria-label="Öppna meny"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {mobileMenuOpen ? <X className="w-6 h-6 text-gray-700" /> : <Menu className="w-6 h-6 text-gray-700" />}
               </button>
             </div>
           </div>
