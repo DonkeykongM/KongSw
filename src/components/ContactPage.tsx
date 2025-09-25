@@ -172,7 +172,8 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack, onSignOut }) => {
                     value={formData.subject}
                     onChange={handleChange}
                     disabled={submitting}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed bg-white text-gray-900 min-h-[52px] text-base appearance-auto"
+                    style={{ fontSize: '16px' }}
                   >
                     <option value="">Välj ämne</option>
                     <option value="course-question">Kursfråga</option>

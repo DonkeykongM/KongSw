@@ -159,6 +159,45 @@
     min-width: 48px !important;
     font-size: 16px !important;
   }
+  
+  /* Fix select dropdown visibility on mobile */
+  select {
+    background-color: white !important;
+    color: #1f2937 !important;
+    border: 2px solid #d1d5db !important;
+    font-size: 16px !important;
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    appearance: auto !important;
+    -webkit-appearance: menulist !important;
+    -moz-appearance: menulist !important;
+  }
+  
+  select:focus {
+    border-color: #3b82f6 !important;
+    outline: 2px solid #3b82f6 !important;
+    outline-offset: 2px !important;
+  }
+  
+  /* Ensure option elements are visible */
+  select option {
+    background-color: white !important;
+    color: #1f2937 !important;
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+    min-height: 48px !important;
+    line-height: 1.5 !important;
+  }
+  
+  select option:checked {
+    background-color: #3b82f6 !important;
+    color: white !important;
+  }
+  
+  select option:hover {
+    background-color: #f3f4f6 !important;
+    color: #1f2937 !important;
+  }
 }
 
 /* Chatbot Container Styling */
