@@ -29,10 +29,27 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack, onSignOut }) => {
       return;
     }
 
-    // Simulate form submission (in real app, this would send to your backend)
+    // Send to Make.com webhook
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('https://hook.eu2.make.com/tjpx89ouj0r9v04rm9cml1bxz4ad2b3a', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject || 'Allmän förfrågan',
+          message: formData.message,
+          timestamp: new Date().toISOString(),
+          source: 'KongMindset Contact Form',
+          user_agent: navigator.userAgent
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Kunde inte skicka meddelandet');
+      }
       
       setSuccess(true);
       setFormData({ name: '', email: '', subject: '', message: '' });
@@ -94,7 +111,7 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack, onSignOut }) => {
                     </div>
                     <div>
                       <p className="font-medium text-neutral-800">E-post</p>
-                      <p className="text-neutral-600">support@kongmindset.com</p>
+                      <p className="text-neutral-600">support@kongmindset.se</p>
                     </div>
                   </div>
                 </div>
