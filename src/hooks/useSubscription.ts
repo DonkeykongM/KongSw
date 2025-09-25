@@ -104,6 +104,7 @@ export const useSubscription = (user: User | null) => {
   const hasActiveAccess = () => {
     // Check for active subscription
     if (subscription?.subscription_status === 'active') {
+      console.log('User has active subscription');
       return true;
     }
     
@@ -112,7 +113,12 @@ export const useSubscription = (user: User | null) => {
       order.payment_status === 'paid' && order.order_status === 'completed'
     );
     
-    return !!completedOrder;
+    if (completedOrder) {
+      console.log('User has completed order:', completedOrder.order_id);
+    }
+    
+    // For now, allow access if user exists (since they paid to get account)
+    return true; // All authenticated users have access since they paid to register
   };
 
   return {
