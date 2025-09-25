@@ -143,6 +143,26 @@ serve(async (req) => {
           } else {
             console.log(`[WEBHOOK] Profile created successfully`)
           }
+
+          // Create user profile automatically
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert([
+              {
+                user_id: newUser.user!.id,
+                display_name: userEmail.split('@')[0] || 'Användare',
+                bio: 'Behärskar Napoleon Hills framgångsprinciper',
+                goals: 'Bygger rikedom genom tankesättstransformation',
+                favorite_module: 'Önskans kraft'
+              }
+            ]);
+
+          if (profileError) {
+            console.error('Error creating user profile:', profileError);
+            // Don't throw error - profile can be created later
+          } else {
+            console.log('✅ User profile created successfully for user:', newUser.user?.id);
+          }
         }
       }
 
