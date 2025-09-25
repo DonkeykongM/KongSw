@@ -569,15 +569,18 @@
   #VG_OVERLAY_CONTAINER {
     /* Optimize positioning on mobile */
     bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
-    right: 20px !important;
-    max-width: calc(100vw - 40px) !important;
-    max-height: calc(100vh - 100px) !important;
+    left: 5vw !important;
+    right: 5vw !important;
+    width: 90vw !important;
+    max-height: 70vh !important;
   }
   
   /* Better mobile interaction */
   #VG_OVERLAY_CONTAINER .vg-chat-container {
     border-radius: 16px !important;
     margin: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
   }
   
   /* Larger touch targets on mobile */

@@ -263,19 +263,19 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
             </h3>
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white/80 rounded-lg p-4 border border-green-100">
+                <div className="bg-white rounded-lg p-4 border border-green-200 shadow-sm">
                   <h4 className="font-bold text-green-800 mb-2">📚 Dag 1-2: Grund</h4>
                   <p className="text-green-700 text-sm">Läs och förstå principen grundligt</p>
                 </div>
-                <div className="bg-white/80 rounded-lg p-4 border border-green-100">
+                <div className="bg-white rounded-lg p-4 border border-green-200 shadow-sm">
                   <h4 className="font-bold text-green-800 mb-2">🎯 Dag 3-4: Praktik</h4>
                   <p className="text-green-700 text-sm">Börja praktisera i små steg</p>
                 </div>
-                <div className="bg-white/80 rounded-lg p-4 border border-green-100">
+                <div className="bg-white rounded-lg p-4 border border-green-200 shadow-sm">
                   <h4 className="font-bold text-green-800 mb-2">⚡ Dag 5-6: Fördjupning</h4>
                   <p className="text-green-700 text-sm">Fördjupa din tillämpning</p>
                 </div>
-                <div className="bg-white/80 rounded-lg p-4 border border-green-100">
+                <div className="bg-white rounded-lg p-4 border border-green-200 shadow-sm">
                   <h4 className="font-bold text-green-800 mb-2">🔍 Dag 7: Utvärdering</h4>
                   <p className="text-green-700 text-sm">Reflektion och utvärdering</p>
                 </div>
@@ -289,7 +289,7 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
               Kärninnehåll
             </h3>
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <div className="whitespace-pre-line text-gray-700 leading-relaxed">
+              <div className="whitespace-pre-line text-gray-900 leading-relaxed font-medium">
                 {module.lessonText}
               </div>
             </div>
@@ -355,7 +355,7 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div className={`bg-white/80 rounded-lg p-4 border transition-all duration-300 ${
-                  checklist.dailyPractice ? 'border-green-300 bg-green-50/50' : 'border-blue-200'
+                  checklist.dailyPractice ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-white'
                 }`}>
                   <div className="flex items-start space-x-3">
                     <input
@@ -367,12 +367,12 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
                     />
                     <div>
                       <label htmlFor="dailyPractice" className={`font-semibold mb-1 cursor-pointer ${
-                        checklist.dailyPractice ? 'text-green-800 line-through' : 'text-blue-800'
+                        checklist.dailyPractice ? 'text-green-800 line-through' : 'text-gray-800'
                       }`}>
                         Praktiserat dagligen i 7 dagar
                       </label>
                       <p className={`text-sm ${
-                        checklist.dailyPractice ? 'text-green-700' : 'text-blue-700'
+                        checklist.dailyPractice ? 'text-green-700' : 'text-gray-700'
                       }`}>
                         Principen ska bli naturlig för dig
                       </p>
@@ -381,7 +381,7 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
                 </div>
                 
                 <div className={`bg-white/80 rounded-lg p-4 border transition-all duration-300 ${
-                  checklist.reflectionCompleted ? 'border-green-300 bg-green-50/50' : 'border-blue-200'
+                  checklist.reflectionCompleted ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-white'
                 }`}>
                   <div className="flex items-start space-x-3">
                     <input
@@ -393,12 +393,12 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
                     />
                     <div>
                       <label htmlFor="reflectionCompleted" className={`font-semibold mb-1 cursor-pointer ${
-                        checklist.reflectionCompleted ? 'text-green-800 line-through' : 'text-blue-800'
+                        checklist.reflectionCompleted ? 'text-green-800 line-through' : 'text-gray-800'
                       }`}>
                         Slutfört reflektionsfrågor
                       </label>
                       <p className={`text-sm ${
-                        checklist.reflectionCompleted ? 'text-green-700' : 'text-blue-700'
+                        checklist.reflectionCompleted ? 'text-green-700' : 'text-gray-700'
                       }`}>
                         Djupare förståelse genom reflektion
                       </p>
@@ -407,7 +407,7 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
                 </div>
                 
                 <div className={`bg-white/80 rounded-lg p-4 border transition-all duration-300 ${
-                  checklist.quizPassed ? 'border-green-300 bg-green-50/50' : 'border-blue-200'
+                  checklist.quizPassed ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-white'
                 }`}>
                   <div className="flex items-start space-x-3">
                     <input
@@ -419,12 +419,12 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
                     />
                     <div>
                       <label htmlFor="quizPassed" className={`font-semibold mb-1 cursor-pointer ${
-                        checklist.quizPassed ? 'text-green-800 line-through' : 'text-blue-800'
+                        checklist.quizPassed ? 'text-green-800 line-through' : 'text-gray-800'
                       }`}>
                         Klarat quizet (80%+)
                       </label>
                       <p className={`text-sm ${
-                        checklist.quizPassed ? 'text-green-700' : 'text-blue-700'
+                        checklist.quizPassed ? 'text-green-700' : 'text-gray-700'
                       }`}>
                         Bekräfta din kunskapsinhämtning
                       </p>
@@ -433,7 +433,7 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
                 </div>
                 
                 <div className={`bg-white/80 rounded-lg p-4 border transition-all duration-300 ${
-                  checklist.observedChanges ? 'border-green-300 bg-green-50/50' : 'border-blue-200'
+                  checklist.observedChanges ? 'border-green-300 bg-green-50' : 'border-gray-300 bg-white'
                 }`}>
                   <div className="flex items-start space-x-3">
                     <input
@@ -445,12 +445,12 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
                     />
                     <div>
                       <label htmlFor="observedChanges" className={`font-semibold mb-1 cursor-pointer ${
-                        checklist.observedChanges ? 'text-green-800 line-through' : 'text-blue-800'
+                        checklist.observedChanges ? 'text-green-800 line-through' : 'text-gray-800'
                       }`}>
                         Observerat förändringar
                       </label>
                       <p className={`text-sm ${
-                        checklist.observedChanges ? 'text-green-700' : 'text-blue-700'
+                        checklist.observedChanges ? 'text-green-700' : 'text-gray-700'
                       }`}>
                         Små framsteg är också framsteg
                       </p>
@@ -461,16 +461,16 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
               
               <div className={`rounded-lg p-4 border transition-all duration-300 ${
                 isChecklistComplete 
-                  ? 'bg-green-100/60 border-green-200' 
-                  : 'bg-blue-100/60 border-blue-200'
+                  ? 'bg-green-50 border-green-200' 
+                  : 'bg-gray-50 border-gray-200'
               }`}>
                 <p className={`text-sm ${
-                  isChecklistComplete ? 'text-green-800' : 'text-blue-800'
+                  isChecklistComplete ? 'text-green-800' : 'text-gray-800'
                 }`}>
                   💡 <strong>Varför tar det tid?</strong> Napoleon Hill upptäckte att det krävs upprepning för att programmera undermedvetandet. Ta dig tid - det är fundamentet för bestående framgång.
                 </p>
                 {isChecklistComplete && (
-                  <p className="text-green-800 text-sm font-bold mt-2">
+                  <p className="text-green-900 text-sm font-bold mt-2">
                     🎉 Fantastisk! Du har slutfört alla steg för denna vecka. {module.id < 13 ? `Vecka ${module.id + 1} är nu tillgänglig!` : 'Du har slutfört hela kursen!'}
                   </p>
                 )}
@@ -1053,19 +1053,10 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
       </div>
 
       {/* Mobile Progress Indicator */}
-      <div className="sm:hidden bg-white border-b px-4 py-2">
-        <div className="flex items-center justify-between text-xs text-gray-600">
-          <span className="font-medium">Modul {module.id} av 13</span>
-          <div className="flex items-center space-x-2">
-            <span>{activeTab === 'lesson' ? 'Lektion' : activeTab === 'reflection' ? 'Reflektion' : activeTab === 'quiz' ? 'Quiz' : 'Översikt'}</span>
-            <button
-              onClick={() => onSignOut()}
-              className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-medium min-h-[32px] min-w-[60px] active:scale-95"
-              title="Logga ut"
-            >
-              Ut
-            </button>
-          </div>
+      <div className="sm:hidden bg-white border-b px-4 py-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-gray-700">Modul {module.id} av 13</span>
+          <span className="text-sm text-gray-600">{activeTab === 'lesson' ? 'Lektion' : activeTab === 'reflection' ? 'Reflektion' : activeTab === 'quiz' ? 'Quiz' : 'Översikt'}</span>
         </div>
       </div>
 
