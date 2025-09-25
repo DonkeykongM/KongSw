@@ -397,3 +397,4 @@
 /* Add visual feedback for interactive elements */
 #VG_OVERLAY_CONTAINER button {
   transition: all 0.2s ease !important;
+}
