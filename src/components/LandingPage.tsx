@@ -95,30 +95,30 @@ export default function LandingPage({ onJoinClick }: LandingPageProps) {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-8 pb-16 md:pt-16 md:pb-24">
+      <section className="relative overflow-hidden pt-16 pb-24">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/5 via-transparent to-yellow-900/5"></div>
         <div className="container mx-auto px-4 sm:px-6 relative">
           <div className="text-center max-w-5xl mx-auto mb-16">
             <div className="flex items-center justify-center space-x-3 mb-6">
-              <img src="https://j0bzpddd4j.ufs.sh/f/bwjssIq7FWHCTuLlG8ZtZKdCcYS0qzlf2bvOgIJwexGAMR89" alt="KongMindset Logo" className="w-16 h-16 md:w-20 md:h-20" />
-              <span className="text-3xl md:text-4xl font-display font-bold bg-gradient-to-r from-blue-700 to-indigo-600 bg-clip-text text-transparent">
+              <img src="https://j0bzpddd4j.ufs.sh/f/bwjssIq7FWHCTuLlG8ZtZKdCcYS0qzlf2bvOgIJwexGAMR89" alt="KongMindset Logo" className="w-20 h-20" />
+              <span className="text-4xl font-display font-bold bg-gradient-to-r from-blue-700 to-indigo-600 bg-clip-text text-transparent">
                 KongMindset
               </span>
             </div>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold mb-6 bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-900 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-6xl lg:text-7xl font-display font-bold mb-6 bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-900 bg-clip-text text-transparent leading-tight">
               Bemästra Napoleon Hills<br />
               <span className="text-yellow-600">Rikedomsplan</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-slate-600 mb-8 max-w-3xl mx-auto font-light leading-relaxed">
+            <p className="text-2xl text-slate-600 mb-8 max-w-3xl mx-auto font-light leading-relaxed">
               Få <strong>originalboken GRATIS</strong> plus <strong>Napoleon Hill i din ficka</strong> - världens första AI-mentor baserad på "Tänk och Bli Rik"
             </p>
             
             {/* Special Offer Badge */}
             <button
               onClick={onJoinClick}
-              className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-8 py-4 rounded-full inline-block mb-8 shadow-2xl animate-pulse transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer min-h-[52px] text-base"
+              className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-8 py-4 rounded-full inline-block mb-8 shadow-2xl animate-pulse transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer min-h-[52px] text-lg"
             >
               <span className="font-bold text-lg">🔥 2025 KAMPANJ: 299 kr specialpris!</span>
             </button>

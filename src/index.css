@@ -17,26 +17,48 @@
   
   /* Mobile-first performance optimizations */
   @media (max-width: 768px) {
-    /* Disable expensive effects on mobile */
-    .backdrop-blur-sm,
-    .backdrop-blur-md,
-    .backdrop-blur-lg {
-      backdrop-filter: none !important;
-      background: rgba(255, 255, 255, 0.95) !important;
+    /* Better mobile typography - smaller sizes for readability */
+    h1 {
+      font-size: 2rem !important; /* 32px instead of 30px */
+      line-height: 1.1 !important;
     }
     
-    /* Optimize gradients for mobile */
-    .bg-gradient-to-br,
-    .bg-gradient-to-r,
-    .bg-gradient-to-l {
-      background: linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to)) !important;
+    h2 {
+      font-size: 1.375rem !important; /* 22px instead of 24px */
+      line-height: 1.2 !important;
     }
     
-    /* Reduce shadow complexity */
-    .shadow-lg,
-    .shadow-xl,
-    .shadow-2xl {
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    h3 {
+      font-size: 1.125rem !important; /* 18px instead of 20px */
+      line-height: 1.3 !important;
+    }
+    
+    /* Better mobile paragraph text */
+    p {
+      font-size: 0.875rem !important; /* 14px */
+      line-height: 1.5 !important;
+    }
+    
+    /* Smaller button text on mobile */
+    button {
+      font-size: 0.875rem !important; /* 14px */
+    }
+    
+    /* Hero section specific mobile fixes */
+    .hero-title {
+      font-size: 2.5rem !important; /* 40px */
+      line-height: 1.1 !important;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.125rem !important; /* 18px */
+      line-height: 1.4 !important;
+    }
+    
+    /* Ensure proper spacing for touch targets */
+    button + button,
+    [role="button"] + [role="button"] {
+      margin-left: 8px;
     }
   }
 }
@@ -44,15 +66,15 @@
 /* Hide scrollbar but keep functionality */
 @layer utilities {
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
   .scrollbar-hide::-webkit-scrollbar { 
-    display: none;  /* Safari and Chrome */
+    display: none;
   }
 }
 
-/* Ensure minimum touch targets */
+/* Enhanced mobile experience */
 @layer base {
   button, [role="button"] {
     min-height: 44px;
@@ -68,55 +90,8 @@
     button, [role="button"], a, .clickable {
       min-height: 48px;
       min-width: 48px;
-      position: relative;
     }
     
-    /* Ensure proper spacing for touch targets */
-    button + button,
-    [role="button"] + [role="button"] {
-      margin-left: 8px;
-    }
-    
-    /* Better tap highlighting */
-    button:active,
-    [role="button"]:active,
-    a:active {
-      background-color: rgba(0, 0, 0, 0.1);
-      transform: scale(0.98);
-      transition: all 0.1s ease;
-    }
-    
-    /* Better mobile form controls */
-    input, select, textarea {
-      padding: 12px 16px;
-      border-radius: 12px;
-    }
-    
-    /* Improved mobile typography */
-    h1 {
-      font-size: 1.875rem; /* 30px */
-      line-height: 1.2;
-    }
-    
-    h2 {
-      font-size: 1.5rem; /* 24px */
-      line-height: 1.3;
-    }
-    
-    h3 {
-      font-size: 1.25rem; /* 20px */
-      line-height: 1.4;
-    }
-    
-    /* Better mobile spacing */
-    .container {
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
-  }
-  
-  /* Mobile-specific improvements for bottom sections */
-  @media (max-width: 768px) {
     /* Ensure footer and bottom sections have proper touch spacing */
     footer {
       padding-bottom: env(safe-area-inset-bottom, 20px) !important;
@@ -132,22 +107,28 @@
       bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
       right: 16px !important;
     }
-  }
-  
-  /* Add touch-friendly interactions */
-  @media (hover: none) and (pointer: coarse) {
-    /* This targets touch devices */
-    button:hover {
-      /* Remove hover effects on touch devices */
-      transform: none;
+    
+    /* Better mobile form controls */
+    input, select, textarea {
+      padding: 12px 16px;
+      border-radius: 12px;
     }
     
-    button:active {
-      transform: scale(0.95);
-      transition: transform 0.1s;
+    /* Better mobile spacing */
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
     }
   }
 }
+
+/* Napoleon Hill AI Chatbot Styling */
+#VG_OVERLAY_CONTAINER {
+  z-index: 9999 !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+  
 
 /* Napoleon Hill AI Brain Chatbot Custom Styling */
 /* Optimize chatbot for mobile performance */
@@ -416,184 +397,3 @@
 /* Add visual feedback for interactive elements */
 #VG_OVERLAY_CONTAINER button {
   transition: all 0.2s ease !important;
-}
-
-#VG_OVERLAY_CONTAINER button:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Clear visual separation between elements */
-#VG_OVERLAY_CONTAINER .vg-chat-container {
-  border: 1px solid #e5e7eb !important;
-}
-
-#VG_OVERLAY_CONTAINER .vg-footer-mother-container {
-  border-top: 1px solid #e5e7eb !important;
-}
-
-/* Force button labels and tooltips with stronger selectors */
-#VG_OVERLAY_CONTAINER button,
-#VG_OVERLAY_CONTAINER [role="button"],
-#VG_OVERLAY_CONTAINER .vg-button,
-#VG_OVERLAY_CONTAINER .button {
-  position: relative !important;
-  overflow: visible !important;
-}
-
-/* Add labels directly to common button patterns */
-#VG_OVERLAY_CONTAINER button:nth-of-type(1):not([type="submit"])::after,
-#VG_OVERLAY_CONTAINER .vg-footer button:nth-child(1)::after {
-  content: "📎 Attach" !important;
-  position: absolute !important;
-  bottom: -20px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  background: #374151 !important;
-  color: #ffffff !important;
-  padding: 2px 6px !important;
-  border-radius: 4px !important;
-  font-size: 10px !important;
-  white-space: nowrap !important;
-  z-index: 9999 !important;
-  opacity: 0 !important;
-  transition: opacity 0.2s !important;
-  pointer-events: none !important;
-}
-
-#VG_OVERLAY_CONTAINER button:nth-of-type(2):not([type="submit"])::after,
-#VG_OVERLAY_CONTAINER .vg-footer button:nth-child(2)::after {
-  content: "🎤 Voice" !important;
-  position: absolute !important;
-  bottom: -20px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  background: #374151 !important;
-  color: #ffffff !important;
-  padding: 2px 6px !important;
-  border-radius: 4px !important;
-  font-size: 10px !important;
-  white-space: nowrap !important;
-  z-index: 9999 !important;
-  opacity: 0 !important;
-  transition: opacity 0.2s !important;
-  pointer-events: none !important;
-}
-
-#VG_OVERLAY_CONTAINER button[type="submit"]::after,
-#VG_OVERLAY_CONTAINER .vg-send-button::after,
-#VG_OVERLAY_CONTAINER .send-button::after {
-  content: "➤ Send to Napoleon Hill" !important;
-  position: absolute !important;
-  bottom: -20px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  background: #f59e0b !important;
-  color: #1f2937 !important;
-  padding: 2px 8px !important;
-  border-radius: 4px !important;
-  font-size: 10px !important;
-  font-weight: 600 !important;
-  white-space: nowrap !important;
-  z-index: 9999 !important;
-  opacity: 0 !important;
-  transition: opacity 0.2s !important;
-  pointer-events: none !important;
-}
-
-/* Show labels on hover */
-#VG_OVERLAY_CONTAINER button:hover::after,
-#VG_OVERLAY_CONTAINER [role="button"]:hover::after {
-  opacity: 1 !important;
-}
-
-/* Make sure footer has enough space for labels */
-#VG_OVERLAY_CONTAINER .vg-footer,
-#VG_OVERLAY_CONTAINER .vg-footer-mother-container {
-  padding-bottom: 30px !important;
-  overflow: visible !important;
-}
-
-/* Alternative approach: Add text inside buttons */
-#VG_OVERLAY_CONTAINER button:not([type="submit"]) {
-  min-width: 50px !important;
-  height: 40px !important;
-}
-
-/* Make send button more obvious */
-#VG_OVERLAY_CONTAINER button[type="submit"],
-#VG_OVERLAY_CONTAINER .vg-send-button {
-  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
-  color: #1f2937 !important;
-  font-weight: 700 !important;
-  min-width: 60px !important;
-  border: 2px solid #92400e !important;
-}
-
-#VG_OVERLAY_CONTAINER button[type="submit"]:hover,
-#VG_OVERLAY_CONTAINER .vg-send-button:hover {
-  background: linear-gradient(135deg, #d97706, #b45309) !important;
-  transform: scale(1.05) !important;
-}
-
-/* Force visible container */
-#VG_OVERLAY_CONTAINER {
-  z-index: 999999 !important;
-  /* Prevent mobile layout issues */
-  pointer-events: auto !important;
-  touch-action: manipulation !important;
-}
-
-/* Try to catch any button with data attributes */
-#VG_OVERLAY_CONTAINER [data-action]::before {
-  content: attr(data-action) !important;
-  position: absolute !important;
-  top: -18px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  background: #374151 !important;
-  color: #ffffff !important;
-  padding: 2px 6px !important;
-  border-radius: 3px !important;
-  font-size: 9px !important;
-  opacity: 0 !important;
-  transition: opacity 0.2s !important;
-}
-
-#VG_OVERLAY_CONTAINER [data-action]:hover::before {
-  opacity: 1 !important;
-}
-
-/* Mobile-specific chatbot fixes */
-@media (max-width: 768px) {
-  #VG_OVERLAY_CONTAINER {
-    /* Optimize positioning on mobile */
-    bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
-    left: 5vw !important;
-    right: 5vw !important;
-    width: 90vw !important;
-    max-height: 70vh !important;
-  }
-  
-  /* Better mobile interaction */
-  #VG_OVERLAY_CONTAINER .vg-chat-container {
-    border-radius: 16px !important;
-    margin: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-  
-  /* Larger touch targets on mobile */
-  #VG_OVERLAY_CONTAINER button,
-  #VG_OVERLAY_CONTAINER input,
-  #VG_OVERLAY_CONTAINER textarea {
-    min-height: 48px !important;
-    border-radius: 12px !important;
-  }
-  
-  /* Prevent iOS zoom on inputs */
-  #VG_OVERLAY_CONTAINER input,
-  #VG_OVERLAY_CONTAINER textarea {
-    font-size: 16px !important;
-  }
-}
