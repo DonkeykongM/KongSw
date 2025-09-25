@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, User, Mail, Calendar, BookOpen, Trophy, Target, Edit2, Save, X, Lock, Eye, EyeOff, Camera, AlertCircle } from 'lucide-react';
+import { ArrowLeft, User, Mail, Calendar, BookOpen, Trophy, Target, CreditCard as Edit2, Save, X, Lock, Eye, EyeOff, Camera, AlertCircle } from 'lucide-react';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { getCompletedWeeksCount, getTotalProgress } from '../utils/progressStorage';
 import { useProfile } from '../hooks/useProfile';
