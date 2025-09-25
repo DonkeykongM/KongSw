@@ -118,32 +118,28 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
       if (err instanceof TypeError && err.message && err.message.includes('Failed to fetch')) {
         setError(`🚨 STRIPE CHECKOUT FUNKTION INTE DEPLOYAD
 
-Din stripe-checkout Edge Function är inte deployad till Supabase.
+🚨 KONTROLLERA STRIPE-KONFIGURATION
 
-STEG FÖR ATT FIXA:
+Din betalning gick igenom men kontot skapades inte. Detta kan bero på:
 
-1. 📂 Öppna Supabase Dashboard:
-   https://supabase.com/dashboard/project/acdwexqoonauzzjtoexx
+MÖJLIGA PROBLEM:
 
-2. 🔧 Gå till "Edge Functions" i vänstra menyn
+1. 📂 Stripe Webhook inte deployad:
+   Gå till Supabase Dashboard → Edge Functions → Skapa "stripe-webhook"
 
-3. ➕ Klicka "Create a new function"
+2. 🔗 Webhook URL inte konfigurerad i Stripe:
+   Lägg till: https://acdwexqoonauzzjtoexx.supabase.co/functions/v1/stripe-webhook
 
-4. 📝 Namnge funktionen: "stripe-checkout"
+3. 🔑 Webhook Secret inte konfigurerad:
+   Kopiera webhook secret från Stripe → Supabase Environment Variables
 
-5. 💾 Kopiera koden från: supabase/functions/stripe-checkout/index.ts
+SNABBFIX:
+📧 Skicka ett mail till support@kongmindset.se med:
+- Din e-postadress: ${email}
+- Texten: "Köpte kursen men kan inte logga in"
+- Vi aktiverar ditt konto manuellt inom 1 timme
 
-6. 🔑 Gå till "Settings" → "Environment Variables" och lägg till:
-   - STRIPE_SECRET_KEY (från Stripe Dashboard → Developers → API keys)
-   - STRIPE_WEBHOOK_SECRET (skapa webhook i Stripe först)
-   - SUPABASE_SERVICE_ROLE_KEY (från Supabase Settings → API)
-
-7. 🚀 Spara och deploya funktionen
-
-8. 🧪 Testa betalningen igen här
-
-ALTERNATIVT: Om du har Supabase CLI installerat lokalt:
-supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
+Alternativt kan du försöka köpa igen (ingen dubbel debitering sker).`);
       } else {
         // Handle other errors
         let errorMessage = 'Kunde inte ansluta till betalningssystemet. Försök igen.';
