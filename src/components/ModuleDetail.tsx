@@ -103,41 +103,72 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
 
   // Load Napoleon Hill AI Brain for module pages
   useEffect(() => {
+    // Prevent chatbot loading on small mobile screens to avoid crashes
+    const isMobile = window.innerWidth < 768;
+    const isLowEndDevice = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
+    
+    // Skip chatbot on mobile or low-end devices to prevent crashes
+    if (isMobile || isLowEndDevice) {
+      console.log('Skipping chatbot on mobile/low-end device to prevent crashes');
+      return;
+    }
+    
     if (!window.VG_SCRIPT_LOADED) {
-      // Create the container if it doesn't exist
-      if (!document.getElementById('VG_OVERLAY_CONTAINER')) {
-        const container = document.createElement('div');
-        container.id = 'VG_OVERLAY_CONTAINER';
-        container.style.width = '0px';
-        container.style.height = '0px';
-        container.style.position = 'fixed';
-        container.style.bottom = '20px';
-        container.style.right = '20px';
-        container.style.zIndex = '9999';
-        container.style.transition = 'width 0.3s ease, height 0.3s ease';
-        container.style.overflow = 'hidden';
-        document.body.appendChild(container);
-      }
+      // Add error handling for chatbot loading
+      try {
+        // Create the container if it doesn't exist
+        if (!document.getElementById('VG_OVERLAY_CONTAINER')) {
+          const container = document.createElement('div');
+          container.id = 'VG_OVERLAY_CONTAINER';
+          container.style.width = '0px';
+          container.style.height = '0px';
+          container.style.position = 'fixed';
+          container.style.bottom = '20px';
+          container.style.right = '20px';
+          container.style.zIndex = '9999';
+          container.style.transition = 'width 0.3s ease, height 0.3s ease';
+          container.style.overflow = 'hidden';
+          document.body.appendChild(container);
+        }
 
-      window.VG_CONFIG = {
-        ID: "6yGc4NPDxDr1xbtes97V",
-        region: 'na',
-        render: 'full-width',
-        stylesheets: [
-          "https://vg-bunny-cdn.b-cdn.net/vg_live_build/styles.css"
-        ]
-      };
-      
-      const VG_SCRIPT = document.createElement("script");
-      VG_SCRIPT.src = "https://vg-bunny-cdn.b-cdn.net/vg_live_build/vg_bundle.js";
-      VG_SCRIPT.defer = true;
-      document.body.appendChild(VG_SCRIPT);
-      window.VG_SCRIPT_LOADED = true;
+        window.VG_CONFIG = {
+          ID: "6yGc4NPDxDr1xbtes97V",
+          region: 'na',
+          render: 'full-width',
+          stylesheets: [
+            "https://vg-bunny-cdn.b-cdn.net/vg_live_build/styles.css"
+          ]
+        };
+        
+        // Add error handling for script loading
+        const VG_SCRIPT = document.createElement("script");
+        VG_SCRIPT.src = "https://vg-bunny-cdn.b-cdn.net/vg_live_build/vg_bundle.js";
+        VG_SCRIPT.defer = true;
+        VG_SCRIPT.onerror = () => {
+          console.warn('Failed to load chatbot script - continuing without AI mentor');
+          window.VG_SCRIPT_LOADED = false;
+        };
+        VG_SCRIPT.onload = () => {
+          console.log('Chatbot script loaded successfully');
+          window.VG_SCRIPT_LOADED = true;
+        };
+        document.body.appendChild(VG_SCRIPT);
+      } catch (error) {
+        console.error('Error setting up chatbot:', error);
+        window.VG_SCRIPT_LOADED = false;
+      }
     }
   }, []);
 
   const toggleChatbot = () => {
+    // Safety check for mobile devices
     const container = document.getElementById('VG_OVERLAY_CONTAINER');
+    if (!container || window.innerWidth < 768) {
+      // Show alternative mobile help instead
+      alert('Napoleon Hill AI-mentor: På mobila enheter, använd reflektionsfrågorna och quizen för vägledning. AI-chatten fungerar bäst på desktop.');
+      return;
+    }
+    
     if (container) {
       if (isChatbotExpanded) {
         container.style.width = '0px';
@@ -775,7 +806,6 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
               <XCircle className="w-10 h-10 text-yellow-600" />
             )}
           </div>
-          <h3 className="text-2xl font-bold text-gray-800 mb-4">Quiz Complete!</h3>
           <h3 className="text-2xl font-bold text-gray-800 mb-4">Quiz slutfört!</h3>
           <p className="text-gray-600 mb-4">
             Du fick {score} av {module.quiz.length} ({percentage}%)
@@ -1041,8 +1071,17 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
       {/* Mobile Progress Indicator */}
       <div className="sm:hidden bg-white border-b px-4 py-2">
         <div className="flex items-center justify-between text-xs text-gray-600">
-          <span>Modul {module.id} av 13</span>
-          <span>{activeTab === 'lesson' ? 'Lektion' : activeTab === 'reflection' ? 'Reflektion' : activeTab === 'quiz' ? 'Quiz' : 'Översikt'}</span>
+          <span className="font-medium">Modul {module.id} av 13</span>
+          <div className="flex items-center space-x-2">
+            <span>{activeTab === 'lesson' ? 'Lektion' : activeTab === 'reflection' ? 'Reflektion' : activeTab === 'quiz' ? 'Quiz' : 'Översikt'}</span>
+            <button
+              onClick={() => onSignOut()}
+              className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-medium min-h-[32px] min-w-[60px] active:scale-95"
+              title="Logga ut"
+            >
+              Ut
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1056,37 +1095,53 @@ const ModuleDetail: React.FC<ModuleDetailProps> = ({ module, onBack, onSignOut }
 
       {/* Chatbot Toggle Button */}
       <div className="fixed bottom-4 right-4 z-[10000]">
-        <button
-          onClick={toggleChatbot}
-          className={`bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-110 flex items-center space-x-2 ring-4 ring-blue-300/50 backdrop-blur-sm ${
-            isChatbotExpanded 
-              ? 'w-14 h-14 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 border-4 border-white text-white shadow-2xl' 
-              : 'p-5 w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white'
-          }`}
-          title={isChatbotExpanded ? 'Minimera Napoleon Hill AI' : 'Fråga Napoleon Hill AI - Din personliga framgångsmentor'}
-        >
-          {isChatbotExpanded ? (
-            <div className="flex flex-col items-center">
-              <X className="w-6 h-6" />
-              <span className="text-xs font-bold">STÄNG</span>
-            </div>
-          ) : (
-            <div className="relative">
-              <Brain className="w-8 h-8 text-white animate-pulse" />
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-bounce">
-                <MessageCircle className="w-3 h-3 text-white ml-0.5 mt-0.5" />
+        {/* Only show chatbot button on larger screens to prevent mobile crashes */}
+        <div className="hidden md:block">
+          <button
+            onClick={toggleChatbot}
+            className={`bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-110 flex items-center space-x-2 ring-4 ring-blue-300/50 backdrop-blur-sm ${
+              isChatbotExpanded 
+                ? 'w-14 h-14 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 border-4 border-white text-white shadow-2xl' 
+                : 'p-5 w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white'
+            }`}
+            title={isChatbotExpanded ? 'Minimera Napoleon Hill AI' : 'Fråga Napoleon Hill AI - Din personliga framgångsmentor'}
+          >
+            {isChatbotExpanded ? (
+              <div className="flex flex-col items-center">
+                <X className="w-6 h-6" />
+                <span className="text-xs font-bold">STÄNG</span>
               </div>
+            ) : (
+              <div className="relative">
+                <Brain className="w-8 h-8 text-white animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-bounce">
+                  <MessageCircle className="w-3 h-3 text-white ml-0.5 mt-0.5" />
+                </div>
+              </div>
+            )}
+          </button>
+          
+          {!isChatbotExpanded && (
+            <div className="absolute -top-16 right-0 bg-gradient-to-r from-blue-900 to-indigo-900 text-white px-4 py-2 rounded-lg shadow-xl opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+              <div className="text-sm font-bold">🧠 Napoleon Hill AI</div>
+              <div className="text-xs opacity-90">Din personliga framgångsmentor</div>
+              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-blue-900"></div>
             </div>
           )}
-        </button>
+        </div>
         
-        {!isChatbotExpanded && (
-          <div className="absolute -top-16 right-0 bg-gradient-to-r from-blue-900 to-indigo-900 text-white px-4 py-2 rounded-lg shadow-xl opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
-            <div className="text-sm font-bold">🧠 Napoleon Hill AI</div>
-            <div className="text-xs opacity-90">Din personliga framgångsmentor</div>
-            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-blue-900"></div>
-          </div>
-        )}
+        {/* Mobile Help Button (Alternative to chatbot) */}
+        <div className="md:hidden">
+          <button
+            onClick={() => {
+              alert('💡 Mobilhjälp:\n\n• Använd reflektionsfrågorna för djupare förståelse\n• Ta quizen för att testa din kunskap\n• Napoleon Hill AI fungerar bäst på desktop\n• Alla moduler är optimerade för mobil läsning');
+            }}
+            className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-110 p-4 w-14 h-14 flex items-center justify-center active:scale-95"
+            title="Mobilhjälp och tips"
+          >
+            <span className="text-2xl">💡</span>
+          </button>
+        </div>
       </div>
     </div>
   );
