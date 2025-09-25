@@ -23,7 +23,6 @@ serve(async (req) => {
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
-    console.log('Webhook event received:', event.type, event.id)
     
 
     let event
@@ -37,6 +36,8 @@ serve(async (req) => {
       console.error('Webhook signature verification failed:', err.message)
       return new Response(`Webhook signature verification failed: ${err.message}`, { status: 400 })
     }
+
+    console.log('Webhook event received:', event.type, event.id)
 
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -153,103 +154,133 @@ serve(async (req) => {
           console.error('Order storage failed:', error)
         }
 
-        console.error('No email found in session:', session.id)
+        if (!customerEmail) {
+          console.error('No email found in session:', session.id)
+        }
+        if (!tempPassword) {
+          console.error('No password found in metadata for session:', session.id)
+        }
+        
+        console.log('Attempting to create account for:', email)
+        
+        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+          email: email,
+          password: password,
+          email_confirm: true,
+          user_metadata: {
+            created_via: 'stripe_checkout',
+            stripe_customer_id: session.customer,
+            stripe_session_id: session.id,
+            display_name: email.split('@')[0]
+          }
+        })
+
+        if (authError) {
+          console.error('Failed to create user account:', authError)
+          
+          // If user already exists, that's OK - they might have signed up manually first
+          if (authError.message?.includes('already_registered') || authError.message?.includes('already exists')) {
+            console.log('User already exists, proceeding with customer creation')
+            // Try to get the existing user
+            const { data: existingUser } = await supabaseAdmin.auth.admin.getUserByEmail(email)
+            if (existingUser?.user) {
+              console.log('Found existing user:', existingUser.user.id)
+              // Continue with customer record creation below
+            } else {
+              return new Response('User exists but could not retrieve', { status: 500, headers: corsHeaders })
+            }
+          } else {
+            return new Response(`Failed to create user: ${authError.message}`, { status: 500, headers: corsHeaders })
+          }
+        } else {
+          console.log('Successfully created user account:', authData.user.id)
+        }
+
+        const userId = authData?.user?.id || (await supabaseAdmin.auth.admin.getUserByEmail(email)).data?.user?.id
+        
+        if (!userId) {
+          console.error('Could not get user ID for email:', email)
+          return new Response('Could not get user ID', { status: 500, headers: corsHeaders })
+        }
+
+        const { error: customerRecordError } = await supabaseAdmin
+          .from('stripe_customers')
+          .upsert([{
+            user_id: userId,
+            customer_id: session.customer as string
+          }], {
+            onConflict: 'user_id'
+          })
+
+        if (customerRecordError) {
+          console.error('Customer record error:', customerRecordError)
+          // Don't fail the webhook if customer record fails, user account is more important
+          console.log('Warning: Customer record creation failed but user account exists')
+        } else {
+          console.log('Successfully created customer record for user:', userId)
+        }
+
+        // Create user profile with default values
+        const { error: profileError } = await supabaseAdmin
+          .from('user_profiles')
+          .upsert([{
+            user_id: userId,
+            display_name: email.split('@')[0],
+            bio: 'Behärskar Napoleon Hills framgångsprinciper',
+            goals: 'Bygger rikedom genom tankesättstransformation',
+            favorite_module: 'Önskans kraft',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }], {
+            onConflict: 'user_id'
+          })
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError)
+          // Don't fail webhook for profile creation error
+          console.log('Warning: Profile creation failed but user account exists')
+        } else {
+          console.log('Successfully created user profile for:', userId)
+        }
+
         // Send notification to Make.com webhook
         try {
           const webhookPayload = {
             event_type: 'course_purchased',
-        console.error('No password found in metadata for session:', session.id)
             customer_email: customerEmail,
             customer_name: session.customer_details?.name || customerEmail?.split('@')[0] || 'Unknown',
             amount: session.amount_total ? (session.amount_total / 100) : 0,
-      console.log('Attempting to create account for:', email)
-      
             currency: session.currency?.toUpperCase() || 'SEK',
             payment_status: session.payment_status,
             stripe_session_id: session.id,
             purchase_date: new Date().toISOString(),
             product_name: 'KongMindset Course - Think and Grow Rich',
-        user_metadata: {
-          created_via: 'stripe_checkout',
-          stripe_customer_id: session.customer,
-          stripe_session_id: session.id,
-          display_name: email.split('@')[0]
-        }
             special_price: session.amount_total === 29900, // 299 kr in öre
             stripe_customer_id: session.customer,
-            source: 'stripe_webhook',
-        console.error('Failed to create user account:', authError)
-        
-        // If user already exists, that's OK - they might have signed up manually first
-        if (authError.message?.includes('already_registered') || authError.message?.includes('already exists')) {
-          console.log('User already exists, proceeding with customer creation')
-          // Try to get the existing user
-          const { data: existingUser } = await supabase.auth.admin.getUserByEmail(email)
-          if (existingUser?.user) {
-            console.log('Found existing user:', existingUser.user.id)
-            // Continue with customer record creation below
-          } else {
-            return new Response('User exists but could not retrieve', { status: 500, headers: corsHeaders })
+            source: 'stripe_webhook'
           }
-        } else {
-          return new Response(`Failed to create user: ${authError.message}`, { status: 500, headers: corsHeaders })
-        }
-      } else {
-        console.log('Successfully created user account:', authData.user.id)
 
           console.log('Sending webhook notification to Make.com')
           
-      const userId = authData?.user?.id || (await supabase.auth.admin.getUserByEmail(email)).data?.user?.id
-      
-      if (!userId) {
-        console.error('Could not get user ID for email:', email)
-        return new Response('Could not get user ID', { status: 500, headers: corsHeaders })
-      }
+          const webhookResponse = await fetch(Deno.env.get('MAKE_WEBHOOK_URL') || '', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-        .upsert([{
+            body: JSON.stringify(webhookPayload)
           })
 
           if (webhookResponse.ok) {
             console.log('Webhook notification sent successfully')
-        }], {
-          onConflict: 'user_id'
-        })
+          } else {
             console.error('Webhook notification failed:', webhookResponse.status)
           }
         } catch (webhookError) {
-        // Don't fail the webhook if customer record fails, user account is more important
-        console.log('Warning: Customer record creation failed but user account exists')
-      } else {
-        console.log('Successfully created customer record for user:', userId)
+          console.error('Webhook notification error:', webhookError)
           // Don't fail the whole process if webhook fails
         }
-      // Create user profile with default values
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .upsert([{
-          user_id: userId,
-          display_name: email.split('@')[0],
-          bio: 'Behärskar Napoleon Hills framgångsprinciper',
-          goals: 'Bygger rikedom genom tankesättstransformation',
-          favorite_module: 'Önskans kraft',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }], {
-          onConflict: 'user_id'
-        })
 
-      if (profileError) {
-        console.error('Profile creation error:', profileError)
-        // Don't fail webhook for profile creation error
-        console.log('Warning: Profile creation failed but user account exists')
-      } else {
-        console.log('Successfully created user profile for:', userId)
-      }
-
-      console.log('Webhook processing completed successfully for:', email)
+        console.log('Webhook processing completed successfully for:', email)
       }
     }
 
