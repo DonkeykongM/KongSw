@@ -70,51 +70,15 @@ const CourseModules: React.FC<CourseModulesProps> = ({ onModuleStart }) => {
         
         // Add close button and click listener to header for minimizing
         setTimeout(() => {
-          // Add close button to chatbot
-          const headerElements = container.querySelectorAll('.vg-header, .vg-title, .vg-header-container, #vg-header-container');
-          headerElements.forEach(header => {
-            // Create close button if it doesn't exist
-            if (!header.querySelector('.close-chatbot-btn')) {
-              const closeBtn = document.createElement('button');
-              closeBtn.className = 'close-chatbot-btn';
-              closeBtn.innerHTML = '✕';
-              closeBtn.style.cssText = `
-                position: absolute;
-                top: 8px;
-                right: 8px;
-                background: rgba(255,255,255,0.9);
-                border: none;
-                border-radius: 50%;
-                width: 32px;
-                height: 32px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 18px;
-                font-weight: bold;
-                color: #374151;
-                cursor: pointer;
-                z-index: 10001;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-              `;
-              closeBtn.onclick = (e) => {
-                e.stopPropagation();
-                container.style.width = '0px';
-                container.style.height = '0px';
-                setIsChatbotExpanded(false);
-              };
-              header.style.position = 'relative';
-              header.appendChild(closeBtn);
-            }
-            
-            header.addEventListener('click', () => {
+          // Look for existing close button and use it instead of creating our own
+          const existingCloseBtn = container.querySelector('button[aria-label*="close"], button[title*="close"], .close-btn, [data-close]');
+          if (existingCloseBtn) {
+            existingCloseBtn.addEventListener('click', () => {
               container.style.width = '0px';
               container.style.height = '0px';
               setIsChatbotExpanded(false);
             });
-            header.style.cursor = 'pointer';
-            header.title = 'Klicka för att stänga chatten';
-          });
+          }
         }, 1000);
       } else {
         container.style.width = '0px';
