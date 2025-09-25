@@ -86,7 +86,7 @@ export default function LandingPage({ onJoinClick }: LandingPageProps) {
             {/* Login Button */}
             <button
               onClick={onJoinClick}
-              className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 inline-flex items-center space-x-2 min-h-[48px]"
+              className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold py-4 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 inline-flex items-center space-x-2 min-h-[52px] text-base"
             >
               <span>🔑 Logga in</span>
             </button>
@@ -118,7 +118,7 @@ export default function LandingPage({ onJoinClick }: LandingPageProps) {
             {/* Special Offer Badge */}
             <button
               onClick={onJoinClick}
-              className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-6 py-3 rounded-full inline-block mb-8 shadow-2xl animate-pulse transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+              className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-8 py-4 rounded-full inline-block mb-8 shadow-2xl animate-pulse transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer min-h-[52px] text-base"
             >
               <span className="font-bold text-lg">🔥 2025 KAMPANJ: 299 kr specialpris!</span>
             </button>
@@ -287,7 +287,7 @@ export default function LandingPage({ onJoinClick }: LandingPageProps) {
 
             <button
               onClick={onJoinClick}
-              className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-black font-bold py-4 px-8 rounded-full text-xl shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-105 active:scale-95 inline-flex items-center space-x-3 mb-8"
+              className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-black font-bold py-4 px-8 rounded-full text-lg sm:text-xl shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-105 active:scale-95 inline-flex items-center space-x-3 mb-8 min-h-[56px]"
             >
               <Sparkles className="w-6 h-6" />
               <span>Säkra Din Plats Nu - {coursePrice}</span>

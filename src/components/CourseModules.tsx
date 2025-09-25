@@ -16,40 +16,67 @@ const CourseModules: React.FC<CourseModulesProps> = ({ onModuleStart }) => {
 
   useEffect(() => {
     // Load Napoleon Hill AI Brain for course pages
+    // Skip chatbot loading on mobile to prevent crashes
+    const isMobile = window.innerWidth < 768;
+    const isLowEndDevice = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
+    
+    if (isMobile || isLowEndDevice) {
+      console.log('Skipping chatbot on mobile/low-end device to prevent crashes');
+      return;
+    }
+    
     if (!window.VG_SCRIPT_LOADED) {
-      // Create the container if it doesn't exist
-      if (!document.getElementById('VG_OVERLAY_CONTAINER')) {
-        const container = document.createElement('div');
-        container.id = 'VG_OVERLAY_CONTAINER';
-        container.style.width = '0px';
-        container.style.height = '0px';
-        container.style.position = 'fixed';
-        container.style.bottom = '20px';
-        container.style.right = '20px';
-        container.style.zIndex = '9998';
-        container.style.transition = 'all 0.3s ease';
-        container.style.overflow = 'hidden';
-        document.body.appendChild(container);
-      }
+      try {
+        // Create the container if it doesn't exist
+        if (!document.getElementById('VG_OVERLAY_CONTAINER')) {
+          const container = document.createElement('div');
+          container.id = 'VG_OVERLAY_CONTAINER';
+          container.style.width = '0px';
+          container.style.height = '0px';
+          container.style.position = 'fixed';
+          container.style.bottom = '20px';
+          container.style.right = '20px';
+          container.style.zIndex = '9998';
+          container.style.transition = 'all 0.3s ease';
+          container.style.overflow = 'hidden';
+          document.body.appendChild(container);
+        }
 
-      window.VG_CONFIG = {
-        ID: "6yGc4NPDxDr1xbtes97V",
-        region: 'na',
-        render: 'full-width',
-        stylesheets: [
-          "https://vg-bunny-cdn.b-cdn.net/vg_live_build/styles.css"
-        ]
-      };
-      
-      const VG_SCRIPT = document.createElement("script");
-      VG_SCRIPT.src = "https://vg-bunny-cdn.b-cdn.net/vg_live_build/vg_bundle.js";
-      VG_SCRIPT.defer = true;
-      document.body.appendChild(VG_SCRIPT);
-      window.VG_SCRIPT_LOADED = true;
+        window.VG_CONFIG = {
+          ID: "6yGc4NPDxDr1xbtes97V",
+          region: 'na',
+          render: 'full-width',
+          stylesheets: [
+            "https://vg-bunny-cdn.b-cdn.net/vg_live_build/styles.css"
+          ]
+        };
+        
+        const VG_SCRIPT = document.createElement("script");
+        VG_SCRIPT.src = "https://vg-bunny-cdn.b-cdn.net/vg_live_build/vg_bundle.js";
+        VG_SCRIPT.defer = true;
+        VG_SCRIPT.onerror = () => {
+          console.warn('Failed to load chatbot script');
+          window.VG_SCRIPT_LOADED = false;
+        };
+        VG_SCRIPT.onload = () => {
+          window.VG_SCRIPT_LOADED = true;
+        };
+        document.body.appendChild(VG_SCRIPT);
+      } catch (error) {
+        console.error('Error setting up chatbot:', error);
+        window.VG_SCRIPT_LOADED = false;
+      }
     }
   }, []);
 
   const toggleChatbot = () => {
+    // Safety check for mobile devices
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) {
+      alert('Napoleon Hill AI-mentor: På mobila enheter rekommenderar vi att använda reflektionsfrågorna och quizen för vägledning. AI-chatten fungerar bäst på desktop för optimal prestanda.');
+      return;
+    }
+    
     const container = document.getElementById('VG_OVERLAY_CONTAINER');
     if (container) {
       if (!isChatbotExpanded) {
@@ -376,35 +403,52 @@ const CourseModules: React.FC<CourseModulesProps> = ({ onModuleStart }) => {
 
     {/* Chatbot Toggle Button */}
     <div className="fixed bottom-4 right-4 z-[10000]">
-      <button
-        onClick={toggleChatbot}
-        className={`bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-110 flex items-center space-x-2 ring-4 ring-blue-300/50 backdrop-blur-sm ${
-          isChatbotExpanded ? 'py-3 px-6 text-base bg-red-600 hover:bg-red-700' : 'p-5 w-16 h-16'
-        }`}
-        title={isChatbotExpanded ? 'Minimera Napoleon Hill AI' : 'Fråga Napoleon Hill AI - Din personliga framgångsmentor'}
-      >
-        {isChatbotExpanded ? (
-          <>
-            <Minimize2 className="w-6 h-6" />
-            <span className="font-semibold">✕ Stäng</span>
-          </>
-        ) : (
-          <div className="relative">
-            <Brain className="w-8 h-8 text-white animate-pulse" />
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-bounce">
-              <MessageCircle className="w-3 h-3 text-white ml-0.5 mt-0.5" />
+      {/* Desktop Chatbot Button */}
+      <div className="hidden md:block">
+        <button
+          onClick={toggleChatbot}
+          className={`bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-110 flex items-center space-x-2 ring-4 ring-blue-300/50 backdrop-blur-sm ${
+            isChatbotExpanded ? 'py-3 px-6 text-base bg-red-600 hover:bg-red-700' : 'p-5 w-16 h-16'
+          }`}
+          title={isChatbotExpanded ? 'Minimera Napoleon Hill AI' : 'Fråga Napoleon Hill AI - Din personliga framgångsmentor'}
+        >
+          {isChatbotExpanded ? (
+            <>
+              <Minimize2 className="w-6 h-6" />
+              <span className="font-semibold">✕ Stäng</span>
+            </>
+          ) : (
+            <div className="relative">
+              <Brain className="w-8 h-8 text-white animate-pulse" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-bounce">
+                <MessageCircle className="w-3 h-3 text-white ml-0.5 mt-0.5" />
+              </div>
             </div>
+          )}
+        </button>
+        
+        {!isChatbotExpanded && (
+          <div className="absolute -top-12 right-0 bg-gradient-to-r from-blue-900 to-indigo-900 text-white px-4 py-2 rounded-lg shadow-xl opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+            <div className="text-sm font-bold">🧠 Napoleon Hill AI</div>
+            <div className="text-xs opacity-90">Din personliga framgångsmentor</div>
+            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-blue-900"></div>
           </div>
         )}
-      </button>
+      </div>
       
-      {!isChatbotExpanded && (
-        <div className="absolute -top-12 right-0 bg-gradient-to-r from-blue-900 to-indigo-900 text-white px-4 py-2 rounded-lg shadow-xl opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
-          <div className="text-sm font-bold">🧠 Napoleon Hill AI</div>
-          <div className="text-xs opacity-90">Din personliga framgångsmentor</div>
-          <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-blue-900"></div>
-        </div>
-      )}
+      {/* Mobile Help Button (Alternative to chatbot) */}
+      <div className="md:hidden">
+        <button
+          onClick={() => {
+            const helpText = '💡 Mobilhjälp:\n\n• Använd reflektionsfrågorna för djupare förståelse\n• Ta quizen för att testa din kunskap\n• Napoleon Hill AI fungerar bäst på desktop\n• Alla moduler är optimerade för mobil läsning\n• Använd röd "Ut"-knapp för att logga ut';
+            alert(helpText);
+          }}
+          className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-110 p-4 w-16 h-16 flex items-center justify-center active:scale-95"
+          title="Mobilhjälp och tips"
+        >
+          <span className="text-2xl">💡</span>
+        </button>
+      </div>
     </div>
     </>
   );

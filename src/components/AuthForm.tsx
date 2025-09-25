@@ -215,7 +215,7 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
           <div className="flex rounded-lg bg-neutral-100 p-1 mb-6">
             <button
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-3 px-3 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-all min-h-[44px] ${
+              className={`flex-1 py-3 px-3 sm:px-4 rounded-md text-sm font-medium transition-all min-h-[48px] active:scale-95 ${
                 isLogin
                   ? 'bg-white text-primary-700 shadow-sm'
                   : 'text-neutral-600 hover:text-primary-600'
@@ -225,7 +225,7 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
             </button>
             <button
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-3 px-3 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-all min-h-[44px] ${
+              className={`flex-1 py-3 px-3 sm:px-4 rounded-md text-sm font-medium transition-all min-h-[48px] active:scale-95 ${
                 !isLogin
                   ? 'bg-white text-primary-700 shadow-sm'
                   : 'text-neutral-600 hover:text-primary-600'
@@ -248,9 +248,10 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-9 sm:pl-10 pr-4 py-3 sm:py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[48px]"
+                  className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[52px] active:border-primary-400"
                   placeholder="Ange din e-postadress"
                   required
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -267,14 +268,15 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-9 sm:pl-10 pr-12 py-3 sm:py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[48px]"
+                  className="w-full pl-10 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[52px] active:border-primary-400"
                   placeholder={isLogin ? "Ange ditt lösenord" : "Skapa ett lösenord"}
                   required
+                  autoComplete={isLogin ? "current-password" : "new-password"}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 min-h-[48px] min-w-[48px] flex items-center justify-center"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 min-h-[52px] min-w-[52px] flex items-center justify-center active:scale-95 rounded-lg hover:bg-gray-100"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                 </button>
@@ -294,14 +296,15 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
                     id="confirmPassword"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-9 sm:pl-10 pr-12 py-3 sm:py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[48px]"
+                    className="w-full pl-10 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[52px] active:border-primary-400"
                     placeholder="Bekräfta ditt lösenord"
                     required
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 min-h-[48px] min-w-[48px] flex items-center justify-center"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 min-h-[52px] min-w-[52px] flex items-center justify-center active:scale-95 rounded-lg hover:bg-gray-100"
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </button>
@@ -348,7 +351,7 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
             <button
               type="submit"
               disabled={loading}
-             className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-4 px-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-h-[48px] text-base"
+             className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-4 px-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-h-[52px] text-base active:scale-95"
             >
               {loading ? 'Bearbetar...' : (isLogin ? 'Logga in' : `🛒 Köp kurs - ${coursePrice}`)}
             </button>
@@ -359,7 +362,7 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
             {isLogin ? "Redo att förvandla ditt liv? " : "Har du redan ett konto? "}
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-primary-600 hover:text-primary-700 font-medium underline"
+              className="text-primary-600 hover:text-primary-700 font-medium underline min-h-[44px] px-2 active:scale-95"
             >
               {isLogin ? 'Köp tillgång' : 'Logga in'}
             </button>

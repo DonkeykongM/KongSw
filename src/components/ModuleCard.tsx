@@ -27,13 +27,13 @@ export default function ModuleCard({
   const { id, title, description, icon: IconComponent } = module;
 
   return (
-    <div className={`bg-white/90 backdrop-blur-sm shadow-lg rounded-xl p-4 sm:p-6 flex flex-col items-center transform transition-all duration-300 border w-full max-w-sm relative ${
+    <div className={`bg-white/95 shadow-lg rounded-xl p-4 sm:p-6 flex flex-col items-center transform transition-all duration-300 border w-full max-w-sm relative ${
       isLocked ? 'opacity-60 border-gray-300' : 
       isCompleted ? 'border-green-300 bg-green-50/50 hover:scale-105 hover:shadow-2xl' : 
       'border-white/20 hover:scale-105 hover:shadow-2xl'
     } ${
       // Enhanced mobile touch experience
-      'active:scale-95 touch-manipulation min-h-[280px] sm:min-h-[320px]'
+      'active:scale-95 touch-manipulation min-h-[300px] sm:min-h-[320px]'
     }`}>
       {isCompleted && (
         <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-green-500 rounded-full p-1.5">
@@ -48,7 +48,7 @@ export default function ModuleCard({
       )}
       
       {/* Week Number Badge */}
-      <div className="absolute top-2 left-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-2 py-1 rounded-full text-xs font-bold">
+      <div className="absolute top-2 left-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold">
         Vecka {id}
       </div>
       
@@ -65,8 +65,8 @@ export default function ModuleCard({
           }`} />
         </div>
       )}
-      <h3 className="text-sm sm:text-lg font-display font-semibold mb-2 text-primary-800 text-center leading-tight px-2 line-clamp-2">{title}</h3>
-      <p className={`text-center mb-4 text-xs sm:text-sm leading-relaxed flex-grow px-2 line-clamp-3 ${
+      <h3 className="text-base sm:text-lg font-display font-semibold mb-3 text-primary-800 text-center leading-tight px-2 line-clamp-2">{title}</h3>
+      <p className={`text-center mb-4 text-sm leading-relaxed flex-grow px-2 line-clamp-3 ${
         isLocked ? 'text-gray-500' : 'text-neutral-600'
       }`}>{description}</p>
       
@@ -89,7 +89,7 @@ export default function ModuleCard({
       <button 
         onClick={() => !isLocked && onModuleStart(module.id)}
         disabled={isLocked}
-        className={`font-semibold py-3 px-4 rounded-full transition-all duration-300 shadow-lg text-sm min-h-[48px] w-full active:scale-95 ${
+        className={`font-semibold py-4 px-4 rounded-full transition-all duration-300 shadow-lg text-sm min-h-[52px] w-full active:scale-95 touch-manipulation ${
           isLocked
             ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
             : 

@@ -7,16 +7,16 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
-    <footer className="bg-gradient-to-r from-neutral-800 to-neutral-900 text-white py-12">
+    <footer className="bg-gradient-to-r from-neutral-800 to-neutral-900 text-white py-8 sm:py-12" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
               <img src="https://j0bzpddd4j.ufs.sh/f/bwjssIq7FWHCTuLlG8ZtZKdCcYS0qzlf2bvOgIJwexGAMR89" alt="KongMindset Logo" className="w-8 h-8" />
-              <span className="text-xl font-display font-bold">KongMindset</span>
+              <span className="text-lg sm:text-xl font-display font-bold">KongMindset</span>
             </div>
-            <p className="text-neutral-300 text-sm leading-relaxed">
+            <p className="text-neutral-300 text-sm sm:text-base leading-relaxed">
               Transformera ditt tankesätt och bygga rikedom med Napoleon Hills tidlösa principer. 
               Bemästra de 13 framgångsprinciperna från "Tänk och Bli Rik."
             </p>
@@ -24,7 +24,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">Snabblänkar</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-white">Snabblänkar</h3>
             <ul className="space-y-2">
               {[
                 { id: 'home', label: 'Hem' },
@@ -35,7 +35,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 <li key={link.id}>
                   <button
                     onClick={() => onNavigate?.(link.id)}
-                    className="text-neutral-300 hover:text-white text-sm transition-colors duration-200 text-left"
+                    className="text-neutral-300 hover:text-white text-sm transition-colors duration-200 text-left min-h-[44px] py-2 active:scale-95"
                   >
                     {link.label}
                   </button>
@@ -46,12 +46,12 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
           {/* Legal Links */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">Juridiskt</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-white">Juridiskt</h3>
             <ul className="space-y-2">
               <li>
                 <button
                   onClick={() => onNavigate?.('privacy-policy')}
-                  className="text-neutral-300 hover:text-white text-sm transition-colors duration-200 flex items-center space-x-2"
+                  className="text-neutral-300 hover:text-white text-sm transition-colors duration-200 flex items-center space-x-2 min-h-[44px] py-2 active:scale-95"
                 >
                   <Shield className="w-4 h-4" />
                   <span>Integritetspolicy</span>
@@ -60,7 +60,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <li>
                 <button
                   onClick={() => onNavigate?.('cookie-policy')}
-                  className="text-neutral-300 hover:text-white text-sm transition-colors duration-200 flex items-center space-x-2"
+                  className="text-neutral-300 hover:text-white text-sm transition-colors duration-200 flex items-center space-x-2 min-h-[44px] py-2 active:scale-95"
                 >
                   <Cookie className="w-4 h-4" />
                   <span>Cookie-policy</span>
@@ -69,7 +69,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <li>
                 <button
                   onClick={() => onNavigate?.('terms-of-service')}
-                  className="text-neutral-300 hover:text-white text-sm transition-colors duration-200 flex items-center space-x-2"
+                  className="text-neutral-300 hover:text-white text-sm transition-colors duration-200 flex items-center space-x-2 min-h-[44px] py-2 active:scale-95"
                 >
                   <FileText className="w-4 h-4" />
                   <span>Användarvillkor</span>
@@ -80,11 +80,11 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
           {/* Contact Info */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">Kontakta oss</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-white">Kontakta oss</h3>
             <div className="space-y-2">
               <div className="flex items-center space-x-2 text-neutral-300 text-sm">
                 <Mail className="w-4 h-4 flex-shrink-0" />
-                <a href="mailto:support@kongmindset.se" className="hover:text-white transition-colors">
+                <a href="mailto:support@kongmindset.se" className="hover:text-white transition-colors min-h-[44px] py-2 active:scale-95">
                   support@kongmindset.se
                 </a>
               </div>
@@ -94,12 +94,12 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
         {/* Bottom Bar */}
         <div className="border-t border-neutral-700 mt-8 pt-6">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
             <p className="text-neutral-300 text-sm">
               &copy; {new Date().getFullYear()} KongMindset AB. Alla rättigheter förbehållna.
             </p>
             
-            <div className="flex space-x-6 text-neutral-300 text-sm">
+            <div className="flex flex-wrap justify-center space-x-4 sm:space-x-6 text-neutral-300 text-sm">
               <span>🇸🇪 Sverige</span>
               <span>💳 Säkra betalningar</span>
               <span>🛡️ GDPR-kompatibel</span>
