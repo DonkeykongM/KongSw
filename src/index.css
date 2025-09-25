@@ -183,7 +183,6 @@
 /* Chatbot Container Styling */
 #VG_OVERLAY_CONTAINER .vg-chat-container {
   background: rgba(255, 255, 255, 0.98) !important;
-  border: 1px solid #e5e7eb !important;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
   border-radius: 12px !important;
 }
@@ -191,17 +190,14 @@
 /* Input Field Styling */
 #VG_OVERLAY_CONTAINER .vg-footer-input-wrapper {
   background: #ffffff !important;
-  border: 2px solid #d1d5db !important;
   color: #1f2937 !important;
 }
 
 #VG_OVERLAY_CONTAINER .vg-footer-input-wrapper:hover {
-  border-color: #1e3a8a !important;
   background: #ffffff !important;
 }
 
 #VG_OVERLAY_CONTAINER .vg-footer-input-wrapper:focus-within {
-  border-color: #1e3a8a !important;
   background: #ffffff !important;
   box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1) !important;
 }
@@ -429,11 +425,11 @@
 
 /* Clear visual separation between elements */
 #VG_OVERLAY_CONTAINER .vg-chat-container {
-  border: 2px solid #e5e7eb !important;
+  border: 1px solid #e5e7eb !important;
 }
 
 #VG_OVERLAY_CONTAINER .vg-footer-mother-container {
-  border-top: 2px solid #e5e7eb !important;
+  border-top: 1px solid #e5e7eb !important;
 }
 
 /* Force button labels and tooltips with stronger selectors */

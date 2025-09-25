@@ -115,9 +115,9 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed top-full left-0 right-0 bg-white border-b border-gray-100 shadow-lg z-50 max-h-[calc(100vh-80px)] overflow-y-auto">
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white shadow-lg z-50 border-t border-gray-200">
             {/* Mobile User Info Header */}
-            <div className="px-4 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+            <div className="px-4 py-4 bg-gray-50">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-base font-medium text-neutral-700">
@@ -153,8 +153,8 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
                     onClick={() => handleNavigation(item.id)}
                     className={`w-full flex items-center space-x-4 px-4 py-4 rounded-xl text-left font-medium transition-all duration-200 min-h-[56px] text-base active:scale-95 ${
                       currentPage === item.id
-                        ? 'text-primary-600 bg-primary-50 border-2 border-primary-200'
-                        : 'text-neutral-600 hover:text-primary-600 hover:bg-neutral-50 border-2 border-transparent'
+                        ? 'text-primary-600 bg-primary-50'
+                        : 'text-neutral-600 hover:text-primary-600 hover:bg-neutral-50'
                     }`}
                   >
                     <Icon className="w-6 h-6 flex-shrink-0" />
