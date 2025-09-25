@@ -435,17 +435,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack, onSignOut, user }) =>
                   <select
                     value={editData.favorite_module}
                     onChange={(e) => setEditData({...editData, favorite_module: e.target.value})}
-                    className="w-full border-2 border-gray-500 rounded-md bg-white text-black"
-                    style={{ 
-                      fontSize: '16px',
-                      minHeight: '48px',
-                      padding: '12px 16px',
-                      WebkitAppearance: 'menulist',
-                      MozAppearance: 'menulist',
-                      appearance: 'menulist',
-                      position: 'relative',
-                      zIndex: 999
-                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                    disabled={saving}
                   >
                     <option value="Önskans kraft">Önskans kraft</option>
                     <option value="Tro och övertygelse">Tro och övertygelse</option>
