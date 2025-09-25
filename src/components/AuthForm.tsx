@@ -47,6 +47,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         return;
       }
 
+      console.log('Creating checkout session for email:', email);
+
       // Ensure we have the correct product and price ID
       if (!mainCourse || !mainCourse.priceId) {
         setError('Produktinformation saknas. Försök igen senare.');
@@ -64,6 +66,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
         body: JSON.stringify({
           email: email,
           password: password,
+          name: email.split('@')[0], // Use email prefix as name
           priceId: mainCourse.priceId,
           success_url: `${window.location.origin}?payment=success`,
           cancel_url: `${window.location.origin}?payment=cancelled`,
@@ -105,7 +108,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onSignUp, onBack }) => {
       }
 
       console.log('Redirecting to Stripe checkout. Account will be created after payment for:', email);
-      setSuccess('🎯 Omdirigerar till säker betalning. Ditt konto skapas automatiskt efter lyckad betalning!');
+      setSuccess('🎯 Omdirigerar till säker betalning...');
       // Redirect to Stripe Checkout
       window.location.href = url;
     } catch (err) {
@@ -159,31 +162,99 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
     }
   };
 
+  // Clear any previous errors when switching modes
+  React.useEffect(() => {
+    setError('');
+    setSuccess('');
+  }, [isLogin]);
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (error) setError(''); // Clear errors when user starts typing
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (error) setError(''); // Clear errors when user starts typing
+  };
+
+  const validateForm = () => {
+    if (!email.trim()) {
+      setError('E-postadress krävs');
+      return false;
+    }
+    
+    if (!email.includes('@') || !email.includes('.')) {
+      setError('Ange en giltig e-postadress');
+      return false;
+    }
+    
+    if (!password.trim()) {
+      setError('Lösenord krävs');
+      return false;
+    }
+    
+    if (!isLogin) {
+      if (password.length < 6) {
+        setError('Lösenordet måste vara minst 6 tecken långt');
+        return false;
+      }
+      
+      if (password !== confirmPassword) {
+        setError('Lösenorden stämmer inte överens');
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    
+    if (!validateForm()) {
+      return;
+    }
     
     if (isLogin) {
       // Handle existing user login
       setLoading(true);
 
       try {
-        const result = await onSignIn(email, password);
+        console.log('Attempting login for:', email);
+        const result = await onSignIn(email.trim(), password);
         if (result.error) {
-          setError(result.error.message);
+          console.error('Login error:', result.error);
+          
+          // Provide helpful error messages
+          if (result.error.message?.includes('Invalid login credentials')) {
+            setError('Fel e-post eller lösenord. Kontrollera dina uppgifter och försök igen.');
+          } else if (result.error.message?.includes('Email not confirmed')) {
+            setError('E-post inte bekräftad. Kontrollera din inkorg för bekräftelselänk.');
+          } else {
+            setError(result.error.message || 'Inloggning misslyckades');
+          }
         } else {
           setSuccess('Inloggning lyckades!');
+          console.log('Login successful for:', email);
         }
       } catch (err) {
-        setError('Ett oväntat fel uppstod.');
+        console.error('Login exception:', err);
+        setError('Ett oväntat fel uppstod vid inloggning.');
       } finally {
         setLoading(false);
       }
     } else {
-      // Handle new user signup with payment (account created after payment)
+      // Handle new user signup with payment
       await handleStripeCheckout();
     }
+  };
+
+  const handleChange = (setter: (value: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setter(e.target.value);
+    if (error) setError(''); // Clear errors when user starts typing
   };
 
   return (
@@ -248,11 +319,12 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
                   type="email"
                   id="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleChange(setEmail)}
                   className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[52px] active:border-primary-400"
                   placeholder="Ange din e-postadress"
                   required
                   autoComplete="email"
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -260,7 +332,7 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
-                Lösenord
+                Lösenord {!isLogin && <span className="text-xs text-gray-500">(minst 6 tecken)</span>}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-neutral-400" />
@@ -268,16 +340,19 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handleChange(setPassword)}
                   className="w-full pl-10 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[52px] active:border-primary-400"
-                  placeholder={isLogin ? "Ange ditt lösenord" : "Skapa ett lösenord"}
+                  placeholder={isLogin ? "Ange ditt lösenord" : "Skapa ett lösenord (6+ tecken)"}
                   required
                   autoComplete={isLogin ? "current-password" : "new-password"}
+                  disabled={loading}
+                  minLength={isLogin ? undefined : 6}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 min-h-[52px] min-w-[52px] flex items-center justify-center active:scale-95 rounded-lg hover:bg-gray-100"
+                  disabled={loading}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                 </button>
@@ -296,16 +371,19 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
                     type={showConfirmPassword ? 'text' : 'password'}
                     id="confirmPassword"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={handleChange(setConfirmPassword)}
                     className="w-full pl-10 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-base min-h-[52px] active:border-primary-400"
                     placeholder="Bekräfta ditt lösenord"
                     required
                     autoComplete="new-password"
+                    disabled={loading}
+                    minLength={6}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 min-h-[52px] min-w-[52px] flex items-center justify-center active:scale-95 rounded-lg hover:bg-gray-100"
+                    disabled={loading}
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </button>
@@ -317,14 +395,40 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
             {error && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-2">
                 <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-red-600">{error}</p>
+                <div className="flex-1">
+                  <p className="text-sm text-red-600 font-medium">Fel vid {isLogin ? 'inloggning' : 'registrering'}</p>
+                  <p className="text-sm text-red-600 mt-1">{error}</p>
+                  {error.includes('Invalid login credentials') && (
+                    <div className="mt-2 text-xs text-red-500">
+                      <p>💡 Tips:</p>
+                      <ul className="list-disc list-inside space-y-1 mt-1">
+                        <li>Kontrollera att e-postadressen är korrekt</li>
+                        <li>Kontrollera att lösenordet är rätt</li>
+                        <li>Om du precis köpte kursen kan kontot ta några minuter att aktiveras</li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
             {/* Success Message */}
             {success && (
               <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-600">{success}</p>
+                <p className="text-sm text-green-600 font-medium">{success}</p>
+              </div>
+            )}
+
+            {/* Login Help for Existing Customers */}
+            {isLogin && (
+              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                <h3 className="font-semibold text-blue-800 mb-2 text-sm">🔑 Inloggningshjälp</h3>
+                <div className="text-xs text-blue-700 space-y-1">
+                  <p>• Använd samma e-post och lösenord som du använde vid köpet</p>
+                  <p>• Om du precis köpte kursen kan det ta 1-2 minuter för kontot att aktiveras</p>
+                  <p>• Kontrollera att du inte har stavfel i e-posten</p>
+                  <p>• Kontakta support@kongmindset.se om problemet kvarstår</p>
+                </div>
               </div>
             )}
 
@@ -352,18 +456,19 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
             <button
               type="submit"
               disabled={loading}
-             className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-4 px-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-h-[52px] text-base active:scale-95"
+              className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-4 px-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-h-[52px] text-base active:scale-95"
             >
-              {loading ? 'Bearbetar...' : (isLogin ? 'Logga in' : `🛒 Köp kurs - ${coursePrice}`)}
+              {loading ? 'Bearbetar...' : (isLogin ? 'Logga in på ditt konto' : `🛒 Köp kurs + skapa konto - ${coursePrice}`)}
             </button>
           </form>
 
           {/* Footer */}
-         <div className="text-center mt-6 text-sm text-neutral-600 px-2">
+          <div className="text-center mt-6 text-sm text-neutral-600 px-2">
             {isLogin ? "Redo att förvandla ditt liv? " : "Har du redan ett konto? "}
             <button
               onClick={() => setIsLogin(!isLogin)}
               className="text-primary-600 hover:text-primary-700 font-medium underline min-h-[44px] px-2 active:scale-95"
+              disabled={loading}
             >
               {isLogin ? 'Köp tillgång' : 'Logga in'}
             </button>
@@ -371,10 +476,19 @@ supabase functions deploy stripe-checkout --project-ref acdwexqoonauzzjtoexx`);
         </div>
 
         {/* Course Preview */}
-       <div className="text-center mt-6 sm:mt-8 px-4">
-         <p className="text-neutral-600 text-xs sm:text-sm">
-            {isLogin ? 'Logga in på ditt konto för att fortsätta din framgångsresa' : 'Efter betalning får du automatiskt ett konto med livstidsåtkomst'}
+        <div className="text-center mt-6 sm:mt-8 px-4">
+          <p className="text-neutral-600 text-xs sm:text-sm">
+            {isLogin ? 'Logga in på ditt konto för att fortsätta din framgångsresa' : 'Efter betalning skapas ditt konto automatiskt med livstidsåtkomst'}
           </p>
+          
+          {/* Debug Info */}
+          {error && error.includes('STRIPE') && (
+            <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <p className="text-yellow-800 text-xs">
+                🛠️ <strong>Utvecklarinfo:</strong> Stripe funktioner behöver konfigureras i Supabase Dashboard
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
