@@ -237,7 +237,7 @@
 #VG_OVERLAY_CONTAINER button {
   background: linear-gradient(45deg, #0891b2, #06b6d4, #10b981, #0891b2) !important;
   background-size: 300% 300% !important;
-  animation: gradientShift 3s ease infinite !important;
+  animation: tealGradientShift 4s ease infinite !important;
   color: #ffffff !important;
   border: none !important;
   font-weight: 600 !important; 
@@ -248,12 +248,17 @@
   overflow: hidden !important;
 }
 
-/* Animated gradient keyframes */
-@keyframes gradientShift {
+/* Teal gradient animation */
+@keyframes tealGradientShift {
   0% {
-  animation: tealGradientShift 4s ease infinite !important;
-  position: relative !important;
-  overflow: hidden !important;
+    background-position: 0% 50% !important;
+  }
+  50% {
+    background-position: 100% 50% !important;
+  }
+  100% {
+    background-position: 0% 50% !important;
+  }
 }
 
 /* Add a subtle shimmer effect */
@@ -289,8 +294,6 @@
   z-index: 2 !important;
   color: #ffffff !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
-}
-
 }
 
 #VG_OVERLAY_CONTAINER button:hover {
