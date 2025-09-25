@@ -219,6 +219,40 @@ Deno.serve(async (req: Request) => {
           console.log('⚠️  Skipping database records - missing user ID or customer ID');
         }
 
+        // Send purchase notification to Make.com webhook
+        try {
+          const webhookData = {
+            event_type: 'course_purchase',
+            customer_email: session.customer_details?.email,
+            customer_name: session.customer_details?.name,
+            amount: session.amount_total,
+            currency: session.currency,
+            payment_status: session.payment_status,
+            stripe_session_id: session.id,
+            purchase_date: new Date().toISOString(),
+            product_name: 'KongMindset Course - Napoleon Hills Tänk och Bli Rik',
+            course_access: 'lifetime',
+            discount_applied: session.amount_total < 50000 // Less than 500 SEK indicates special pricing
+          };
+
+          const webhookResponse = await fetch('https://hook.eu2.make.com/3wp7eyx3z2h9v9u50mbqlz3bg4j1wd4r', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(webhookData),
+          });
+
+          if (webhookResponse.ok) {
+            console.log('Purchase notification sent to Make.com webhook successfully');
+          } else {
+            console.error('Failed to send webhook notification:', webhookResponse.status);
+          }
+        } catch (webhookError) {
+          console.error('Error sending webhook notification:', webhookError);
+          // Don't fail the main process if webhook fails
+        }
+
         console.log('🎉 Payment processing completed successfully!');
 
       } catch (error) {
