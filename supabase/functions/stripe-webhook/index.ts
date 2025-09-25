@@ -1,232 +1,302 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.51.0'
+import Stripe from 'https://esm.sh/stripe@14.21.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    console.log('Webhook received')
-    
-    // Get Stripe signature
     const signature = req.headers.get('stripe-signature')
     if (!signature) {
-      console.error('No Stripe signature found')
-      return new Response('No signature', { status: 400, headers: corsHeaders })
+      return new Response('No signature', { status: 400 })
     }
 
-    // Get environment variables
-    const stripeWebhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
-    if (!stripeWebhookSecret) {
-      console.error('STRIPE_WEBHOOK_SECRET not configured')
-      return new Response('Webhook secret not configured', { status: 500, headers: corsHeaders })
-    }
-
-    // Get request body
     const body = await req.text()
-    console.log('Webhook body received, length:', body.length)
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2023-10-16',
+    })
+    
 
-    // Verify webhook signature (simplified for now - in production use proper verification)
-    const supabase = createClient(
+    let event
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        signature,
+        Deno.env.get('STRIPE_WEBHOOK_SECRET') || ''
+      )
+    } catch (err) {
+      console.error('Webhook signature verification failed:', err.message)
+      return new Response(`Webhook signature verification failed: ${err.message}`, { status: 400 })
+    }
+
+    console.log('Webhook event received:', event.type, event.id)
+
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Parse the event
-    let event
-    try {
-      event = JSON.parse(body)
-      console.log('Event type:', event.type)
-    } catch (err) {
-      console.error('Failed to parse webhook body:', err)
-      return new Response('Invalid JSON', { status: 400, headers: corsHeaders })
-    }
+    console.log('Processing webhook event:', event.type)
 
-    // Handle successful checkout
+    // Handle successful payment
     if (event.type === 'checkout.session.completed') {
-      console.log('Processing checkout.session.completed')
+      const session = event.data.object as Stripe.Checkout.Session
+      console.log('Processing checkout session:', session.id)
+      console.log('Customer email:', session.customer_details?.email)
+      console.log('Metadata:', session.metadata)
       
-      const session = event.data.object
-      const customerEmail = session.customer_details?.email
-      const customerPassword = session.metadata?.password
-      const customerName = session.customer_details?.name || session.metadata?.name
-      
-      console.log('Customer email:', customerEmail)
-      console.log('Customer name:', customerName)
-      console.log('Has password in metadata:', !!customerPassword)
+      // Extract user credentials from metadata with better error handling
+      const email = session.metadata?.email || session.customer_details?.email
+      const password = session.metadata?.password
 
-      if (!customerEmail || !customerPassword) {
-        console.error('Missing customer email or password')
-        return new Response('Missing required data', { status: 400, headers: corsHeaders })
-      }
-
-      try {
-        // Create Supabase account
-        console.log('Creating Supabase account for:', customerEmail)
+      if (session.payment_status === 'paid') {
+        // Get customer details including metadata with password
+        const customer = await stripe.customers.retrieve(session.customer as string)
         
-        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-          email: customerEmail,
-          password: customerPassword,
-          email_confirm: true, // Auto-confirm email
+        const customerEmail = session.customer_details?.email
+        const tempPassword = (customer as any).metadata?.temp_password
+        
+        console.log('Creating account for:', customerEmail)
+        console.log('Has temp password:', !!tempPassword)
+
+        if (customerEmail && tempPassword) {
+          try {
+            // Create Supabase user account
+            const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+              email: customerEmail,
+              password: tempPassword,
+              email_confirm: true, // Auto-confirm email
+              user_metadata: {
+                created_via: 'stripe_checkout',
+                stripe_customer_id: session.customer
+              }
+            })
+
+            if (authError) {
+              console.error('Error creating user account:', authError)
+              // Continue processing even if account creation fails
+            } else {
+              console.log('User account created successfully:', authData.user.id)
+              
+              // Create user profile
+              const { error: profileError } = await supabaseAdmin
+                .from('user_profiles')
+                .insert([{
+                  user_id: authData.user.id,
+                  display_name: customerEmail.split('@')[0],
+                  bio: 'Behärskar Napoleon Hills framgångsprinciper',
+                  goals: 'Bygger rikedom genom tankesättstransformation',
+                  favorite_module: 'Önskans kraft'
+                }])
+
+              if (profileError) {
+                console.error('Error creating user profile:', profileError)
+              } else {
+                console.log('User profile created successfully')
+              }
+
+              // Create stripe customer record
+              const { error: customerError } = await supabaseAdmin
+                .from('stripe_customers')
+                .insert([{
+                  user_id: authData.user.id,
+                  customer_id: session.customer as string
+                }])
+
+              if (customerError) {
+                console.error('Error creating customer record:', customerError)
+              }
+
+              // Clean up temporary password from Stripe metadata
+              await stripe.customers.update(session.customer as string, {
+                metadata: {
+                  temp_password: null,
+                  account_created: 'true',
+                  user_id: authData.user.id
+                }
+              })
+            }
+
+          } catch (error) {
+            console.error('Account creation process failed:', error)
+          }
+        }
+
+        // Store order information
+        try {
+          const { error: orderError } = await supabaseAdmin
+            .from('stripe_orders')
+            .insert([{
+              checkout_session_id: session.id,
+              payment_intent_id: session.payment_intent as string,
+              customer_id: session.customer as string,
+              amount_subtotal: session.amount_subtotal || 0,
+              amount_total: session.amount_total || 0,
+              currency: session.currency || 'sek',
+              payment_status: session.payment_status,
+              status: 'completed'
+            }])
+
+          if (orderError) {
+            console.error('Error storing order:', orderError)
+          } else {
+            console.log('Order stored successfully')
+          }
+        } catch (error) {
+          console.error('Order storage failed:', error)
+        }
+
+        if (!customerEmail) {
+          console.error('No email found in session:', session.id)
+        }
+        if (!tempPassword) {
+          console.error('No password found in metadata for session:', session.id)
+        }
+        
+        console.log('Attempting to create account for:', email)
+        
+        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+          email: email,
+          password: password,
+          email_confirm: true,
           user_metadata: {
-            name: customerName,
+            created_via: 'stripe_checkout',
             stripe_customer_id: session.customer,
-            payment_method: 'stripe',
-            course_access: true
+            stripe_session_id: session.id,
+            display_name: email.split('@')[0]
           }
         })
 
         if (authError) {
-          console.error('Error creating user:', authError)
+          console.error('Failed to create user account:', authError)
           
-          // If user already exists, try to update their access
-          if (authError.message?.includes('already been registered')) {
-            console.log('User already exists, updating access')
-            
-            // Get existing user
-            const { data: users, error: getUserError } = await supabase.auth.admin.listUsers()
-            if (getUserError) {
-              console.error('Error listing users:', getUserError)
-              return new Response('Error updating user access', { status: 500, headers: corsHeaders })
-            }
-            
-            const existingUser = users.users.find(u => u.email === customerEmail)
-            if (existingUser) {
-              // Update user metadata to grant access
-              const { error: updateError } = await supabase.auth.admin.updateUserById(existingUser.id, {
-                user_metadata: {
-                  ...existingUser.user_metadata,
-                  stripe_customer_id: session.customer,
-                  course_access: true,
-                  payment_confirmed: true
-                }
-              })
-              
-              if (updateError) {
-                console.error('Error updating user:', updateError)
-              } else {
-                console.log('Successfully updated existing user access')
-              }
+          // If user already exists, that's OK - they might have signed up manually first
+          if (authError.message?.includes('already_registered') || authError.message?.includes('already exists')) {
+            console.log('User already exists, proceeding with customer creation')
+            // Try to get the existing user
+            const { data: existingUser } = await supabaseAdmin.auth.admin.getUserByEmail(email)
+            if (existingUser?.user) {
+              console.log('Found existing user:', existingUser.user.id)
+              // Continue with customer record creation below
+            } else {
+              return new Response('User exists but could not retrieve', { status: 500, headers: corsHeaders })
             }
           } else {
-            return new Response('Error creating user account', { status: 500, headers: corsHeaders })
+            return new Response(`Failed to create user: ${authError.message}`, { status: 500, headers: corsHeaders })
           }
         } else {
-          console.log('User created successfully:', authData.user.id)
-          
-          // Create user profile
-          const { error: profileError } = await supabase
-            .from('user_profiles')
-            .insert([{
-              user_id: authData.user.id,
-              display_name: customerName || customerEmail.split('@')[0],
-              bio: 'Behärskar Napoleon Hills framgångsprinciper',
-              goals: 'Bygger rikedom genom tankesättstransformation',
-              favorite_module: 'Önskans kraft'
-            }])
-
-          if (profileError) {
-            console.error('Error creating profile:', profileError)
-          } else {
-            console.log('Profile created successfully')
-          }
+          console.log('Successfully created user account:', authData.user.id)
         }
 
-        // Store customer information
-        const userId = authData?.user?.id
-        if (userId) {
-          const { error: customerError } = await supabase
-            .from('stripe_customers')
-            .upsert([{
-              user_id: userId,
-              customer_id: session.customer,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }])
-
-          if (customerError) {
-            console.error('Error storing customer:', customerError)
-          }
-        }
-
-        console.log('Checkout completed successfully for:', customerEmail)
-        return new Response('success', { headers: corsHeaders })
+        const userId = authData?.user?.id || (await supabaseAdmin.auth.admin.getUserByEmail(email)).data?.user?.id
         
-      } catch (err) {
-        console.error('Error in checkout processing:', err)
-        return new Response('Internal error', { status: 500, headers: corsHeaders })
+        if (!userId) {
+          console.error('Could not get user ID for email:', email)
+          return new Response('Could not get user ID', { status: 500, headers: corsHeaders })
+        }
+
+        const { error: customerRecordError } = await supabaseAdmin
+          .from('stripe_customers')
+          .upsert([{
+            user_id: userId,
+            customer_id: session.customer as string
+          }], {
+            onConflict: 'user_id'
+          })
+
+        if (customerRecordError) {
+          console.error('Customer record error:', customerRecordError)
+          // Don't fail the webhook if customer record fails, user account is more important
+          console.log('Warning: Customer record creation failed but user account exists')
+        } else {
+          console.log('Successfully created customer record for user:', userId)
+        }
+
+        // Create user profile with default values
+        const { error: profileError } = await supabaseAdmin
+          .from('user_profiles')
+          .upsert([{
+            user_id: userId,
+            display_name: email.split('@')[0],
+            bio: 'Behärskar Napoleon Hills framgångsprinciper',
+            goals: 'Bygger rikedom genom tankesättstransformation',
+            favorite_module: 'Önskans kraft',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }], {
+            onConflict: 'user_id'
+          })
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError)
+          // Don't fail webhook for profile creation error
+          console.log('Warning: Profile creation failed but user account exists')
+        } else {
+          console.log('Successfully created user profile for:', userId)
+        }
+
+        // Send notification to Make.com webhook
+        try {
+          const webhookPayload = {
+            event_type: 'course_purchased',
+            customer_email: customerEmail,
+            customer_name: session.customer_details?.name || customerEmail?.split('@')[0] || 'Unknown',
+            amount: session.amount_total ? (session.amount_total / 100) : 0,
+            currency: session.currency?.toUpperCase() || 'SEK',
+            payment_status: session.payment_status,
+            stripe_session_id: session.id,
+            purchase_date: new Date().toISOString(),
+            product_name: 'KongMindset Course - Think and Grow Rich',
+            special_price: session.amount_total === 29900, // 299 kr in öre
+            stripe_customer_id: session.customer,
+            source: 'stripe_webhook'
+          }
+
+          console.log('Sending webhook notification to Make.com')
+          
+          const webhookResponse = await fetch(Deno.env.get('MAKE_WEBHOOK_URL') || '', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(webhookPayload)
+          })
+
+          if (webhookResponse.ok) {
+            console.log('Webhook notification sent successfully')
+          } else {
+            console.error('Webhook notification failed:', webhookResponse.status)
+          }
+        } catch (webhookError) {
+          console.error('Webhook notification error:', webhookError)
+          // Don't fail the whole process if webhook fails
+        }
+
+        console.log('Webhook processing completed successfully for:', email)
       }
     }
 
-    // Handle subscription updates
-    if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.created') {
-      console.log('Processing subscription event:', event.type)
-      
-      const subscription = event.data.object
-      
-      const { error } = await supabase
-        .from('stripe_subscriptions')
-        .upsert([{
-          customer_id: subscription.customer,
-          subscription_id: subscription.id,
-          price_id: subscription.items.data[0]?.price?.id,
-          current_period_start: subscription.current_period_start,
-          current_period_end: subscription.current_period_end,
-          cancel_at_period_end: subscription.cancel_at_period_end,
-          status: subscription.status,
-          updated_at: new Date().toISOString()
-        }])
+    console.log('Webhook event type not handled:', event.type)
+    return new Response(JSON.stringify({ received: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
 
-      if (error) {
-        console.error('Error updating subscription:', error)
-        return new Response('Error updating subscription', { status: 500, headers: corsHeaders })
+  } catch (error) {
+    console.error('Webhook processing error:', error)
+    return new Response(
+      JSON.stringify({ error: 'Webhook processing failed' }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
-
-      return new Response('success', { headers: corsHeaders })
-    }
-
-    // Handle one-time payments
-    if (event.type === 'payment_intent.succeeded') {
-      console.log('Processing payment_intent.succeeded')
-      
-      const paymentIntent = event.data.object
-      
-      // Store order information
-      const { error: orderError } = await supabase
-        .from('stripe_orders')
-        .insert([{
-          checkout_session_id: paymentIntent.metadata?.checkout_session_id || '',
-          payment_intent_id: paymentIntent.id,
-          customer_id: paymentIntent.customer || '',
-          amount_subtotal: paymentIntent.amount,
-          amount_total: paymentIntent.amount,
-          currency: paymentIntent.currency,
-          payment_status: paymentIntent.status,
-          status: 'completed',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
-
-      if (orderError) {
-        console.error('Error storing order:', orderError)
-      }
-
-      return new Response('success', { headers: corsHeaders })
-    }
-
-    console.log('Unhandled event type:', event.type)
-    return new Response('success', { headers: corsHeaders })
-    
-  } catch (err) {
-    console.error('Webhook error:', err)
-    return new Response('Internal error', { status: 500, headers: corsHeaders })
+    )
   }
 })
