@@ -32,7 +32,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
   const activeProduct = getActiveProduct();
   const hasAccess = hasActiveAccess();
   return (
-    <nav className="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 relative">
+    <nav className="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 relative z-[9999]" style={{ position: 'relative', zIndex: 9999 }}>
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
@@ -115,7 +115,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="mobile-menu-overlay lg:hidden fixed top-[64px] sm:top-[80px] left-0 right-0 bg-white shadow-2xl z-[99999] border-t border-gray-200 max-h-[calc(100vh-64px)] sm:max-h-[calc(100vh-80px)] overflow-y-auto pointer-events-auto touch-manipulation">
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white shadow-2xl z-[99999] border-t border-gray-200 pointer-events-auto" style={{ position: 'absolute', zIndex: 99999 }}>
             {/* Mobile User Info Header */}
             <div className="px-4 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200">
               <div className="flex items-center justify-between">
