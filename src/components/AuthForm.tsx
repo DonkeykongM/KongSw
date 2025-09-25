@@ -443,7 +443,7 @@ Alternativt kan du försöka köpa igen (ingen dubbel debitering sker).`);
                   <li>🧠 Napoleon Hill AI-mentor (24/7)</li>
                   <li>✅ GRATIS originalbok "Tänk och Bli Rik"</li>
                   <li>💚 30 dagars pengarna-tillbaka-garanti</li>
-                  <li>🔐 Ditt konto skapas automatiskt efter betalning</li>
+                  <li>🔐 Ditt konto skapas automatiskt - logga in direkt efter köp!</li>
                 </ul>
               </div>
             )}
@@ -454,7 +454,7 @@ Alternativt kan du försöka köpa igen (ingen dubbel debitering sker).`);
               disabled={loading}
               className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-4 px-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-h-[52px] text-base active:scale-95"
             >
-              {loading ? 'Bearbetar...' : (isLogin ? 'Logga in på ditt konto' : `🛒 Köp kurs + skapa konto - ${coursePrice}`)}
+              {loading ? (isLogin ? 'Loggar in...' : 'Förbereder säker betalning...') : (isLogin ? 'Logga in på ditt konto' : `🛒 Köp fullständig tillgång - ${coursePrice}`)}
             </button>
           </form>
 

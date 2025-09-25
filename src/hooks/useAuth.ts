@@ -16,11 +16,13 @@ export const useAuth = () => {
     // Get initial session with proper error handling
     const getInitialSession = async () => {
       try {
+        console.log('Getting initial session...');
         const { data: { session }, error } = await supabase.auth.getSession()
         if (error) {
           console.error('Session error:', error)
           setUser(null)
         } else {
+          console.log('Initial session:', session?.user?.email || 'no user');
           setUser(session?.user ?? null)
         }
       } catch (error) {
@@ -35,14 +37,14 @@ export const useAuth = () => {
 
     // Listen for auth changes with error handling
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth event:', event, session?.user?.email || 'no user')
+      console.log('Auth state change:', event, 'User:', session?.user?.email || 'none')
       
-      if (event === 'SIGNED_OUT') {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
         setUser(session?.user ?? null)
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        console.log('User signed in:', session?.user?.email);
+      } else if (event === 'SIGNED_OUT') {
         setUser(session?.user ?? null)
-      } else if (event === 'INITIAL_SESSION') {
-        setUser(session?.user ?? null)
+        console.log('User signed out');
       }
       setLoading(false)
     })

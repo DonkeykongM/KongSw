@@ -30,11 +30,14 @@ function App() {
     
     if (paymentStatus === 'success') {
       setCurrentPage('success');
+      setShowAuthForm(false); // Reset auth form state
       // Clear URL params
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (paymentStatus === 'cancelled') {
       setShowAuthForm(false);
       setCurrentPage('home');
+      // Clear URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
   const handleModuleStart = (moduleId: number) => {

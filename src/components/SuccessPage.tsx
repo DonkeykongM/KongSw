@@ -30,13 +30,18 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
               </h2>
               {user ? (
                 <p className="text-lg text-green-700 leading-relaxed">
-                  Du har nu gjort den viktigaste investeringen i ditt liv - en investering i dig själv och din framtid. 
-                  Du är redan inloggad och redo att börja din transformationsresa!
+                  Perfekt! Ditt konto är redo och du är redan inloggad. Du har nu livstidsåtkomst till:
+                  <br/>• Alla 13 interaktiva moduler
+                  <br/>• Napoleon Hill AI-mentor 24/7
+                  <br/>• GRATIS originalbok för nedladdning
+                  <br/><br/>Din transformationsresa kan börja NU!
                 </p>
               ) : (
                 <p className="text-lg text-green-700 leading-relaxed">
-                  Du har nu gjort den viktigaste investeringen i ditt liv - en investering i dig själv och din framtid. 
-                  Ditt konto har skapats automatiskt med den e-postadress och det lösenord du angav vid köpet.
+                  Ditt konto har skapats automatiskt! Logga in med:
+                  <br/>• E-post: Den du använde vid köpet
+                  <br/>• Lösenord: Det du valde vid köpet
+                  <br/><br/>Efter inloggning får du omedelbar tillgång till allt kursinnehåll!
                 </p>
               )}
             </div>
