@@ -2,6 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Critical Mobile Performance Optimizations */
+@layer base {
+  /* Reduce motion for better mobile performance */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  
+  /* Mobile-first performance optimizations */
+  @media (max-width: 768px) {
+    /* Disable expensive effects on mobile */
+    .backdrop-blur-sm,
+    .backdrop-blur-md,
+    .backdrop-blur-lg {
+      backdrop-filter: none !important;
+      background: rgba(255, 255, 255, 0.95) !important;
+    }
+    
+    /* Optimize gradients for mobile */
+    .bg-gradient-to-br,
+    .bg-gradient-to-r,
+    .bg-gradient-to-l {
+      background: linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to)) !important;
+    }
+    
+    /* Reduce shadow complexity */
+    .shadow-lg,
+    .shadow-xl,
+    .shadow-2xl {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+  }
+}
+
 /* Hide scrollbar but keep functionality */
 @layer utilities {
   .scrollbar-hide {
@@ -26,9 +65,25 @@
   
   /* Enhanced mobile touch targets */
   @media (max-width: 768px) {
-    button, [role="button"], a {
+    button, [role="button"], a, .clickable {
       min-height: 48px;
       min-width: 48px;
+      position: relative;
+    }
+    
+    /* Ensure proper spacing for touch targets */
+    button + button,
+    [role="button"] + [role="button"] {
+      margin-left: 8px;
+    }
+    
+    /* Better tap highlighting */
+    button:active,
+    [role="button"]:active,
+    a:active {
+      background-color: rgba(0, 0, 0, 0.1);
+      transform: scale(0.98);
+      transition: all 0.1s ease;
     }
     
     /* Better mobile form controls */
@@ -60,6 +115,25 @@
     }
   }
   
+  /* Mobile-specific improvements for bottom sections */
+  @media (max-width: 768px) {
+    /* Ensure footer and bottom sections have proper touch spacing */
+    footer {
+      padding-bottom: env(safe-area-inset-bottom, 20px) !important;
+    }
+    
+    /* Better mobile navigation */
+    nav {
+      padding-bottom: 8px;
+    }
+    
+    /* Mobile-optimized chatbot positioning */
+    .fixed.bottom-4.right-4 {
+      bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+      right: 16px !important;
+    }
+  }
+  
   /* Add touch-friendly interactions */
   @media (hover: none) and (pointer: coarse) {
     /* This targets touch devices */
@@ -76,6 +150,7 @@
 }
 
 /* Napoleon Hill AI Brain Chatbot Custom Styling */
+/* Optimize chatbot for mobile performance */
 #VG_OVERLAY_CONTAINER {
   /* Improve chatbot visibility and readability */
   --vg-primary: #1e3a8a !important;
@@ -83,14 +158,34 @@
   --vg-primary-100: #dbeafe !important;
   --vg-background: #ffffff !important;
   --vg-foreground: #1f2937 !important;
+  
+  /* Mobile performance optimizations */
+  will-change: transform, opacity !important;
+  contain: layout style paint !important;
+}
+
+/* Mobile-specific chatbot optimizations */
+@media (max-width: 768px) {
+  #VG_OVERLAY_CONTAINER {
+    /* Reduce complexity on mobile */
+    backdrop-filter: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  /* Optimize button sizes for mobile */
+  #VG_OVERLAY_CONTAINER button {
+    min-height: 48px !important;
+    min-width: 48px !important;
+    font-size: 16px !important;
+  }
 }
 
 /* Chatbot Container Styling */
 #VG_OVERLAY_CONTAINER .vg-chat-container {
   background: rgba(255, 255, 255, 0.98) !important;
-  backdrop-filter: blur(10px) !important;
   border: 1px solid #e5e7eb !important;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 12px !important;
 }
 
 /* Input Field Styling */
@@ -448,6 +543,9 @@
 /* Force visible container */
 #VG_OVERLAY_CONTAINER {
   z-index: 999999 !important;
+  /* Prevent mobile layout issues */
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
 }
 
 /* Try to catch any button with data attributes */
@@ -468,4 +566,35 @@
 
 #VG_OVERLAY_CONTAINER [data-action]:hover::before {
   opacity: 1 !important;
+}
+
+/* Mobile-specific chatbot fixes */
+@media (max-width: 768px) {
+  #VG_OVERLAY_CONTAINER {
+    /* Optimize positioning on mobile */
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 20px !important;
+    max-width: calc(100vw - 40px) !important;
+    max-height: calc(100vh - 100px) !important;
+  }
+  
+  /* Better mobile interaction */
+  #VG_OVERLAY_CONTAINER .vg-chat-container {
+    border-radius: 16px !important;
+    margin: 0 !important;
+  }
+  
+  /* Larger touch targets on mobile */
+  #VG_OVERLAY_CONTAINER button,
+  #VG_OVERLAY_CONTAINER input,
+  #VG_OVERLAY_CONTAINER textarea {
+    min-height: 48px !important;
+    border-radius: 12px !important;
+  }
+  
+  /* Prevent iOS zoom on inputs */
+  #VG_OVERLAY_CONTAINER input,
+  #VG_OVERLAY_CONTAINER textarea {
+    font-size: 16px !important;
+  }
 }

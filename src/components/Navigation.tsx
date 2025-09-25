@@ -52,7 +52,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
                 <button
                   key={item.id}
                   onClick={() => handleNavigation(item.id)}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] ${
                     currentPage === item.id
                       ? 'text-primary-600 bg-primary-50 shadow-sm'
                       : 'text-neutral-600 hover:text-primary-600 hover:bg-neutral-50'
@@ -76,9 +76,10 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
                   )}
                 </div>
               </div>
+              {/* Prominent Desktop Logout Button */}
               <button
                 onClick={() => onSignOut()}
-                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-red-600 hover:bg-red-50 transition-all duration-200 min-h-[44px]"
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-all duration-200 min-h-[44px] shadow-md hover:shadow-lg"
                 title="Logga ut"
               >
                 <LogOut className="w-5 h-5" />
@@ -89,6 +90,87 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
 
           {/* Mobile menu button */}
           <div className="lg:hidden">
+            {/* Prominent Mobile Logout Button */}
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => onSignOut()}
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-all duration-200 min-h-[48px] min-w-[48px] shadow-md active:scale-95"
+                title="Logga ut"
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="hidden xs:inline">Ut</span>
+              </button>
+              
+              {/* Menu Toggle */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 rounded-lg text-neutral-600 hover:text-primary-600 hover:bg-neutral-50 transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center active:scale-95"
+                aria-label="Öppna meny"
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden fixed top-full left-0 right-0 bg-white border-b border-gray-100 shadow-lg z-50 max-h-[calc(100vh-80px)] overflow-y-auto">
+            {/* Mobile User Info Header */}
+            <div className="px-4 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-base font-medium text-neutral-700">
+                    {profile?.display_name || user?.email?.split('@')[0] || 'Elev'}
+                  </span>
+                  {hasAccess && activeProduct && (
+                    <div className="text-sm text-green-600 font-medium mt-1">
+                      ✅ Premium tillgång
+                    </div>
+                  )}
+                </div>
+                
+                {/* Mobile Logout Button - Prominent */}
+                <button
+                  onClick={() => {
+                    onSignOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center space-x-2 px-4 py-3 rounded-xl text-white bg-red-600 hover:bg-red-700 transition-all duration-200 min-h-[52px] text-base font-medium shadow-lg active:scale-95"
+                >
+                  <LogOut className="w-5 h-5 flex-shrink-0" />
+                  <span>Logga ut</span>
+                </button>
+              </div>
+            </div>
+            
+            <div className="px-4 py-4 space-y-2">
+              {navItems.map(item => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavigation(item.id)}
+                    className={`w-full flex items-center space-x-4 px-4 py-4 rounded-xl text-left font-medium transition-all duration-200 min-h-[56px] text-base active:scale-95 ${
+                      currentPage === item.id
+                        ? 'text-primary-600 bg-primary-50 border-2 border-primary-200'
+                        : 'text-neutral-600 hover:text-primary-600 hover:bg-neutral-50 border-2 border-transparent'
+                    }`}
+                  >
+                    <Icon className="w-6 h-6 flex-shrink-0" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+};
+
+export default Navigation;
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg text-neutral-600 hover:text-primary-600 hover:bg-neutral-50 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
