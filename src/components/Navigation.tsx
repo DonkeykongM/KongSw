@@ -115,16 +115,16 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed top-[64px] left-0 right-0 bg-white shadow-2xl z-[9999] border-t border-gray-200 max-h-[calc(100vh-64px)] overflow-y-auto">
+          <div className="lg:hidden fixed top-[64px] left-0 right-0 bg-white shadow-2xl z-[9999] border-t border-gray-200 max-h-[calc(100vh-64px)] overflow-y-auto pointer-events-auto touch-manipulation">
             {/* Mobile User Info Header */}
-            <div className="px-4 py-4 bg-gray-100 border-b border-gray-300">
+            <div className="px-4 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-base font-bold text-gray-900">
+                  <span className="text-base font-bold text-blue-900">
                     {profile?.display_name || user?.email?.split('@')[0] || 'Elev'}
                   </span>
                   {hasAccess && activeProduct && (
-                    <div className="text-sm text-green-700 font-bold mt-1">
+                    <div className="text-sm text-green-800 font-bold mt-1">
                       ✅ Premium tillgång
                     </div>
                   )}
@@ -136,7 +136,8 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
                     onSignOut();
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center space-x-2 px-4 py-3 rounded-xl text-white bg-red-600 hover:bg-red-700 transition-all duration-200 min-h-[52px] text-base font-bold shadow-lg active:scale-95 border-2 border-red-500"
+                  className="flex items-center space-x-2 px-4 py-3 rounded-xl text-white bg-red-600 hover:bg-red-700 active:bg-red-800 transition-all duration-200 min-h-[52px] text-base font-bold shadow-lg active:scale-95 border-2 border-red-500 touch-manipulation pointer-events-auto"
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   <LogOut className="w-5 h-5 flex-shrink-0" />
                   <span>Logga ut</span>
@@ -144,21 +145,23 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onSign
               </div>
             </div>
             
-            <div className="px-4 py-4 space-y-3 bg-white">
+            <div className="px-4 py-4 space-y-4 bg-white">
               {navItems.map(item => {
                 const Icon = item.icon;
                 return (
                   <button
                     key={item.id}
                     onClick={() => handleNavigation(item.id)}
-                    className={`w-full flex items-center space-x-4 px-4 py-4 rounded-xl text-left font-bold transition-all duration-200 min-h-[56px] text-base active:scale-95 border-2 shadow-sm ${
+                    className={`w-full flex items-center space-x-4 px-6 py-5 rounded-xl text-left font-bold transition-all duration-200 min-h-[60px] text-lg active:scale-95 border-2 shadow-md touch-manipulation pointer-events-auto ${
                       currentPage === item.id
-                        ? 'text-blue-800 bg-blue-100 border-blue-300'
-                        : 'text-gray-900 hover:text-blue-700 hover:bg-blue-50 border-gray-200 bg-gray-50'
+                        ? 'text-blue-900 bg-gradient-to-r from-blue-100 to-blue-200 border-blue-400 shadow-lg'
+                        : 'text-gray-900 hover:text-blue-800 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 active:bg-blue-100 border-gray-300 bg-white'
                     }`}
+                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                    type="button"
                   >
                     <Icon className={`w-6 h-6 flex-shrink-0 ${
-                      currentPage === item.id ? 'text-blue-700' : 'text-gray-800'
+                      currentPage === item.id ? 'text-blue-800' : 'text-gray-700'
                     }`} />
                     <span className="font-bold">{item.label}</span>
                   </button>
