@@ -20,6 +20,7 @@ interface WebhookEvent {
 }
 
 Deno.serve(async (req: Request) => {
+  let createdUserId: string | null = null;
   try {
     // Handle CORS preflight
     if (req.method === 'OPTIONS') {
@@ -91,6 +92,8 @@ Deno.serve(async (req: Request) => {
             }
           });
 
+          createdUserId = user?.id || null;
+
           if (authError) {
             // Check if user already exists
             if (authError.message?.includes('already registered')) {
@@ -148,6 +151,39 @@ Deno.serve(async (req: Request) => {
         } catch (err) {
           console.error('❌ Customer creation error:', err);
           return new Response(`Customer creation error: ${err}`, { status: 500, headers: corsHeaders });
+        }
+
+        // CRITICAL: Also create user profile directly as backup
+        if (createdUserId) {
+          const displayName = userEmail.split('@')[0] || 'Användare';
+          
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert([{
+              user_id: createdUserId,
+              display_name: displayName,
+              bio: 'Behärskar Napoleon Hills framgångsprinciper',
+              goals: 'Bygger rikedom genom tankesättstransformation',
+              favorite_module: 'Önskans kraft'
+            }]);
+          
+          if (profileError) {
+            // Don't throw error for profile creation failure - triggers will handle it
+            console.warn('⚠️ Direct profile creation failed (triggers will handle):', profileError.message);
+          } else {
+            console.log('✅ User profile created directly in webhook');
+          }
+        }
+        
+        // Verify profile was created (either by direct insert or trigger)
+        if (createdUserId) {
+          const { data: profileCheck } = await supabase
+            .from('user_profiles')
+            .select('id')
+            .eq('user_id', createdUserId)
+            .single();
+          
+          console.log('🔍 Profile verification:', profileCheck ? 'EXISTS' : 'MISSING');
         }
 
         // Ensure user profile is created (fallback if trigger doesn't work)
