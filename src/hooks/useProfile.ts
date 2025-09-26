@@ -47,14 +47,26 @@ export const useProfile = (user: User | null) => {
       } else {
         setProfile(defaultProfile);
       }
-          .insert({
-            user_id: userId,
-            email: userData?.email || 'användare@exempel.se',
-            display_name: 'Kursdeltagare',
-            bio: 'Studerar Napoleon Hills framgångsprinciper',
-            goals: 'Skapar rikedom genom rätt tankesätt',
-            favorite_module: 'Önskans kraft'
-          })
+      setLoading(false);
+      return;
+    }
+
+    const fetchProfile = async () => {
+      try {
+        // Sätt current user email i session för RLS
+        const { data: userData } = await supabase
+          .from('simple_logins')
+          .select('email')
+          .eq('id', user.id)
+          .single();
+        
+        if (userData?.email) {
+          await supabase.rpc('set_current_user_email', { user_email: userData.email });
+        }
+
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('*')
           .eq('user_id', user.id)
           .single();
 
@@ -107,7 +119,7 @@ export const useProfile = (user: User | null) => {
       const { data: userData } = await supabase
         .from('simple_logins')
         .select('email')
-        .eq('id', userId)
+        .eq('id', user.id)
         .single();
       
       if (userData?.email) {
