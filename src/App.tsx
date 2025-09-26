@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSimpleAuth } from './hooks/useSimpleAuth';
+import { useAuth } from './hooks/useAuth';
 import { LanguageProvider } from './contexts/LanguageContext';
 import AuthForm from './components/AuthForm';
 import LandingPage from './components/LandingPage';
@@ -17,7 +17,7 @@ import { courseContent } from './data/courseContent';
 import { ModuleContent } from './data/courseContent';
 
 function App() {
-  const { user, loading, signIn, signOut, isConfigured } = useSimpleAuth();
+  const { user, loading, signIn, signOut, isConfigured } = useAuth();
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedModule, setSelectedModule] = useState<ModuleContent | null>(null);
