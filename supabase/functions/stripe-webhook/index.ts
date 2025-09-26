@@ -150,6 +150,26 @@ Deno.serve(async (req: Request) => {
           return new Response(`Customer creation error: ${err}`, { status: 500, headers: corsHeaders });
         }
 
+        // Ensure user profile is created (fallback if trigger doesn't work)
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .upsert({
+            user_id: authUser.id,
+            display_name: userName || userEmail.split('@')[0] || 'Användare',
+            bio: 'Behärskar Napoleon Hills framgångsprinciper',
+            goals: 'Bygger rikedom genom tankesättstransformation',
+            favorite_module: 'Önskans kraft',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'user_id' // Don't overwrite if profile already exists
+          });
+
+        if (profileError) {
+          console.error('Failed to create user profile, but continuing:', profileError);
+          // Don't throw error - profile creation is not critical for basic access
+        }
+
         // Step 3: Create order record
         try {
           const { error: orderError } = await supabase
