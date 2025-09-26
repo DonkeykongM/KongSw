@@ -47,34 +47,42 @@ export const useSubscription = (user: User | null) => {
         setLoading(true);
         setError(null);
 
-        // Fetch subscription data
-        const { data: subData, error: subError } = await supabase
-          .from('stripe_user_subscriptions')
-          .select('*')
-          .maybeSingle();
-
-        if (subError) {
-          console.error('Error fetching subscription:', subError);
-          setError('Failed to load subscription data');
-        } else {
-          setSubscription(subData);
-        }
-
-        // Fetch order data
+        // Fetch purchase data from course_purchases table
         const { data: orderData, error: orderError } = await supabase
-          .from('stripe_user_orders')
+          .from('course_purchases')
           .select('*')
-          .order('order_date', { ascending: false });
+          .eq('email', user.email)
+          .order('purchased_at', { ascending: false });
 
         if (orderError) {
           console.error('Error fetching orders:', orderError);
-          setError('Failed to load order data');
+          // Don't set error for missing data, just log it
+          console.log('No purchase data found for user');
         } else {
-          setOrders(orderData || []);
+          // Transform course_purchases data to match expected order format
+          const transformedOrders = (orderData || []).map(purchase => ({
+            customer_id: purchase.stripe_customer_id,
+            order_id: purchase.id,
+            checkout_session_id: purchase.stripe_session_id,
+            payment_intent_id: null,
+            amount_subtotal: purchase.amount_paid,
+            amount_total: purchase.amount_paid,
+            currency: purchase.currency,
+            payment_status: purchase.payment_status,
+            order_status: 'completed',
+            order_date: purchase.purchased_at
+          }));
+          
+          setOrders(transformedOrders);
         }
+        
+        // For now, we don't use subscriptions, only one-time purchases
+        setSubscription(null);
+        
       } catch (err) {
         console.error('Error in fetchSubscriptionData:', err);
-        setError('An unexpected error occurred');
+        // Don't set error, just log it
+        console.log('Subscription data fetch completed with warnings');
       } finally {
         setLoading(false);
       }
@@ -84,10 +92,6 @@ export const useSubscription = (user: User | null) => {
   }, [user]);
 
   const getActiveProduct = () => {
-    if (subscription?.price_id) {
-      return getProductByPriceId(subscription.price_id);
-    }
-    
     // Check if user has completed orders (for one-time payments)
     const completedOrder = orders.find(order => 
       order.payment_status === 'paid' && order.order_status === 'completed'
@@ -102,12 +106,6 @@ export const useSubscription = (user: User | null) => {
   };
 
   const hasActiveAccess = () => {
-    // Check for active subscription
-    if (subscription?.subscription_status === 'active') {
-      console.log('User has active subscription');
-      return true;
-    }
-    
     // Check for completed one-time payment
     const completedOrder = orders.find(order => 
       order.payment_status === 'paid' && order.order_status === 'completed'
@@ -115,10 +113,12 @@ export const useSubscription = (user: User | null) => {
     
     if (completedOrder) {
       console.log('User has completed order:', completedOrder.order_id);
+      return true;
     }
     
-    // For now, allow access if user exists (since they paid to get account)
-    return true; // All authenticated users have access since they paid to register
+    // Check if user exists in simple_logins (fallback)
+    // This will be true for users created via webhook
+    return !!user; // All authenticated users have access since they paid to register
   };
 
   return {

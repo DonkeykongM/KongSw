@@ -15,12 +15,13 @@
 ### Steg 1: Supabase Setup
 1. **Skapa nytt Supabase projekt**
 2. **Gå till SQL Editor**
-3. **Kör migration:** `supabase/migrations/create_simple_system.sql`
+3. **Kör migrations i ordning:**
+   - `cleanup_and_optimize_database.sql`
+   - `create_stripe_tables.sql` (om den inte redan körts)
 4. **Verifiera tabeller skapade:**
    - `course_purchases`
    - `user_profiles`
-   - `stripe_user_subscriptions`
-   - `stripe_user_orders`
+   - `simple_logins`
 
 ### Steg 2: Environment Variables
 **I Supabase → Edge Functions → Environment Variables:**
