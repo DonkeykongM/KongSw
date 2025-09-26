@@ -17,7 +17,7 @@ interface SubscriptionData {
 
 interface OrderData {
   customer_id: string | null;
-  order_id: string | null;
+  order_id: number | null;
   checkout_session_id: string | null;
   payment_intent_id: string | null;
   amount_subtotal: number | null;
@@ -47,37 +47,31 @@ export const useSubscription = (user: User | null) => {
         setLoading(true);
         setError(null);
 
-        // Fetch order data from course_purchases table
-        const { data: purchaseData, error: purchaseError } = await supabase
-          .from('course_purchases')
+        // Fetch subscription data
+        const { data: subData, error: subError } = await supabase
+          .from('stripe_user_subscriptions')
           .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+          .maybeSingle();
 
-        if (purchaseError) {
-          console.error('Error fetching purchases:', purchaseError);
-          setError('Failed to load purchase data');
+        if (subError) {
+          console.error('Error fetching subscription:', subError);
+          setError('Failed to load subscription data');
         } else {
-          // Convert course_purchases data to OrderData format
-          const orderData: OrderData[] = (purchaseData || []).map(purchase => ({
-            customer_id: purchase.stripe_customer_id,
-            order_id: purchase.id,
-            checkout_session_id: purchase.stripe_session_id,
-            payment_intent_id: null,
-            amount_subtotal: purchase.amount_paid,
-            amount_total: purchase.amount_paid,
-            currency: purchase.currency || 'SEK',
-            payment_status: purchase.payment_status || 'pending',
-            order_status: purchase.payment_status === 'paid' ? 'completed' : 'pending',
-            order_date: purchase.purchased_at || purchase.created_at,
-          }));
-          
-          setOrders(orderData);
+          setSubscription(subData);
         }
 
-        // For this course system, we don't have subscriptions, so set to null
-        setSubscription(null);
-        
+        // Fetch order data
+        const { data: orderData, error: orderError } = await supabase
+          .from('stripe_user_orders')
+          .select('*')
+          .order('order_date', { ascending: false });
+
+        if (orderError) {
+          console.error('Error fetching orders:', orderError);
+          setError('Failed to load order data');
+        } else {
+          setOrders(orderData || []);
+        }
       } catch (err) {
         console.error('Error in fetchSubscriptionData:', err);
         setError('An unexpected error occurred');
@@ -90,6 +84,10 @@ export const useSubscription = (user: User | null) => {
   }, [user]);
 
   const getActiveProduct = () => {
+    if (subscription?.price_id) {
+      return getProductByPriceId(subscription.price_id);
+    }
+    
     // Check if user has completed orders (for one-time payments)
     const completedOrder = orders.find(order => 
       order.payment_status === 'paid' && order.order_status === 'completed'
@@ -104,6 +102,12 @@ export const useSubscription = (user: User | null) => {
   };
 
   const hasActiveAccess = () => {
+    // Check for active subscription
+    if (subscription?.subscription_status === 'active') {
+      console.log('User has active subscription');
+      return true;
+    }
+    
     // Check for completed one-time payment
     const completedOrder = orders.find(order => 
       order.payment_status === 'paid' && order.order_status === 'completed'
@@ -111,7 +115,6 @@ export const useSubscription = (user: User | null) => {
     
     if (completedOrder) {
       console.log('User has completed order:', completedOrder.order_id);
-      return true;
     }
     
     // For now, allow access if user exists (since they paid to get account)

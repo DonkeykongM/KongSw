@@ -48,12 +48,6 @@ export const useAuth = () => {
     try {
       console.log('🔐 Försöker logga in:', email)
       
-      // Clear any existing session first
-      await supabase.auth.signOut()
-      
-      // Add a small delay to ensure cleanup is complete
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
@@ -61,51 +55,6 @@ export const useAuth = () => {
 
       if (error) {
         console.error('❌ Login error:', error)
-        console.error('Full error details:', {
-          message: error.message,
-          status: error.status,
-          name: error.name
-        });
-        // If there's an error, try to fix it automatically
-        if (error.message?.includes('Email not confirmed') || error.message?.includes('signup_disabled')) {
-          console.log('🔄 Trying to fix email confirmation...');
-          try {
-            // Try to fix the confirmation in the background
-            await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/rpc/fix_user_confirmation`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-                'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY
-              },
-              body: JSON.stringify({ user_email: email.trim() })
-            });
-            
-            // Try login again after fix
-            const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
-              email: email.trim(),
-              password: password.trim(),
-            });
-            
-            if (!retryError) {
-              console.log('✅ Login succeeded after fix');
-              return { data: retryData, error: null };
-            }
-          } catch (fixError) {
-            console.error('Could not auto-fix:', fixError);
-          }
-        }
-        
-        // Enhanced error messages
-        if (error.message?.includes('Invalid login credentials')) {
-          return { error: { message: 'Fel e-post eller lösenord. Om du nyligen köpte kursen, kontakta support@kongmindset.se så fixar vi det direkt.' } }
-        } else if (error.message?.includes('Email not confirmed')) {
-          return { error: { message: 'E-post behöver bekräftas. Kontakta support@kongmindset.se för omedelbar aktivering.' } }
-        } else if (error.message?.includes('User not found')) {
-          return { error: { message: 'Kontot hittades inte. Kontakta support@kongmindset.se om du köpt kursen.' } }
-        } else if (error.message?.includes('Too many requests')) {
-          return { error: { message: 'För många försök. Vänta 1 minut och försök igen.' } }
-        }
         return { error }
       }
 

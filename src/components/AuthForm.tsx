@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Brain, Mail, Lock, Eye, EyeOff, CreditCard, AlertCircle, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Brain, Mail, Lock, Eye, EyeOff, CreditCard, AlertCircle, ArrowLeft } from 'lucide-react';
 
 interface AuthFormProps {
   onSignIn: (email: string, password: string) => Promise<{ data?: any; error: any }>;
@@ -13,7 +13,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -95,7 +94,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
     }
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setError('');
 
@@ -105,21 +105,17 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
       const result = await onSignIn(email.trim(), password.trim());
       
       if (result.error) {
-        setError(result.error.message || 'Inloggning misslyckades.');
+        if (result.error.message?.includes('Invalid login credentials')) {
+          setError('Fel e-post eller lösenord. Kontrollera att du använder samma uppgifter som vid köpet.');
+        } else {
+          setError(result.error.message || 'Inloggning misslyckades');
+        }
       } else {
         console.log('✅ Inloggning lyckades');
-        setSuccess('Inloggning lyckades! Omdirigerar...');
-        // Clear form after successful login
-        setTimeout(() => {
-          setEmail('');
-          setPassword('');
-          setError('');
-          setSuccess('');
-        }, 1000);
       }
     } catch (err) {
       console.error('Login exception:', err);
-      setError('Inloggning misslyckades. Försök igen.');
+      setError('Ett oväntat fel uppstod');
     } finally {
       setLoading(false);
     }
@@ -176,7 +172,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
 
           {isLogin ? (
             // Login Form
-            <div className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
                   E-postadress
@@ -188,7 +184,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="exempel@email.com"
+                    placeholder="din@email.com"
                     required
                     disabled={loading}
                   />
@@ -221,13 +217,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
               </div>
 
               <button
-                onClick={handleLogin}
+                type="submit"
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-4 px-4 rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
               >
-                {loading ? 'Loggar in...' : '🔑 Logga in på kursen'}
+                {loading ? 'Loggar in...' : 'Logga in på kursen'}
               </button>
-            </div>
+            </form>
           ) : (
             // Purchase Form
             <div className="space-y-6">
@@ -257,7 +253,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="exempel@email.com"
+                    placeholder="din@email.com"
                     required
                     disabled={loading}
                   />
@@ -297,21 +293,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
                   <input
-                    type={showConfirmPassword ? 'text' : 'password'}
+                    type={showPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-10 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Upprepa lösenordet"
                     required
                     disabled={loading}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
                 </div>
               </div>
 
@@ -369,7 +358,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
           {/* Help Text */}
           <div className="text-center mt-4 text-xs text-neutral-500">
             {isLogin 
-              ? 'Logga in med samma uppgifter som du använde vid köpet' 
+              ? 'Använd samma e-post och lösenord som du använde vid köpet' 
               : 'Efter betalning skapas ditt konto automatiskt med dessa inloggningsuppgifter'
             }
           </div>
