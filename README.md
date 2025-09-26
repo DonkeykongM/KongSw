@@ -1,209 +1,76 @@
-# KongMindset - Master Your Mind, Master Your Life
+# Course Purchase & User Registration System
 
-A comprehensive online course platform based on Napoleon Hill's timeless masterpiece "Think and Grow Rich". KongMindset provides an interactive learning experience with 13 modules designed to transform your mindset and unlock your potential through mental conditioning and success principles.
+A complete solution for automatically registering users when they purchase courses, built with Supabase.
 
 ## Features
 
-- **13 Interactive Modules**: Each module covers a chapter from "Think and Grow Rich" with modern applications
-- **Comprehensive Content**: Module overviews, key points, inspirational quotes
-- **Interactive Learning**: Reflection questions and knowledge-testing quizzes
-- **Post-it Note System**: Save and organize your reflections and quiz results
-- **Responsive Design**: Works perfectly on desktop, tablet, and mobile devices
-- **Elegant Design**: Beautiful, sophisticated interface with premium aesthetics
-- **SEO Optimized**: Proper meta tags, structured data, and sitemap
-- **Authentication**: Secure login system with Supabase
-- **Fast Loading**: Optimized for performance
+- 🛒 **Automated User Registration**: Create accounts automatically after successful payments
+- 🔐 **Secure Authentication**: Login system with password reset functionality  
+- 💳 **Payment Integration**: Stripe integration with webhook automation
+- 📧 **Email Notifications**: Automatic login credential delivery
+- 🎓 **Course Access Control**: Only paying customers can access content
+- 🛡️ **Security**: Row Level Security (RLS) and proper data protection
 
-## Module Structure
+## Architecture Overview
 
-Each module includes:
-- **Overview**: Comprehensive summary of the chapter's key concepts
-- **Key Points**: 3-5 bullet points highlighting the most important learnings
-- **Inspirational Quote**: Motivational quote from Napoleon Hill
-- **Reflection Questions**: Thought-provoking questions for personal development
-- **Knowledge Quiz**: Interactive quiz to test understanding
-- **Additional Resources**: Recommended books and materials for further learning
+```
+Customer Purchase Flow:
+1. Customer fills purchase form (email + payment)
+2. Stripe processes payment 
+3. Webhook triggers user creation
+4. System sends login credentials via email
+5. Customer can immediately access course content
+```
 
-## The 13 Modules
+## Setup Instructions
 
-1. **The Power of Desire** - Learn to cultivate burning desire for your goals
-2. **Faith and Belief** - Develop unwavering faith in your ability to achieve
-3. **The Power of Autosuggestion** - Master programming your subconscious mind
-4. **Specialized Knowledge** - Acquire specific knowledge relevant to your goals
-5. **Creative Imagination** - Harness the power of your creative mind
-6. **Organized Planning** - Develop systematic plans to achieve your desires
-7. **Persistence** - Overcome setbacks with unwavering persistence
-8. **The Power of Decision** - Make decisive choices quickly and effectively
-9. **Master of the Subconscious Mind** - Understand and control your subconscious
-10. **The Brain and Your Mind** - Learn how your brain works and harness its power
-11. **The Transmutation of Sex Energy** - Channel energy into creative success
-12. **The Sixth Sense** - Develop your intuition and sixth sense
-13. **The Philosophy of Wealth** - Understand principles of creating wealth
+### 1. Supabase Project Setup
 
-## Technology Stack
+1. Go to [supabase.com](https://supabase.com) and create a new project
+2. Note your project URL and anon key from Settings > API
+3. Update the `.env` file with your credentials
+4. Run the database migrations to set up tables
+5. Deploy the Edge Functions
 
-- **Frontend**: React 18 with TypeScript
-- **Styling**: Tailwind CSS for responsive design
-- **Icons**: Lucide React for consistent iconography
-- **Build Tool**: Vite for fast development and building
-- **Deployment**: Ready for Netlify, Vercel, or any static hosting
-- **Authentication**: Supabase for user authentication and data storage
+### 2. Stripe Integration
 
-## Getting Started
+1. Create a Stripe account and get your keys
+2. Set up webhook endpoint in Stripe Dashboard
+3. Configure environment variables in Supabase
+4. Test the payment flow
 
-### Prerequisites
+### 3. Email Configuration
 
-- Node.js (version 16 or higher)
-- npm or yarn package manager
+1. Configure SMTP settings in Supabase
+2. Customize email templates
+3. Test email delivery
 
-### Installation
+## Quick Start
 
-1. Clone the repository or download the files
-2. Navigate to the project directory
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-### Development
-
-Start the development server:
 ```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your Supabase credentials
+
+# Start development server
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`
+## Database Schema
 
-### Building for Production
+See `supabase/migrations/` for complete database setup.
 
-Create a production build:
-```bash
-npm run build
-```
+## Security Considerations
 
-The built files will be in the `dist` directory.
-
-## Deployment
-
-### Setting up Supabase
-
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Get your project URL and anon key
-3. Update the `.env` file with your Supabase credentials:
-   ```
-   VITE_SUPABASE_URL=your_supabase_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
-4. Enable Email authentication in your Supabase dashboard
-5. Configure any additional authentication settings as needed
-
-### Deployment Options
-
-### Netlify (Recommended)
-
-1. Build your project: `npm run build`
-2. Upload the `dist` folder to Netlify
-3. Or connect your GitHub repository to Netlify for automatic deployments
-
-### Vercel
-
-1. Install Vercel CLI: `npm i -g vercel`
-2. Run `vercel` in your project directory
-3. Follow the prompts to deploy
-
-### GitHub Pages
-
-1. Build your project: `npm run build`
-2. Upload the `dist` folder contents to your GitHub Pages repository
-
-## Customization
-
-### Content Updates
-
-All course content is stored in `src/data/courseContent.ts`. You can:
-- Modify module descriptions and overviews
-- Update key points and quotes
-- Add or modify quiz questions
-- Change reflection questions
-- Update additional resources
-
-### Styling
-
-The design uses Tailwind CSS. Key customization points:
-- Colors: Update the color palette in `tailwind.config.js`
-- Fonts: Change typography in `index.html` and CSS classes
-- Layout: Modify components in `src/components/`
-
-### Adding New Modules
-
-1. Add new module data to `courseContent` array in `src/data/courseContent.ts`
-2. Include all required fields: overview, keyPoints, quiz, reflectionQuestions, etc.
-3. The module will automatically appear in the course grid
-
-## SEO Optimization
-
-The website includes:
-- Proper meta tags in `index.html`
-- Structured headings (H1, H2, H3)
-- Alt text for images
-- Sitemap.xml for search engine indexing
-- Fast loading times with optimized assets
-
-## Accessibility
-
-The website follows WCAG 2.1 guidelines:
-- Proper color contrast ratios
-- Keyboard navigation support
-- Screen reader compatibility
-- Semantic HTML structure
-- Focus indicators for interactive elements
-
-## Performance Optimization
-
-- Lazy loading for images
-- Minimized CSS and JavaScript
-- Efficient React rendering
-- Optimized bundle size with Vite
-
-## Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-- Mobile browsers (iOS Safari, Chrome Mobile)
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License. See LICENSE file for details.
+- All sensitive operations are handled server-side
+- Passwords are securely hashed
+- Payment data is handled by Stripe (PCI compliant)
+- Email templates are sanitized
+- RLS policies protect user data
 
 ## Support
 
-For questions or support:
-- Email: support@kongmindset.se
-- Phone: +1 (555) 123-4567
-
-## Acknowledgments
-
-- Napoleon Hill for the original "Think and Grow Rich" book
-- Design inspiration from modern premium course platforms
-- React and Tailwind CSS communities for excellent tools and documentation
-
-## Version History
-
-- v2.0.0 - KongMindet rebrand with enhanced design and features
-- Features: Post-it note system, premium UI, mobile optimization
-- v2.1.0 - KongMindset rebrand with authentication
-- Features: Supabase authentication, protected course access
-
----
-
-*Master your mind, master your life. Begin your transformation with KongMindset today!*
+For questions or issues, contact: support@yourcompany.com
