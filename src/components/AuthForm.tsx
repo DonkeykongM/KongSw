@@ -105,17 +105,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
       const result = await onSignIn(email.trim(), password.trim());
       
       if (result.error) {
-        if (result.error.message?.includes('Invalid login credentials')) {
-          setError('Fel e-post eller lösenord. Kontrollera att du använder samma uppgifter som vid köpet.');
-        } else {
-          setError(result.error.message || 'Inloggning misslyckades');
-        }
+        setError(result.error.message || 'Inloggning misslyckades. Kontakta support@kongmindset.se');
       } else {
         console.log('✅ Inloggning lyckades');
       }
     } catch (err) {
       console.error('Login exception:', err);
-      setError('Ett oväntat fel uppstod');
+      setError('Inloggning misslyckades. Försök igen eller kontakta support.');
     } finally {
       setLoading(false);
     }
