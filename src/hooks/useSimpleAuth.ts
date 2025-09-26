@@ -38,6 +38,7 @@ export const useSimpleAuth = () => {
       console.log('🔐 Attempting login for:', email);
 
       if (!isSupabaseConfigured) {
+        console.log('⚠️ Supabase not configured - using demo mode');
         // Demo mode - simulera inloggning
         const demoUser: SimpleUser = {
           id: 'demo-user',
@@ -54,23 +55,48 @@ export const useSimpleAuth = () => {
       }
 
       // Check if user exists in simple_logins table
+      console.log('🔍 Checking simple_logins table for:', email);
+      
       const { data: loginData, error: loginError } = await supabase
         .from('simple_logins')
         .select('*')
         .eq('email', email.toLowerCase().trim())
         .single();
 
-      if (loginError || !loginData) {
-        console.error('No login found:', loginError);
+      console.log('📊 Query result:', { data: loginData, error: loginError });
+
+      if (loginError) {
+        console.error('❌ Database error:', loginError);
+        
+        if (loginError.code === 'PGRST116') {
+          // No rows found
+          return { 
+            error: { 
+              message: 'E-post eller lösenord fel. Om du köpt kursen men inte kan logga in, kontakta support@kongmindset.se' 
+            } 
+          };
+        }
+        
         return { 
           error: { 
-            message: 'E-post eller lösenord fel. Om du köpt kursen men inte kan logga in, kontakta support@kongmindset.se' 
+            message: 'Databasfel. Försök igen eller kontakta support.' 
           } 
         };
       }
 
-      // Simple password check (for demo - in real app use bcrypt)
+      if (!loginData) {
+        console.error('❌ No login data found');
+        return { 
+          error: { 
+            message: 'Kontot hittades inte. Kontakta support@kongmindset.se om du köpt kursen.' 
+          } 
+        };
+      }
+
+      // Check password (simple text comparison for now)
+      console.log('🔑 Checking password...');
       if (loginData.password_hash !== password.trim()) {
+        console.error('❌ Password mismatch');
         return { 
           error: { 
             message: 'Fel lösenord. Kontakta support@kongmindset.se om du glömt ditt lösenord.' 
@@ -78,11 +104,17 @@ export const useSimpleAuth = () => {
         };
       }
 
+      console.log('✅ Password correct, updating last login...');
+
       // Update last login
-      await supabase
+      const { error: updateError } = await supabase
         .from('simple_logins')
         .update({ last_login: new Date().toISOString() })
         .eq('id', loginData.id);
+
+      if (updateError) {
+        console.warn('⚠️ Could not update last login:', updateError);
+      }
 
       // Create user from login data
       const simpleUser: SimpleUser = {
@@ -100,10 +132,10 @@ export const useSimpleAuth = () => {
       return { user: simpleUser, error: null };
 
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('🚨 Login exception:', error);
       return { 
         error: { 
-          message: 'Inloggning misslyckades. Försök igen.' 
+          message: 'Inloggning misslyckades. Kontakta support@kongmindset.se för hjälp.' 
         } 
       };
     }
@@ -125,6 +157,6 @@ export const useSimpleAuth = () => {
     loading,
     signIn,
     signOut,
-    isConfigured: true
+    isConfigured: isSupabaseConfigured
   };
 };

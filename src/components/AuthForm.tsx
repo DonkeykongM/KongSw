@@ -13,6 +13,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -140,8 +141,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
           <p className="text-neutral-600">Napoleon Hills Tänk och Bli Rik</p>
         </div>
 
-        {/* Special Notice for Mathias */}
-
         {/* Auth Form */}
         <div className="bg-white/90 rounded-2xl shadow-xl p-8 border border-white/20">
           {/* Toggle Buttons */}
@@ -182,7 +181,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="din@email.com"
+                    placeholder="exempel@email.com"
                     required
                     disabled={loading}
                   />
@@ -251,7 +250,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="din@email.com"
+                    placeholder="exempel@email.com"
                     required
                     disabled={loading}
                   />
@@ -291,14 +290,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type={showConfirmPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full pl-10 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Upprepa lösenordet"
                     required
                     disabled={loading}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
               </div>
 
