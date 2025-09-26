@@ -5,6 +5,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 export interface UserProfile {
   id?: string;
   user_id: string;
+  email: string;
   display_name: string;
   bio: string;
   goals: string;
@@ -29,6 +30,7 @@ export const useProfile = (user: User | null) => {
     // Initialize default profile
     const defaultProfile: UserProfile = {
       user_id: user.id,
+      email: user.email || '',
       display_name: user.email?.split('@')[0] || 'Användare',
       bio: 'Behärskar Napoleon Hills framgångsprinciper',
       goals: 'Bygger rikedom genom tankesättstransformation',
