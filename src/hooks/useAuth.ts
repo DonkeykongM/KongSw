@@ -47,7 +47,7 @@ export const useAuth = () => {
     }
 
     try {
-      console.log('🔐 Försöker logga in:', email)
+      console.log('🔐 Försöker logga in:', email.trim())
       
       // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -67,10 +67,11 @@ export const useAuth = () => {
 
       if (error) {
         console.error('❌ Direct login failed:', error.message)
+        console.log('🔍 Checking if user exists in simple_logins table...')
         
         // If login fails, check if user exists in simple_logins (webhook created users)
         if (error.message?.includes('Invalid login credentials')) {
-          console.log('🔍 Checking simple_logins for webhook-created user...')
+          console.log('🔍 User not found in auth.users, checking simple_logins...')
           
           try {
             // Add timeout to prevent hanging
@@ -90,11 +91,17 @@ export const useAuth = () => {
             ]) as any;
             
             if (simpleLoginData && !simpleLoginError) {
-              console.log('✅ Found user in simple_logins:', simpleLoginData.email)
+              console.log('✅ Found user in simple_logins table:', simpleLoginData.email)
+              console.log('📊 User data:', {
+                email: simpleLoginData.email,
+                hasStripeCustomer: !!simpleLoginData.stripe_customer_id,
+                purchaseDate: simpleLoginData.purchase_date,
+                courseAccess: simpleLoginData.course_access
+              })
               
               // User exists in simple_logins but not in auth.users
               // This means webhook created the user but auth creation might have failed
-              console.log('🔧 Attempting to create missing auth user...')
+              console.log('🔧 Creating auth user from webhook data...')
               
               // Try to create the auth user with the provided password
               const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -105,24 +112,27 @@ export const useAuth = () => {
                   data: {
                     display_name: simpleLoginData.display_name || 'Kursdeltagare',
                     stripe_customer_id: simpleLoginData.stripe_customer_id,
-                    purchase_date: simpleLoginData.purchase_date
+                    purchase_date: simpleLoginData.purchase_date,
+                    source: 'webhook_recovery'
                   }
                 }
               })
               
               if (signUpError) {
                 console.error('❌ Auth user creation failed:', signUpError.message)
+                console.log('🔍 Error details:', signUpError)
                 
                 if (signUpError.message?.includes('already registered')) {
                   // User exists in auth but password is wrong
-                  return { error: { message: 'Fel lösenord. Använd samma lösenord som du valde vid köpet. Om du glömt det, kontakta support.' } }
+                  return { error: { message: 'Fel lösenord. Använd samma lösenord som du valde vid köpet. Kontakta support@kongmindset.se om du glömt det.' } }
                 }
                 
-                return { error: { message: 'Kunde inte skapa användarkonto. Kontakta support på support@kongmindset.se' } }
+                return { error: { message: 'Tekniskt fel vid kontoskapande. Kontakta support@kongmindset.se med din e-post så hjälper vi dig.' } }
               }
               
               if (signUpData.user) {
-                console.log('✅ Auth user created from simple_logins data')
+                console.log('✅ Auth user created successfully from webhook data')
+                console.log('👤 New user ID:', signUpData.user.id)
                 
                 // Create user profile if it doesn't exist
                 const { error: profileError } = await supabase
@@ -140,8 +150,9 @@ export const useAuth = () => {
                 
                 if (profileError) {
                   console.error('❌ Profile creation failed:', profileError)
+                  console.log('⚠️ User can still access course without profile')
                 } else {
-                  console.log('✅ User profile created/updated')
+                  console.log('✅ User profile created successfully')
                 }
                 
                 // Now try to login again
@@ -151,25 +162,27 @@ export const useAuth = () => {
                 })
                 
                 if (retryError) {
-                  console.error('❌ Retry login failed:', retryError)
-                  return { error: { message: 'Inloggning misslyckades efter kontoskapande. Vänta 30 sekunder och försök igen.' } }
+                  console.error('❌ Retry login failed after user creation:', retryError)
+                  return { error: { message: 'Kontot skapades men inloggning misslyckades. Vänta 1 minut och försök logga in igen.' } }
                 }
                 
-                console.log('✅ Login successful after auth user creation')
+                console.log('✅ Login successful after auth user creation!')
+                console.log('🎉 User now has full access to course')
                 return { data: retryData, error: null }
               }
             } else {
               console.log('❌ User not found in simple_logins table')
-              return { error: { message: 'Användare hittades inte. Kontrollera att du har slutfört köpet eller kontakta support på support@kongmindset.se' } }
+              console.log('🔍 This means user has not completed purchase via webhook')
+              return { error: { message: 'Användare hittades inte. Du måste först köpa kursen för att få tillgång. Kontakta support@kongmindset.se om du redan betalat.' } }
             }
           } catch (fallbackError) {
             console.error('❌ Fallback check failed:', fallbackError)
             
             if (fallbackError.message === 'Timeout') {
-              return { error: { message: 'Anslutningen tog för lång tid. Kontrollera din internetanslutning och försök igen.' } }
+              return { error: { message: 'Anslutningen tog för lång tid. Kontrollera din internetanslutning och försök igen om 30 sekunder.' } }
             }
             
-            return { error: { message: 'Inloggning misslyckades. Kontakta support på support@kongmindset.se' } }
+            return { error: { message: 'Tekniskt fel vid inloggning. Kontakta support@kongmindset.se med din e-post så hjälper vi dig.' } }
           }
         }
         
@@ -177,17 +190,18 @@ export const useAuth = () => {
         let userFriendlyMessage = 'Inloggning misslyckades';
         
         if (error.message?.includes('Email not confirmed')) {
-          userFriendlyMessage = 'E-post inte bekräftad. Kontrollera din inkorg eller kontakta support.';
+          userFriendlyMessage = 'E-post inte bekräftad. Kontrollera din inkorg eller kontakta support@kongmindset.se';
         } else if (error.message?.includes('Too many requests')) {
-          userFriendlyMessage = 'För många inloggningsförsök. Vänta 5 minuter och försök igen.';
+          userFriendlyMessage = 'För många inloggningsförsök. Vänta 10 minuter och försök igen.';
         } else if (error.message?.includes('Invalid login credentials')) {
-          userFriendlyMessage = 'Fel e-post eller lösenord. Kontrollera att du använder samma uppgifter som vid köpet.';
+          userFriendlyMessage = 'Fel e-post eller lösenord. Använd samma uppgifter som vid köpet. Kontakta support@kongmindset.se om problemet kvarstår.';
         }
         
         return { error: { message: userFriendlyMessage } }
       }
 
-      console.log('✅ Direct login successful:', email)
+      console.log('✅ Direct login successful for:', email.trim())
+      console.log('🎉 User authenticated and has course access')
       return { data, error: null }
       
     } catch (err: any) {
