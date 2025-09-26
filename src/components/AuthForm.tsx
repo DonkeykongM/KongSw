@@ -238,7 +238,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-4 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-4 pr-12 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Ditt lösenord"
                     required
                     disabled={loading}
@@ -246,7 +246,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1"
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />
@@ -310,7 +310,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-4 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-4 pr-12 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Minst 6 tecken"
                     required
                     minLength={6}
@@ -319,7 +319,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1 z-10"
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />
@@ -339,7 +339,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     type={showPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-4 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-4 pr-12 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Upprepa lösenordet"
                     required
                     disabled={loading}
@@ -347,7 +347,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1 z-10"
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />
