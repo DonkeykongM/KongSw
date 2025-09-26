@@ -20,7 +20,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
   const handleStripeCheckout = async () => {
     setLoading(true);
     setError('');
-    setSuccess('Förbereder säker betalning...');
+    setSuccess('');
 
     try {
       // Basic validation
@@ -42,17 +42,29 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
         return;
       }
 
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) {
+        setError('Ange en giltig e-postadress.');
+        setLoading(false);
+        return;
+      }
+
+      setSuccess('Förbereder säker betalning...');
+
       // Check if Supabase is configured
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       
       if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('placeholder')) {
-        setError('Systemet är inte konfigurerat. Kontakta support.');
+        setError('Betalningssystemet är inte tillgängligt just nu. Kontakta support på support@kongmindset.se');
         setLoading(false);
         return;
       }
 
       console.log('🛒 Startar checkout för:', email);
+
+      setSuccess('Kontaktar betalningssystem...');
 
       // Create checkout session
       const response = await fetch(`${supabaseUrl}/functions/v1/stripe-checkout`, {
@@ -69,9 +81,25 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Checkout error:', response.status, errorText);
-        throw new Error('Kunde inte starta betalningen');
+        let errorMessage = 'Kunde inte starta betalningen';
+        
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } catch {
+          const errorText = await response.text();
+          console.error('Checkout error:', response.status, errorText);
+          
+          if (response.status === 404) {
+            errorMessage = 'Betalningsfunktionen är inte tillgänglig. Kontakta support.';
+          } else if (response.status === 500) {
+            errorMessage = 'Serverfel uppstod. Försök igen om en stund.';
+          } else if (response.status === 403) {
+            errorMessage = 'Åtkomst nekad. Kontrollera din internetanslutning.';
+          }
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const { url } = await response.json();
@@ -88,7 +116,17 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
       
     } catch (err: any) {
       console.error('Checkout fel:', err);
-      setError(err.message || 'Betalningen kunde inte startas');
+      
+      // Provide more specific error messages
+      let userFriendlyError = err.message || 'Betalningen kunde inte startas';
+      
+      if (err.message?.includes('fetch')) {
+        userFriendlyError = 'Kunde inte ansluta till betalningssystemet. Kontrollera din internetanslutning och försök igen.';
+      } else if (err.message?.includes('network')) {
+        userFriendlyError = 'Nätverksfel. Kontrollera din internetanslutning och försök igen.';
+      }
+      
+      setError(userFriendlyError);
       setSuccess('');
       setLoading(false);
     }
@@ -196,12 +234,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                   Lösenord
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full pl-4 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Ditt lösenord"
                     required
                     disabled={loading}
@@ -265,12 +302,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                   Välj lösenord <span className="text-xs text-gray-500">(blir ditt inloggningslösenord)</span>
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full pl-4 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Minst 6 tecken"
                     required
                     minLength={6}
@@ -291,16 +327,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                   Bekräfta lösenord
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full pl-4 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Upprepa lösenordet"
                     required
                     disabled={loading}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -340,12 +382,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
           {error && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-2">
               <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-red-600">{error}</p>
+              <div className="flex-1">
+                <p className="text-sm text-red-600">{error}</p>
+                {error.includes('support') && (
+                  <p className="text-xs text-red-500 mt-1">
+                    📧 E-post: support@kongmindset.se
+                  </p>
+                )}
+              </div>
             </div>
           )}
 
           {success && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-start space-x-2">
+              <div className="w-5 h-5 mt-0.5 flex-shrink-0">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+              </div>
               <p className="text-sm text-green-600 font-medium">{success}</p>
             </div>
           )}

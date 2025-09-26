@@ -43,11 +43,21 @@ export const useAuth = () => {
   const signIn = async (email: string, password: string) => {
     if (!isSupabaseConfigured) {
       console.log('⚠️ Supabase not configured - demo mode')
-      return { error: { message: 'Supabase inte konfigurerat - kontakta support' } }
+      return { error: { message: 'Systemet är inte konfigurerat. Kontakta support på support@kongmindset.se' } }
     }
 
     try {
       console.log('🔐 Försöker logga in:', email)
+      
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) {
+        return { error: { message: 'Ange en giltig e-postadress.' } };
+      }
+      
+      if (password.length < 6) {
+        return { error: { message: 'Lösenordet måste vara minst 6 tecken långt.' } };
+      }
       
       // Try direct login first
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -63,11 +73,21 @@ export const useAuth = () => {
           console.log('🔍 Checking simple_logins for webhook-created user...')
           
           try {
-            const { data: simpleLoginData, error: simpleLoginError } = await supabase
+            // Add timeout to prevent hanging
+            const timeoutPromise = new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Timeout')), 10000)
+            );
+            
+            const queryPromise = supabase
               .from('simple_logins')
               .select('*')
               .eq('email', email.trim())
-              .maybeSingle()
+              .maybeSingle();
+            
+            const { data: simpleLoginData, error: simpleLoginError } = await Promise.race([
+              queryPromise,
+              timeoutPromise
+            ]) as any;
             
             if (simpleLoginData && !simpleLoginError) {
               console.log('✅ Found user in simple_logins:', simpleLoginData.email)
@@ -87,6 +107,11 @@ export const useAuth = () => {
                     stripe_customer_id: simpleLoginData.stripe_customer_id,
                     purchase_date: simpleLoginData.purchase_date
                   }
+                  data: {
+                    display_name: simpleLoginData.display_name || 'Kursdeltagare',
+                    stripe_customer_id: simpleLoginData.stripe_customer_id,
+                    purchase_date: simpleLoginData.purchase_date
+                  }
                 }
               })
               
@@ -95,10 +120,10 @@ export const useAuth = () => {
                 
                 if (signUpError.message?.includes('already registered')) {
                   // User exists in auth but password is wrong
-                  return { error: { message: 'Fel lösenord. Kontrollera att du använder samma lösenord som vid köpet.' } }
+                  return { error: { message: 'Fel lösenord. Använd samma lösenord som du valde vid köpet. Om du glömt det, kontakta support.' } }
                 }
                 
-                return { error: { message: 'Kunde inte skapa användarkonto. Kontakta support.' } }
+                return { error: { message: 'Kunde inte skapa användarkonto. Kontakta support på support@kongmindset.se' } }
               }
               
               if (signUpData.user) {
@@ -132,7 +157,7 @@ export const useAuth = () => {
                 
                 if (retryError) {
                   console.error('❌ Retry login failed:', retryError)
-                  return { error: { message: 'Inloggning misslyckades efter kontoskapande. Försök igen.' } }
+                  return { error: { message: 'Inloggning misslyckades efter kontoskapande. Vänta 30 sekunder och försök igen.' } }
                 }
                 
                 console.log('✅ Login successful after auth user creation')
@@ -140,15 +165,31 @@ export const useAuth = () => {
               }
             } else {
               console.log('❌ User not found in simple_logins table')
-              return { error: { message: 'Användare hittades inte. Kontrollera att du har köpt kursen eller kontakta support.' } }
+              return { error: { message: 'Användare hittades inte. Kontrollera att du har slutfört köpet eller kontakta support på support@kongmindset.se' } }
             }
           } catch (fallbackError) {
             console.error('❌ Fallback check failed:', fallbackError)
-            return { error: { message: 'Inloggning misslyckades. Kontakta support.' } }
+            
+            if (fallbackError.message === 'Timeout') {
+              return { error: { message: 'Anslutningen tog för lång tid. Kontrollera din internetanslutning och försök igen.' } }
+            }
+            
+            return { error: { message: 'Inloggning misslyckades. Kontakta support på support@kongmindset.se' } }
           }
         }
         
-        return { error: { message: error.message || 'Inloggning misslyckades' } }
+        // Handle other auth errors
+        let userFriendlyMessage = 'Inloggning misslyckades';
+        
+        if (error.message?.includes('Email not confirmed')) {
+          userFriendlyMessage = 'E-post inte bekräftad. Kontrollera din inkorg eller kontakta support.';
+        } else if (error.message?.includes('Too many requests')) {
+          userFriendlyMessage = 'För många inloggningsförsök. Vänta 5 minuter och försök igen.';
+        } else if (error.message?.includes('Invalid login credentials')) {
+          userFriendlyMessage = 'Fel e-post eller lösenord. Kontrollera att du använder samma uppgifter som vid köpet.';
+        }
+        
+        return { error: { message: userFriendlyMessage } }
       }
 
       console.log('✅ Direct login successful:', email)
@@ -156,7 +197,16 @@ export const useAuth = () => {
       
     } catch (err: any) {
       console.error('❌ Login exception:', err)
-      return { error: { message: 'Ett oväntat fel uppstod vid inloggning' } }
+      
+      let errorMessage = 'Ett oväntat fel uppstod vid inloggning';
+      
+      if (err.message?.includes('fetch')) {
+        errorMessage = 'Kunde inte ansluta till servern. Kontrollera din internetanslutning.';
+      } else if (err.message?.includes('network')) {
+        errorMessage = 'Nätverksfel. Kontrollera din internetanslutning och försök igen.';
+      }
+      
+      return { error: { message: errorMessage } }
     }
   }
 
