@@ -144,11 +144,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
       const result = await onSignIn(email.trim(), password.trim());
       
       if (result.error) {
-        if (result.error.message?.includes('Invalid login credentials')) {
-          setError('Fel e-post eller lösenord. Kontrollera att du använder samma uppgifter som vid köpet.');
-        } else {
-          setError(result.error.message || 'Inloggning misslyckades');
-        }
+        setError(result.error.message || 'Inloggning misslyckades');
       } else {
         console.log('✅ Inloggning lyckades');
       }
