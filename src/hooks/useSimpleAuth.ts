@@ -132,6 +132,7 @@ export const useSimpleAuth = () => {
       };
 
       localStorage.setItem('kongmindset_user', JSON.stringify(simpleUser));
+       setUser(simpleUser);  // This was missing!
       setUser(simpleUser);
 
       console.log('✅ Login successful for:', email);

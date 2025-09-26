@@ -109,6 +109,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
       } else {
         console.log('✅ Inloggning lyckades');
         setSuccess('Inloggning lyckades! Omdirigerar...');
+        // Clear form after successful login
+        setTimeout(() => {
+          setEmail('');
+          setPassword('');
+          setError('');
+          setSuccess('');
+        }, 1000);
       }
     } catch (err) {
       console.error('Login exception:', err);
