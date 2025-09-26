@@ -11,22 +11,19 @@ const isSupabaseConfigured = supabaseUrl &&
   supabaseUrl.startsWith('https://') &&
   supabaseAnonKey.length > 50
 
-// Create client with proper configuration check
-export const supabase = isSupabaseConfigured 
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: true, // Enable persistence when configured
-        autoRefreshToken: true, // Enable auto refresh when configured
-        storage: window.localStorage, // Use localStorage for persistence
-        storageKey: 'sb-auth-token',
-        flowType: 'pkce'
-      }
-    })
-  : createClient('https://placeholder.supabase.co', 'placeholder-anon-key', {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      }
-    })
+// Create client - always create it, but with different config
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: isSupabaseConfigured, // Only persist if properly configured
+    autoRefreshToken: isSupabaseConfigured,
+    storage: isSupabaseConfigured ? window.localStorage : undefined
+  }
+})
 
 export { isSupabaseConfigured }
+
+console.log('🔧 Supabase config:', { 
+  configured: isSupabaseConfigured, 
+  hasUrl: !!supabaseUrl && !supabaseUrl.includes('placeholder'),
+  hasKey: !!supabaseAnonKey && !supabaseAnonKey.includes('placeholder')
+})

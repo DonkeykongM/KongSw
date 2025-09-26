@@ -1,23 +1,28 @@
 import { useState, useEffect } from 'react'
 import { User } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [profile, setProfile] = useState<any>(null)
 
   useEffect(() => {
-    // Hämta initial session
+    // Skip auth if Supabase not configured
+    if (!isSupabaseConfigured) {
+      console.log('⚠️ Supabase not configured - skipping auth')
+      setLoading(false)
+      return
+    }
+
+    // Get initial session
     const getInitialSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
-        if (session?.user) {
-          setUser(session.user)
-          await loadProfile(session.user.id)
-        }
+        setUser(session?.user || null)
+        console.log('👤 Current user:', session?.user?.email || 'None')
       } catch (error) {
         console.error('Session error:', error)
+        setUser(null)
       } finally {
         setLoading(false)
       }
@@ -25,47 +30,23 @@ export const useAuth = () => {
 
     getInitialSession()
 
-    // Lyssna på auth förändringar
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event)
-      
-      if (session?.user) {
-        setUser(session.user)
-        await loadProfile(session.user.id)
-      } else {
-        setUser(null)
-        setProfile(null)
-      }
+      console.log('🔄 Auth state change:', event, session?.user?.email || 'No user')
+      setUser(session?.user || null)
       setLoading(false)
     })
 
     return () => subscription.unsubscribe()
   }, [])
 
-  // Ladda användarprofil
-  const loadProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .single()
-
-      if (error) {
-        console.error('Profile load error:', error)
-      } else {
-        setProfile(data)
-        console.log('✅ Profil laddad för:', data.email)
-      }
-    } catch (err) {
-      console.error('Profile fetch error:', err)
-    }
-  }
-
-  // Logga in
   const signIn = async (email: string, password: string) => {
+    if (!isSupabaseConfigured) {
+      return { error: { message: 'Supabase inte konfigurerat' } }
+    }
+
     try {
-      console.log('🔑 Försöker logga in:', email)
+      console.log('🔐 Försöker logga in:', email)
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -73,11 +54,11 @@ export const useAuth = () => {
       })
 
       if (error) {
-        console.error('Login error:', error)
+        console.error('❌ Login error:', error)
         return { error }
       }
 
-      console.log('✅ Inloggning lyckades för:', email)
+      console.log('✅ Login success:', email)
       return { data, error: null }
       
     } catch (err: any) {
@@ -86,12 +67,15 @@ export const useAuth = () => {
     }
   }
 
-  // Logga ut
   const signOut = async () => {
+    if (!isSupabaseConfigured) {
+      setUser(null)
+      return { error: null }
+    }
+
     try {
       const { error } = await supabase.auth.signOut()
       setUser(null)
-      setProfile(null)
       return { error }
     } catch (err) {
       console.error('Logout error:', err)
@@ -99,18 +83,11 @@ export const useAuth = () => {
     }
   }
 
-  // Kontrollera om användaren har kurstillgång
-  const hasCourseAccess = () => {
-    return profile?.has_course_access === true || false
-  }
-
   return {
     user,
-    profile,
     loading,
     signIn,
     signOut,
-    hasCourseAccess,
-    refreshProfile: () => user && loadProfile(user.id)
+    isConfigured: isSupabaseConfigured
   }
 }

@@ -23,9 +23,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
     setSuccess('Förbereder säker betalning...');
 
     try {
-      // Validera formulär
-      if (!email || !password) {
-        setError('E-post och lösenord krävs.');
+      // Basic validation
+      if (!email || !password || !name) {
+        setError('Alla fält krävs för att köpa kursen.');
         setLoading(false);
         return;
       }
@@ -42,19 +42,29 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
         return;
       }
 
+      // Check if Supabase is configured
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('placeholder')) {
+        setError('Systemet är inte konfigurerat. Kontakta support.');
+        setLoading(false);
+        return;
+      }
+
       console.log('🛒 Startar checkout för:', email);
 
-      // Skapa checkout session
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`, {
+      // Create checkout session
+      const response = await fetch(`${supabaseUrl}/functions/v1/stripe-checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${supabaseKey}`,
         },
         body: JSON.stringify({
           email: email.trim(),
           password: password.trim(),
-          name: name.trim() || email.split('@')[0]
+          name: name.trim()
         }),
       });
 
@@ -73,7 +83,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
       console.log('✅ Omdirigerar till Stripe checkout');
       setSuccess('🎯 Omdirigerar till säker betalning...');
       
-      // Omdirigera till Stripe
+      // Redirect to Stripe
       window.location.href = url;
       
     } catch (err: any) {
@@ -228,6 +238,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                   className="w-full px-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="För- och efternamn"
                   disabled={loading}
+                  required
                 />
               </div>
 
@@ -251,7 +262,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
 
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Välj lösenord <span className="text-xs text-gray-500">(kommer att vara ditt inloggningslösenord)</span>
+                  Välj lösenord <span className="text-xs text-gray-500">(blir ditt inloggningslösenord)</span>
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
@@ -300,9 +311,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                   <span className="font-semibold text-green-800">Komplett KongMindset-kurs</span>
                 </div>
                 <ul className="text-xs text-green-600 space-y-1">
-                  <li>🎯 13 interaktiva moduler (lifstidsåtkomst)</li>
+                  <li>🎯 13 interaktiva moduler (livstidsåtkomst)</li>
                   <li>🧠 Napoleon Hill AI-mentor (24/7)</li>
-                  <li>✅ GRATIS originalbok "Tänk och Bli Rik"</li>
+                  <li>📚 GRATIS originalbok "Tänk och Bli Rik"</li>
                   <li>💚 30 dagars pengarna-tillbaka-garanti</li>
                   <li>🔐 Ditt konto skapas automatiskt efter betalning</li>
                 </ul>

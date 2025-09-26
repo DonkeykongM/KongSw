@@ -12,13 +12,12 @@ import ProfilePage from './components/ProfilePage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import CookiePolicy from './components/CookiePolicy';
 import TermsOfService from './components/TermsOfService';
-import Footer from './components/Footer';
 import SuccessPage from './components/SuccessPage';
 import { courseContent } from './data/courseContent';
 import { ModuleContent } from './data/courseContent';
 
 function App() {
-  const { user, loading, signIn, signUp, signOut } = useAuth();
+  const { user, loading, signIn, signOut, isConfigured } = useAuth();
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedModule, setSelectedModule] = useState<ModuleContent | null>(null);
@@ -30,16 +29,15 @@ function App() {
     
     if (paymentStatus === 'success') {
       setCurrentPage('success');
-      setShowAuthForm(false); // Reset auth form state
-      // Clear URL params
+      setShowAuthForm(false);
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (paymentStatus === 'cancelled') {
       setShowAuthForm(false);
       setCurrentPage('home');
-      // Clear URL params
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
+
   const handleModuleStart = (moduleId: number) => {
     const module = courseContent.find(m => m.id === moduleId);
     if (module) {
@@ -63,7 +61,7 @@ function App() {
   };
 
   const handleBackToLanding = () => {
-   setCurrentPage('home');
+    setCurrentPage('home');
     setShowAuthForm(false);
   };
 
@@ -71,7 +69,7 @@ function App() {
     if (user) {
       setCurrentPage('home');
     } else {
-     setCurrentPage('auth'); // Reset current page to allow auth form to show
+      setCurrentPage('auth');
       setShowAuthForm(true);
     }
   };
@@ -83,13 +81,15 @@ function App() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 mx-auto mb-6"></div>
           <p className="text-neutral-600 text-lg font-medium">Laddar din kurs...</p>
-          <p className="text-neutral-500 text-sm mt-2">Vänligen vänta medan vi förbereder din framgångsresa</p>
+          {!isConfigured && (
+            <p className="text-neutral-500 text-sm mt-2">⚠️ Supabase inte konfigurerat - kör i demo-läge</p>
+          )}
         </div>
       </div>
     );
   }
 
-  // Check for payment success first, before user authentication
+  // Handle success page first
   if (currentPage === 'success') {
     return (
       <LanguageProvider>
@@ -98,26 +98,25 @@ function App() {
     );
   }
 
-  // Show auth form if not logged in
-  if (!user) {
-   // Handle auth form after success page
-   if (currentPage === 'auth' || showAuthForm) {
-     return (
-       <LanguageProvider>
-         <AuthForm onSignIn={signIn} onSignUp={signUp} onBack={handleBackToLanding} />
-       </LanguageProvider>
-     );
-   }
-   
-    if (!showAuthForm) {
-      return (
-        <LanguageProvider>
-          <LandingPage onJoinClick={handleJoinClick} />
-        </LanguageProvider>
-      );
-    }
+  // Show auth form if requested or if user not logged in and trying to access protected content
+  if (showAuthForm || (currentPage === 'auth')) {
+    return (
+      <LanguageProvider>
+        <AuthForm onSignIn={signIn} onBack={handleBackToLanding} />
+      </LanguageProvider>
+    );
   }
 
+  // Show landing page if no user
+  if (!user) {
+    return (
+      <LanguageProvider>
+        <LandingPage onJoinClick={handleJoinClick} />
+      </LanguageProvider>
+    );
+  }
+
+  // Show module detail if selected
   if (currentPage === 'module-detail' && selectedModule) {
     return (
       <LanguageProvider>
@@ -126,6 +125,7 @@ function App() {
     );
   }
 
+  // Show other pages
   if (currentPage === 'contact') {
     return (
       <LanguageProvider>
@@ -174,14 +174,13 @@ function App() {
     );
   }
 
+  // Default: Show main course interface
   return (
     <LanguageProvider>
       <div className="flex flex-col min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50">
         <Navigation currentPage={currentPage} onNavigate={handleNavigation} onSignOut={signOut} user={user} />
         <main className="flex-grow">
-          {(currentPage === 'home' || currentPage === 'modules') && (
-            <CourseModules onModuleStart={handleModuleStart} />
-          )}
+          <CourseModules onModuleStart={handleModuleStart} />
         </main>
       </div>
     </LanguageProvider>
