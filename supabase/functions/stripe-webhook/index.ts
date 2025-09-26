@@ -109,6 +109,7 @@ serve(async (req) => {
         user_metadata: {
           name: name,
           purchased_at: new Date().toISOString()
+        }
         email_confirm: true
       })
 
