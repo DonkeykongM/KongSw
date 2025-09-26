@@ -48,6 +48,9 @@ export const useAuth = () => {
     try {
       console.log('🔐 Försöker logga in:', email)
       
+      // Clear any existing session first
+      await supabase.auth.signOut()
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
@@ -55,6 +58,14 @@ export const useAuth = () => {
 
       if (error) {
         console.error('❌ Login error:', error)
+        // Enhanced error messages for common issues
+        if (error.message?.includes('Invalid login credentials')) {
+          return { error: { message: 'Fel e-post eller lösenord. Om du nyss köpte kursen, vänta 1 minut och försök igen.' } }
+        } else if (error.message?.includes('Email not confirmed')) {
+          return { error: { message: 'E-post inte bekräftad. Kontakta support@kongmindset.se' } }
+        } else if (error.message?.includes('Too many requests')) {
+          return { error: { message: 'För många försök. Vänta 1 minut och försök igen.' } }
+        }
         return { error }
       }
 
