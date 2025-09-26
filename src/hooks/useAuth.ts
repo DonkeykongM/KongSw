@@ -65,7 +65,7 @@ export const useAuth = () => {
             .from('simple_logins')
             .select('*')
             .eq('email', email.trim())
-            .maybeSingle()
+            .single()
           
           if (simpleLoginData && !simpleLoginError) {
             console.log('✅ Found user in simple_logins, creating auth user...')
