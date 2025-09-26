@@ -76,7 +76,7 @@ export const useAuth = () => {
           try {
             // Add timeout to prevent hanging
             const timeoutPromise = new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('Timeout')), 10000)
+              setTimeout(() => reject(new Error('Timeout')), 15000)
             );
             
             const queryPromise = supabase
