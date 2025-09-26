@@ -94,8 +94,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async () => {
     setLoading(true);
     setError('');
 
@@ -168,7 +167,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
 
           {isLogin ? (
             // Login Form
-            <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
                   E-postadress
@@ -213,13 +212,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
               </div>
 
               <button
-                type="submit"
+                onClick={handleLogin}
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-4 px-4 rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
               >
                 {loading ? 'Loggar in...' : 'Logga in på kursen'}
               </button>
-            </form>
+            </div>
           ) : (
             // Purchase Form
             <div className="space-y-6">
