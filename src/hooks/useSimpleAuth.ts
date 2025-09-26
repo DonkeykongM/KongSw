@@ -48,6 +48,9 @@ export const useSimpleAuth = () => {
           has_access: true
         };
         
+        // Sätt user email i Supabase session för RLS
+        await supabase.rpc('set_current_user_email', { user_email: loginData.email });
+        
         localStorage.setItem('kongmindset_user', JSON.stringify(demoUser));
         setUser(demoUser);
         
