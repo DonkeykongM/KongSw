@@ -107,11 +107,6 @@ export const useAuth = () => {
                     stripe_customer_id: simpleLoginData.stripe_customer_id,
                     purchase_date: simpleLoginData.purchase_date
                   }
-                  data: {
-                    display_name: simpleLoginData.display_name || 'Kursdeltagare',
-                    stripe_customer_id: simpleLoginData.stripe_customer_id,
-                    purchase_date: simpleLoginData.purchase_date
-                  }
                 }
               })
               
