@@ -42,22 +42,8 @@ export const useAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     if (!isSupabaseConfigured) {
-      // Check simple_logins table for demo mode
-      const savedUsers = JSON.parse(localStorage.getItem('demo_users') || '[]');
-      const user = savedUsers.find((u: any) => u.email === email.trim());
-      
-      if (user && user.password === password.trim()) {
-        // Create a mock user object
-        const mockUser = {
-          id: user.id,
-          email: user.email,
-          created_at: user.created_at
-        };
-        setUser(mockUser as any);
-        return { data: { user: mockUser }, error: null };
-      } else {
-        return { error: { message: 'Fel e-post eller lösenord' } };
-      }
+      console.log('⚠️ Supabase not configured - demo mode')
+      return { error: { message: 'Supabase inte konfigurerat - kontakta support' } }
     }
 
     try {
@@ -70,6 +56,55 @@ export const useAuth = () => {
 
       if (error) {
         console.error('❌ Login error:', error)
+        
+        // Check if user exists in simple_logins table (fallback for users created via webhook)
+        if (error.message?.includes('Invalid login credentials')) {
+          console.log('🔍 Checking simple_logins table for user...')
+          
+          const { data: simpleLoginData, error: simpleLoginError } = await supabase
+            .from('simple_logins')
+            .select('*')
+            .eq('email', email.trim())
+            .single()
+          
+          if (simpleLoginData && !simpleLoginError) {
+            console.log('✅ Found user in simple_logins, creating auth user...')
+            
+            // Try to create auth user from simple_logins data
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+              email: email.trim(),
+              password: password.trim(),
+              options: {
+                emailRedirectTo: undefined,
+                data: {
+                  display_name: simpleLoginData.display_name || 'Kursdeltagare'
+                }
+              }
+            })
+            
+            if (signUpError) {
+              console.error('❌ Failed to create auth user:', signUpError)
+              return { error: { message: 'Kunde inte skapa användarkonto' } }
+            }
+            
+            console.log('✅ Auth user created, trying login again...')
+            
+            // Try login again
+            const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+              email: email.trim(),
+              password: password.trim(),
+            })
+            
+            if (retryError) {
+              console.error('❌ Retry login failed:', retryError)
+              return { error: { message: 'Inloggning misslyckades efter kontoskapande' } }
+            }
+            
+            console.log('✅ Login successful after auth user creation')
+            return { data: retryData, error: null }
+          }
+        }
+        
         return { error }
       }
 
