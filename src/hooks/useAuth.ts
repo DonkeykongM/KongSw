@@ -42,7 +42,22 @@ export const useAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     if (!isSupabaseConfigured) {
-      return { error: { message: 'Supabase inte konfigurerat' } }
+      // Check simple_logins table for demo mode
+      const savedUsers = JSON.parse(localStorage.getItem('demo_users') || '[]');
+      const user = savedUsers.find((u: any) => u.email === email.trim());
+      
+      if (user && user.password === password.trim()) {
+        // Create a mock user object
+        const mockUser = {
+          id: user.id,
+          email: user.email,
+          created_at: user.created_at
+        };
+        setUser(mockUser as any);
+        return { data: { user: mockUser }, error: null };
+      } else {
+        return { error: { message: 'Fel e-post eller lösenord' } };
+      }
     }
 
     try {

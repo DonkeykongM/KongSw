@@ -67,7 +67,7 @@ function App() {
 
   const handleSuccessContinue = () => {
     if (user) {
-      setCurrentPage('home');
+      setCurrentPage('modules');
     } else {
       setCurrentPage('auth');
       setShowAuthForm(true);

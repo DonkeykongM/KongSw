@@ -37,6 +37,22 @@ export const useProfile = (user: User | null) => {
 
     if (!isSupabaseConfigured) {
       // Use localStorage if Supabase is not configured
+      const savedUsers = JSON.parse(localStorage.getItem('demo_users') || '[]');
+      const userData = savedUsers.find((u: any) => u.id === user.id);
+      
+      if (userData) {
+        const profileData = {
+          user_id: user.id,
+          display_name: userData.display_name || user.email?.split('@')[0] || 'Användare',
+          bio: userData.bio || 'Behärskar Napoleon Hills framgångsprinciper',
+          goals: userData.goals || 'Bygger rikedom genom tankesättstransformation',
+          favorite_module: userData.favorite_module || 'Önskans kraft'
+        };
+        setProfile(profileData);
+      } else {
+        setProfile(defaultProfile);
+      }
+      
       const savedProfile = localStorage.getItem(`profile_${user.id}`);
       if (savedProfile) {
         try {
