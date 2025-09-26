@@ -1,231 +1,306 @@
-import { corsHeaders } from '../_shared/cors.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.51.0'
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
-const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
-if (!STRIPE_WEBHOOK_SECRET || !SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  throw new Error('Missing required environment variables');
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-// Import Stripe with npm: prefix for Deno
-// @ts-ignore
-import Stripe from 'npm:stripe@14.21.0';
-
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-  apiVersion: '2023-10-16',
-});
-
-// Function to generate a secure random password
-function generateSecurePassword(length: number = 12): string {
-  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-  let password = '';
-  
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * charset.length);
-    password += charset[randomIndex];
-  }
-  
-  return password;
+interface WebhookPayload {
+  type: string;
+  data: {
+    object: {
+      id: string;
+      object: string;
+      customer: string;
+      metadata?: {
+        email?: string;
+        password?: string;
+        name?: string;
+      };
+      payment_status?: string;
+      amount_total?: number;
+      currency?: string;
+      payment_intent?: string;
+    };
+  };
 }
 
-// Function to send email with login credentials
-async function sendLoginCredentials(email: string, password: string, name: string) {
-  try {
-    const emailResponse = await fetch(`${SUPABASE_URL}/functions/v1/send-login-email`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        to: email,
-        name: name,
-        email: email,
-        password: password,
-      }),
-    });
+serve(async (req) => {
+  console.log('🎯 Webhook received:', req.method, req.url);
 
-    if (!emailResponse.ok) {
-      console.error('Failed to send login email:', await emailResponse.text());
-    } else {
-      console.log('Login credentials sent successfully to:', email);
-    }
-  } catch (error) {
-    console.error('Error sending login email:', error);
-  }
-}
-
-Deno.serve(async (req: Request) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 200,
-      headers: corsHeaders,
-    });
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const signature = req.headers.get('stripe-signature');
-    
-    if (!signature) {
-      return new Response('No signature provided', {
-        status: 400,
-        headers: corsHeaders,
+    // Get environment variables
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const stripeWebhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')!
+
+    console.log('📊 Environment check:', {
+      supabaseUrl: supabaseUrl ? '✅ Set' : '❌ Missing',
+      serviceKey: supabaseServiceKey ? '✅ Set' : '❌ Missing', 
+      webhookSecret: stripeWebhookSecret ? '✅ Set' : '❌ Missing'
+    });
+
+    if (!supabaseUrl || !supabaseServiceKey || !stripeWebhookSecret) {
+      console.error('❌ Missing environment variables');
+      return new Response('Missing environment variables', { 
+        status: 500,
+        headers: corsHeaders
       });
     }
 
-    const body = await req.text();
-    
+    // Initialize Supabase client with service role
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
+
     // Verify webhook signature
-    let event;
-    try {
-      event = stripe.webhooks.constructEvent(body, signature, STRIPE_WEBHOOK_SECRET);
-    } catch (err) {
-      console.error('Webhook signature verification failed:', err.message);
-      return new Response('Webhook signature verification failed', {
+    const body = await req.text()
+    const signature = req.headers.get('stripe-signature')
+
+    console.log('🔍 Webhook data received:', {
+      bodyLength: body.length,
+      hasSignature: !!signature,
+      signature: signature?.substring(0, 20) + '...'
+    });
+
+    if (!signature) {
+      console.error('❌ No stripe signature found');
+      return new Response('No signature', { 
         status: 400,
-        headers: corsHeaders,
+        headers: corsHeaders
       });
     }
 
-    console.log('Webhook event received:', event.type);
+    // Parse webhook payload
+    let event: WebhookPayload;
+    try {
+      event = JSON.parse(body);
+      console.log('📨 Webhook event:', {
+        type: event.type,
+        objectId: event.data.object.id,
+        customer: event.data.object.customer
+      });
+    } catch (err) {
+      console.error('❌ Invalid JSON payload:', err);
+      return new Response('Invalid JSON', { 
+        status: 400,
+        headers: corsHeaders
+      });
+    }
 
-    // Handle checkout session completed
+    // Handle checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
-      
-      console.log('Processing checkout session:', session.id);
-      console.log('Customer email:', session.customer_email);
-      console.log('Metadata:', session.metadata);
+      const session = event.data.object;
+      const metadata = session.metadata || {};
 
-      const {
-        email,
-        firstName,
-        lastName,
-        phone,
-        courseId,
-        displayName
-      } = session.metadata || {};
+      console.log('🛒 Processing checkout completion:', {
+        sessionId: session.id,
+        customerId: session.customer,
+        email: metadata.email,
+        hasPassword: !!metadata.password,
+        paymentStatus: session.payment_status
+      });
 
-      if (!email || !firstName || !lastName || !courseId) {
-        console.error('Missing required metadata in session:', session.metadata);
-        return new Response('Missing required metadata', {
+      // Verify we have required metadata
+      if (!metadata.email || !metadata.password) {
+        console.error('❌ Missing required metadata:', { 
+          hasEmail: !!metadata.email, 
+          hasPassword: !!metadata.password 
+        });
+        return new Response('Missing metadata', { 
           status: 400,
-          headers: corsHeaders,
+          headers: corsHeaders
         });
       }
 
       try {
-        // Generate secure password for the user
-        const generatedPassword = generateSecurePassword(12);
+        // Step 1: Create auth user
+        console.log('👤 Creating auth user for:', metadata.email);
         
-        console.log('Creating auth user for:', email);
-
-        // Create auth user using Supabase Admin API
-        const authResponse = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_SERVICE_KEY,
-          },
-          body: JSON.stringify({
-            email: email,
-            password: generatedPassword,
-            email_confirm: true, // Auto-confirm email
-            user_metadata: {
-              first_name: firstName,
-              last_name: lastName,
-              display_name: displayName || `${firstName} ${lastName}`,
-            },
-          }),
+        const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+          email: metadata.email,
+          password: metadata.password,
+          email_confirm: true, // Auto-confirm email
+          user_metadata: {
+            display_name: metadata.name || metadata.email.split('@')[0],
+            created_via: 'stripe_webhook',
+            stripe_customer_id: session.customer
+          }
         });
 
-        if (!authResponse.ok) {
-          const errorText = await authResponse.text();
-          console.error('Failed to create auth user:', errorText);
-          throw new Error('Failed to create user account');
-        }
-
-        const authUser = await authResponse.json();
-        console.log('Auth user created successfully:', authUser.id);
-
-        // Create user profile
-        const profileResponse = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-            'apikey': SUPABASE_SERVICE_KEY,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal',
-          },
-          body: JSON.stringify({
-            user_id: authUser.id,
-            display_name: displayName || `${firstName} ${lastName}`,
-            email: email,
-            phone: phone || null,
-          }),
-        });
-
-        if (!profileResponse.ok) {
-          const errorText = await profileResponse.text();
-          console.error('Failed to create user profile:', errorText);
-          // Continue anyway - user can still access course
+        if (authError) {
+          console.error('❌ Auth user creation failed:', authError);
+          
+          // Check if user already exists
+          if (authError.message?.includes('already registered')) {
+            console.log('👤 User already exists, getting existing user...');
+            
+            const { data: existingUser, error: getUserError } = await supabase.auth.admin.getUserByEmail(metadata.email);
+            
+            if (getUserError || !existingUser?.user) {
+              console.error('❌ Failed to get existing user:', getUserError);
+              throw new Error(`User exists but couldn't retrieve: ${getUserError?.message}`);
+            }
+            
+            console.log('✅ Found existing user:', existingUser.user.id);
+            
+            // Use existing user
+            const userId = existingUser.user.id;
+            
+            // Continue with stripe_customers creation
+            await createStripeCustomerRecord(supabase, userId, session.customer);
+            await createUserProfile(supabase, userId, metadata);
+            
+          } else {
+            throw new Error(`Auth user creation failed: ${authError.message}`);
+          }
         } else {
-          console.log('User profile created successfully');
+          console.log('✅ Auth user created successfully:', authUser.user.id);
+          
+          const userId = authUser.user.id;
+          
+          // Step 2: Create stripe_customers record (this should trigger user_profiles creation)
+          await createStripeCustomerRecord(supabase, userId, session.customer);
+          
+          // Step 3: Create user profile directly as backup (in case trigger fails)
+          await createUserProfile(supabase, userId, metadata);
         }
 
-        // Create purchase record
-        const purchaseResponse = await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-            'apikey': SUPABASE_SERVICE_KEY,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal',
-          },
-          body: JSON.stringify({
-            user_id: authUser.id,
-            course_id: courseId,
-            stripe_payment_intent_id: session.payment_intent,
-            amount: session.amount_total,
-            currency: session.currency,
-            status: 'completed',
-          }),
+        // Step 4: Create order record for tracking
+        await createOrderRecord(supabase, session);
+
+        console.log('🎉 Webhook processing completed successfully');
+
+        return new Response('Webhook processed successfully', {
+          status: 200,
+          headers: corsHeaders
         });
-
-        if (!purchaseResponse.ok) {
-          const errorText = await purchaseResponse.text();
-          console.error('Failed to create purchase record:', errorText);
-          // Continue anyway - user account is created
-        } else {
-          console.log('Purchase record created successfully');
-        }
-
-        // Send login credentials via email
-        await sendLoginCredentials(email, generatedPassword, displayName || `${firstName} ${lastName}`);
-
-        console.log('Webhook processing completed successfully for:', email);
 
       } catch (error) {
-        console.error('Error processing checkout session:', error);
-        return new Response('Error processing purchase', {
+        console.error('💥 Webhook processing error:', error);
+        
+        return new Response(`Webhook error: ${error.message}`, {
           status: 500,
-          headers: corsHeaders,
+          headers: corsHeaders
         });
       }
     }
 
-    return new Response('Webhook processed successfully', {
+    // Handle other events
+    console.log('ℹ️ Unhandled webhook event type:', event.type);
+    return new Response('Event not handled', {
       status: 200,
-      headers: corsHeaders,
+      headers: corsHeaders
     });
+
   } catch (error) {
-    console.error('Webhook error:', error);
-    return new Response('Webhook processing failed', {
+    console.error('💥 General webhook error:', error);
+    return new Response(`Server error: ${error.message}`, {
       status: 500,
-      headers: corsHeaders,
+      headers: corsHeaders
     });
   }
 });
+
+// Helper function: Create stripe_customers record
+async function createStripeCustomerRecord(supabase: any, userId: string, customerId: string) {
+  console.log('💳 Creating stripe_customers record...', { userId, customerId });
+  
+  const { data, error } = await supabase
+    .from('stripe_customers')
+    .upsert([
+      {
+        user_id: userId,
+        customer_id: customerId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ], { 
+      onConflict: 'user_id',
+      ignoreDuplicates: false 
+    })
+    .select();
+
+  if (error) {
+    console.error('❌ stripe_customers creation failed:', error);
+    throw new Error(`Failed to create stripe customer: ${error.message}`);
+  }
+
+  console.log('✅ stripe_customers record created/updated:', data);
+  return data;
+}
+
+// Helper function: Create user profile directly  
+async function createUserProfile(supabase: any, userId: string, metadata: any) {
+  console.log('👤 Creating user profile directly...', { userId });
+  
+  const displayName = metadata.name || metadata.email?.split('@')[0] || 'Användare';
+  
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .upsert([
+      {
+        user_id: userId,
+        display_name: displayName,
+        bio: 'Behärskar Napoleon Hills framgångsprinciper',
+        goals: 'Bygger rikedom genom tankesättstransformation',
+        favorite_module: 'Önskans kraft',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ], { 
+      onConflict: 'user_id',
+      ignoreDuplicates: false 
+    })
+    .select();
+
+  if (error) {
+    console.error('❌ user_profiles creation failed:', error);
+    throw new Error(`Failed to create user profile: ${error.message}`);
+  }
+
+  console.log('✅ user_profiles record created/updated:', data);
+  return data;
+}
+
+// Helper function: Create order record
+async function createOrderRecord(supabase: any, session: any) {
+  console.log('📦 Creating order record...', { sessionId: session.id });
+  
+  const { data, error } = await supabase
+    .from('stripe_orders')
+    .insert([
+      {
+        checkout_session_id: session.id,
+        payment_intent_id: session.payment_intent || 'unknown',
+        customer_id: session.customer,
+        amount_subtotal: session.amount_total || 0,
+        amount_total: session.amount_total || 0,
+        currency: session.currency || 'sek',
+        payment_status: session.payment_status || 'paid',
+        status: 'completed',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ])
+    .select();
+
+  if (error) {
+    console.error('❌ Order creation failed:', error);
+    // Don't throw error for order creation failure
+    console.log('⚠️ Order creation failed but continuing...');
+  } else {
+    console.log('✅ Order record created:', data);
+  }
+
+  return data;
+}

@@ -1,88 +1,190 @@
 import React, { useState } from 'react';
 import { useAuth } from './hooks/useAuth';
-import { AuthProvider } from './contexts/AuthContext';
+import { LanguageProvider } from './contexts/LanguageContext';
+import AuthForm from './components/AuthForm';
 import LandingPage from './components/LandingPage';
-import LoginForm from './components/LoginForm';
-import PurchaseForm from './components/PurchaseForm';
-import Dashboard from './components/Dashboard';
+import Navigation from './components/Navigation';
+import CourseModules from './components/CourseModules';
+import ModuleDetail from './components/ModuleDetail';
+import ResourcesPage from './components/ResourcesPage';
+import ContactPage from './components/ContactPage';
+import ProfilePage from './components/ProfilePage';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import CookiePolicy from './components/CookiePolicy';
+import TermsOfService from './components/TermsOfService';
+import Footer from './components/Footer';
 import SuccessPage from './components/SuccessPage';
+import { courseContent } from './data/courseContent';
+import { ModuleContent } from './data/courseContent';
 
-function AppContent() {
-  const { user, loading } = useAuth();
-  const [currentView, setCurrentView] = useState<'landing' | 'login' | 'purchase' | 'success'>('landing');
+function App() {
+  const { user, loading, signIn, signUp, signOut } = useAuth();
+  const [showAuthForm, setShowAuthForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState('home');
+  const [selectedModule, setSelectedModule] = useState<ModuleContent | null>(null);
 
-  // Handle URL parameters for payment success/failure
+  // Handle payment success/failure from URL params
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment');
     
     if (paymentStatus === 'success') {
-      setCurrentView('success');
+      setCurrentPage('success');
+      setShowAuthForm(false); // Reset auth form state
       // Clear URL params
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (paymentStatus === 'cancelled') {
-      setCurrentView('landing');
+      setShowAuthForm(false);
+      setCurrentPage('home');
       // Clear URL params
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
+  const handleModuleStart = (moduleId: number) => {
+    const module = courseContent.find(m => m.id === moduleId);
+    if (module) {
+      setSelectedModule(module);
+      setCurrentPage('module-detail');
+    }
+  };
 
+  const handleBackToHome = () => {
+    setCurrentPage('home');
+    setSelectedModule(null);
+  };
+
+  const handleNavigation = (page: string) => {
+    setCurrentPage(page);
+    setSelectedModule(null);
+  };
+
+  const handleJoinClick = () => {
+    setShowAuthForm(true);
+  };
+
+  const handleBackToLanding = () => {
+   setCurrentPage('home');
+    setShowAuthForm(false);
+  };
+
+  const handleSuccessContinue = () => {
+    if (user) {
+      setCurrentPage('home');
+    } else {
+     setCurrentPage('auth'); // Reset current page to allow auth form to show
+      setShowAuthForm(true);
+    }
+  };
+
+  // Show loading spinner while checking auth
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-6"></div>
-          <p className="text-gray-600 text-lg">Loading...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 mx-auto mb-6"></div>
+          <p className="text-neutral-600 text-lg font-medium">Laddar din kurs...</p>
+          <p className="text-neutral-500 text-sm mt-2">Vänligen vänta medan vi förbereder din framgångsresa</p>
         </div>
       </div>
     );
   }
 
-  // Show success page after payment
-  if (currentView === 'success') {
+  // Check for payment success first, before user authentication
+  if (currentPage === 'success') {
     return (
-      <SuccessPage 
-        onContinue={() => setCurrentView(user ? 'landing' : 'login')} 
-      />
+      <LanguageProvider>
+        <SuccessPage onContinue={handleSuccessContinue} user={user} />
+      </LanguageProvider>
     );
   }
 
-  // Show dashboard if user is authenticated
-  if (user) {
-    return <Dashboard />;
+  // Show auth form if not logged in
+  if (!user) {
+   // Handle auth form after success page
+   if (currentPage === 'auth' || showAuthForm) {
+     return (
+       <LanguageProvider>
+         <AuthForm onSignIn={signIn} onSignUp={signUp} onBack={handleBackToLanding} />
+       </LanguageProvider>
+     );
+   }
+   
+    if (!showAuthForm) {
+      return (
+        <LanguageProvider>
+          <LandingPage onJoinClick={handleJoinClick} />
+        </LanguageProvider>
+      );
+    }
   }
 
-  // Show appropriate form based on current view
-  switch (currentView) {
-    case 'login':
-      return (
-        <LoginForm 
-          onBack={() => setCurrentView('landing')}
-          onSuccess={() => setCurrentView('landing')}
-        />
-      );
-    case 'purchase':
-      return (
-        <PurchaseForm 
-          onBack={() => setCurrentView('landing')}
-          onSuccess={() => setCurrentView('success')}
-        />
-      );
-    default:
-      return (
-        <LandingPage 
-          onLogin={() => setCurrentView('login')}
-          onPurchase={() => setCurrentView('purchase')}
-        />
-      );
+  if (currentPage === 'module-detail' && selectedModule) {
+    return (
+      <LanguageProvider>
+        <ModuleDetail module={selectedModule} onBack={handleBackToHome} onSignOut={signOut} />
+      </LanguageProvider>
+    );
   }
-}
 
-function App() {
+  if (currentPage === 'contact') {
+    return (
+      <LanguageProvider>
+        <ContactPage onBack={handleBackToHome} onSignOut={signOut} />
+      </LanguageProvider>
+    );
+  }
+
+  if (currentPage === 'profile') {
+    return (
+      <LanguageProvider>
+        <ProfilePage onBack={handleBackToHome} onSignOut={signOut} user={user} />
+      </LanguageProvider>
+    );
+  }
+
+  if (currentPage === 'resources') {
+    return (
+      <LanguageProvider>
+        <ResourcesPage onBack={handleBackToHome} onSignOut={signOut} user={user} />
+      </LanguageProvider>
+    );
+  }
+
+  if (currentPage === 'privacy-policy') {
+    return (
+      <LanguageProvider>
+        <PrivacyPolicy onBack={handleBackToHome} />
+      </LanguageProvider>
+    );
+  }
+
+  if (currentPage === 'cookie-policy') {
+    return (
+      <LanguageProvider>
+        <CookiePolicy onBack={handleBackToHome} />
+      </LanguageProvider>
+    );
+  }
+
+  if (currentPage === 'terms-of-service') {
+    return (
+      <LanguageProvider>
+        <TermsOfService onBack={handleBackToHome} />
+      </LanguageProvider>
+    );
+  }
+
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <LanguageProvider>
+      <div className="flex flex-col min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50">
+        <Navigation currentPage={currentPage} onNavigate={handleNavigation} onSignOut={signOut} user={user} />
+        <main className="flex-grow">
+          {(currentPage === 'home' || currentPage === 'modules') && (
+            <CourseModules onModuleStart={handleModuleStart} />
+          )}
+        </main>
+      </div>
+    </LanguageProvider>
   );
 }
 
