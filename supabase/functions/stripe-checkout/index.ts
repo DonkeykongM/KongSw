@@ -1,100 +1,80 @@
-import { createClient } from 'npm:@supabase/supabase-js@2.51.0';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+}
 
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
 
-Deno.serve(async (req: Request) => {
   try {
-    // Handle CORS preflight
-    if (req.method === 'OPTIONS') {
-      return new Response(null, { status: 200, headers: corsHeaders });
-    }
-
-    if (req.method !== 'POST') {
-      return new Response('Method not allowed', { status: 405, headers: corsHeaders });
-    }
-
-    const { email, password, name, priceId, success_url, cancel_url } = await req.json();
-
-    // Validate required fields
-    if (!email || !password || !priceId) {
+    const { email, password, name } = await req.json()
+    
+    console.log('🛒 Skapar checkout för:', email)
+    
+    if (!email || !password) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: email, password, priceId' }),
+        JSON.stringify({ error: 'Email och lösenord krävs' }), 
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      )
     }
 
-    console.log('🛒 Creating checkout for:', email);
-
-    // Initialize Stripe
-    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
-    if (!stripeKey) {
-      console.error('Missing STRIPE_SECRET_KEY');
+    // Stripe setup
+    const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY')
+    if (!stripeSecretKey) {
+      console.error('❌ STRIPE_SECRET_KEY saknas')
       return new Response(
-        JSON.stringify({ error: 'Payment system not configured' }),
+        JSON.stringify({ error: 'Stripe not configured' }), 
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      )
     }
 
-    // Create Stripe checkout session with comprehensive metadata
-    const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+    // Skapa Stripe checkout session
+    const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${stripeKey}`,
+        'Authorization': `Bearer ${stripeSecretKey}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        'mode': 'payment',
-        'payment_method_types[0]': 'card',
-        'line_items[0][price]': priceId,
+        'line_items[0][price]': 'price_1S7zDfBu2e08097PaQ5APyYq', // Din price ID
         'line_items[0][quantity]': '1',
+        'mode': 'payment',
+        'success_url': `${req.headers.get('origin')}?payment=success`,
+        'cancel_url': `${req.headers.get('origin')}?payment=cancelled`,
         'customer_email': email,
-        'success_url': success_url || `${new URL(req.url).origin}?payment=success`,
-        'cancel_url': cancel_url || `${new URL(req.url).origin}?payment=cancelled`,
-        
-        // CRITICAL: Add all user data to metadata so webhook can create account
         'metadata[email]': email,
         'metadata[password]': password,
         'metadata[name]': name || email.split('@')[0],
-        'metadata[source]': 'kongmindset_course',
-        'metadata[timestamp]': new Date().toISOString(),
-        
-        // Additional metadata for webhook processing
-        'metadata[create_user]': 'true',
-        'metadata[course_access]': 'lifetime',
-        'metadata[platform]': 'kongmindset'
-      }).toString(),
-    });
+        'allow_promotion_codes': 'true'
+      }).toString()
+    })
 
-    if (!stripeResponse.ok) {
-      const errorText = await stripeResponse.text();
-      console.error('Stripe API error:', stripeResponse.status, errorText);
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('❌ Stripe fel:', response.status, errorText)
       return new Response(
-        JSON.stringify({ error: 'Failed to create checkout session' }),
+        JSON.stringify({ error: 'Payment setup failed' }), 
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      )
     }
 
-    const session = await stripeResponse.json();
-    console.log('✅ Checkout session created:', session.id);
+    const session = await response.json()
+    console.log('✅ Checkout session skapad:', session.id)
 
     return new Response(
-      JSON.stringify({ url: session.url }),
+      JSON.stringify({ url: session.url }), 
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-
+    )
+    
   } catch (error) {
-    console.error('🚨 Checkout error:', error);
+    console.error('💥 Checkout fel:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error during checkout creation' }),
+      JSON.stringify({ error: 'Internal server error' }), 
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    )
   }
-});
+})
