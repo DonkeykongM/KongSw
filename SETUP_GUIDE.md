@@ -19,6 +19,8 @@
 4. **Verifiera tabeller skapade:**
    - `course_purchases`
    - `user_profiles`
+   - `stripe_user_subscriptions`
+   - `stripe_user_orders`
 
 ### Steg 2: Environment Variables
 **I Supabase → Edge Functions → Environment Variables:**
