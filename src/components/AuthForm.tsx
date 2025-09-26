@@ -141,15 +141,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
         </div>
 
         {/* Special Notice for Mathias */}
-        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-6">
-          <div className="flex items-center space-x-2 mb-2">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <span className="font-bold text-green-800">Specialåtkomst för Mathias</span>
-          </div>
-          <p className="text-green-700 text-sm">
-            Skriv bara in din e-post `mathias_bahko@hotmail.com` och vilket lösenord som helst - du får omedelbar tillgång!
-          </p>
-        </div>
 
         {/* Auth Form */}
         <div className="bg-white/90 rounded-2xl shadow-xl p-8 border border-white/20">
