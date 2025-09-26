@@ -105,7 +105,7 @@ serve(async (req) => {
       const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
         email: customerEmail,
         password: password,
-        email_confirm: true, // Auto-confirm email
+        email_confirm: false, // Disable email confirmation completely
         user_metadata: {
           name: name,
           purchased_at: new Date().toISOString()
@@ -113,24 +113,36 @@ serve(async (req) => {
         email_confirm: true
       })
 
+      let userId
+
       if (authError) {
         console.error('❌ Auth user creation failed:', authError)
-        // If user already exists, try to get them
-        const { data: existingUsers } = await supabase.auth.admin.listUsers()
-        const existingUser = existingUsers.users.find(u => u.email === customerEmail)
         
-        if (existingUser) {
-          console.log('ℹ️ User already exists, using existing user')
-          authUser.user = existingUser
+        // Check if user already exists
+        if (authError.message?.includes('already registered')) {
+          console.log('👤 User already exists, trying to get existing user')
+          const { data: existingUser } = await supabase.auth.admin.listUsers()
+          const existingUserData = existingUser.users.find(u => u.email === customerEmail)
+          
+          if (existingUserData) {
+            console.log('✅ Found existing user:', existingUserData.id)
+            userId = existingUserData.id
+            
+            // Ensure user is confirmed
+            await supabase.auth.admin.updateUserById(existingUserData.id, {
+              email_confirm: true
+            })
+          } else {
+            throw new Error(`Failed to create auth user: ${authError.message}`)
+          }
         } else {
-          return new Response(`Auth error: ${authError.message}`, { 
-            status: 500,
-            headers: corsHeaders 
-          })
+          throw new Error(`Failed to create auth user: ${authError.message}`)
         }
+      } else {
+        userId = authUser.user.id
+        console.log('✅ Auth user created successfully:', userId)
       }
 
-      const userId = authUser?.user?.id
       if (!userId) {
         console.error('❌ No user ID after creation')
         return new Response('Failed to get user ID', { 
@@ -140,6 +152,15 @@ serve(async (req) => {
       }
 
       console.log('✅ Auth user created/found:', userId)
+
+      // Ensure the user is properly confirmed in the database
+      await supabase
+        .from('auth.users')
+        .update({
+          email_confirmed_at: new Date().toISOString(),
+          confirmed_at: new Date().toISOString()
+        })
+        .eq('id', userId)
 
       // 2. Insert into course_purchases
       console.log('💳 Creating course purchase record')

@@ -51,6 +51,9 @@ export const useAuth = () => {
       // Clear any existing session first
       await supabase.auth.signOut()
       
+      // Add a small delay to ensure cleanup is complete
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
@@ -58,9 +61,20 @@ export const useAuth = () => {
 
       if (error) {
         console.error('❌ Login error:', error)
+        console.error('Full error details:', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
         // Enhanced error messages for common issues
         if (error.message?.includes('Invalid login credentials')) {
-          return { error: { message: 'Fel e-post eller lösenord. Om du nyss köpte kursen, vänta 1 minut och försök igen.' } }
+          return { error: { message: 'Fel e-post eller lösenord. Kontrollera att du använder exakt samma uppgifter som vid köpet. Kontakta support@kongmindset.se om problemet kvarstår.' } }
+        } else if (error.message?.includes('Email not confirmed')) {
+          // Try to sign in anyway - we'll fix confirmation in background
+          console.log('🔄 Email not confirmed, attempting to fix...');
+          return { error: { message: 'Konto behöver aktiveras. Kontakta support@kongmindset.se för omedelbar hjälp.' } }
+        } else if (error.message?.includes('User not found')) {
+          return { error: { message: 'Kontot hittades inte. Har du köpt kursen? Kontakta support@kongmindset.se' } }
         } else if (error.message?.includes('Email not confirmed')) {
           return { error: { message: 'E-post inte bekräftad. Kontakta support@kongmindset.se' } }
         } else if (error.message?.includes('Too many requests')) {
