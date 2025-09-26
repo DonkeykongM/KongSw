@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Brain, Mail, Lock, Eye, EyeOff, CreditCard, AlertCircle, ArrowLeft } from 'lucide-react';
+import SupabaseDiagnostic from './SupabaseDiagnostic';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 interface AuthFormProps {
   onSignIn: (email: string, password: string) => Promise<{ data?: any; error: any }>;
@@ -159,6 +161,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {/* Show diagnostic if Supabase not configured */}
+        {!isSupabaseConfigured && (
+          <div className="mb-6">
+            <SupabaseDiagnostic />
+          </div>
+        )}
+
         {/* Back Button */}
         <div className="text-left mb-6">
           <button
