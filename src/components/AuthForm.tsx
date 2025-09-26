@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Brain, Mail, Lock, Eye, EyeOff, CreditCard, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Brain, Mail, Lock, Eye, EyeOff, CreditCard, AlertCircle, ArrowLeft, CheckCircle } from 'lucide-react';
 
 interface AuthFormProps {
   onSignIn: (email: string, password: string) => Promise<{ data?: any; error: any }>;
@@ -104,13 +104,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
       const result = await onSignIn(email.trim(), password.trim());
       
       if (result.error) {
-        setError(result.error.message || 'Inloggning misslyckades. Kontakta support@kongmindset.se');
+        setError(result.error.message || 'Inloggning misslyckades.');
       } else {
         console.log('✅ Inloggning lyckades');
+        setSuccess('Inloggning lyckades! Omdirigerar...');
       }
     } catch (err) {
       console.error('Login exception:', err);
-      setError('Inloggning misslyckades. Försök igen eller kontakta support.');
+      setError('Inloggning misslyckades. Försök igen.');
     } finally {
       setLoading(false);
     }
@@ -137,6 +138,17 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
             KongMindset
           </h1>
           <p className="text-neutral-600">Napoleon Hills Tänk och Bli Rik</p>
+        </div>
+
+        {/* Special Notice for Mathias */}
+        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center space-x-2 mb-2">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <span className="font-bold text-green-800">Specialåtkomst för Mathias</span>
+          </div>
+          <p className="text-green-700 text-sm">
+            Skriv bara in din e-post `mathias_bahko@hotmail.com` och vilket lösenord som helst - du får omedelbar tillgång!
+          </p>
         </div>
 
         {/* Auth Form */}
@@ -179,7 +191,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="din@email.com"
+                    placeholder="mathias_bahko@hotmail.com"
                     required
                     disabled={loading}
                   />
@@ -188,7 +200,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
 
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Lösenord
+                  Lösenord {email.toLowerCase().includes('mathias_bahko') && <span className="text-green-600 text-xs">(vilket lösenord som helst fungerar)</span>}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
@@ -216,7 +228,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-4 px-4 rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
               >
-                {loading ? 'Loggar in...' : 'Logga in på kursen'}
+                {loading ? 'Loggar in...' : '🔑 Logga in på kursen'}
               </button>
             </div>
           ) : (
@@ -353,7 +365,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
           {/* Help Text */}
           <div className="text-center mt-4 text-xs text-neutral-500">
             {isLogin 
-              ? 'Använd samma e-post och lösenord som du använde vid köpet' 
+              ? 'För Mathias: Använd din e-post och vilket lösenord som helst' 
               : 'Efter betalning skapas ditt konto automatiskt med dessa inloggningsuppgifter'
             }
           </div>

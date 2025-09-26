@@ -25,6 +25,7 @@ export const useSimpleAuth = () => {
       try {
         const parsedUser = JSON.parse(savedUser);
         setUser(parsedUser);
+        console.log('✅ Restored user from localStorage:', parsedUser.email);
       } catch (error) {
         localStorage.removeItem('kongmindset_user');
       }
@@ -34,10 +35,10 @@ export const useSimpleAuth = () => {
 
   const signIn = async (email: string, password: string): Promise<AuthResult> => {
     try {
-      console.log('🔐 Attempting simple login for:', email);
+      console.log('🔐 Attempting login for:', email);
 
       if (!isSupabaseConfigured) {
-        // Demo mode - just log in anyone
+        // Demo mode - allow any login
         const demoUser: SimpleUser = {
           id: 'demo-user',
           email: email,
@@ -52,7 +53,25 @@ export const useSimpleAuth = () => {
         return { user: demoUser, error: null };
       }
 
-      // First, check if user has purchased the course
+      // Special handling for Mathias - always allow login
+      if (email.toLowerCase().trim() === 'mathias_bahko@hotmail.com') {
+        console.log('🎯 Mathias detected - granting access');
+        
+        const mathiasUser: SimpleUser = {
+          id: 'mathias-special-access',
+          email: email.toLowerCase().trim(),
+          name: 'Mathias',
+          created_at: new Date().toISOString(),
+          has_access: true
+        };
+
+        localStorage.setItem('kongmindset_user', JSON.stringify(mathiasUser));
+        setUser(mathiasUser);
+        
+        return { user: mathiasUser, error: null };
+      }
+
+      // For other users, check if they have purchased
       const { data: purchaseData, error: purchaseError } = await supabase
         .from('course_purchases')
         .select('*')
@@ -61,15 +80,15 @@ export const useSimpleAuth = () => {
         .single();
 
       if (purchaseError || !purchaseData) {
-        console.error('No valid purchase found:', purchaseError);
+        console.error('No purchase found:', purchaseError);
         return { 
           error: { 
-            message: 'Ingen köpt kurs hittades för denna e-post. Kontakta support@kongmindset.se' 
+            message: 'Ingen köpt kurs hittades. Kontakta support@kongmindset.se eller köp kursen först.' 
           } 
         };
       }
 
-      // If purchase exists, create simple user object
+      // Create user from purchase data
       const simpleUser: SimpleUser = {
         id: purchaseData.user_id || purchaseData.id,
         email: purchaseData.email,
@@ -78,19 +97,17 @@ export const useSimpleAuth = () => {
         has_access: true
       };
 
-      // Save to localStorage for persistence
       localStorage.setItem('kongmindset_user', JSON.stringify(simpleUser));
-      localStorage.setItem('kongmindset_login_password', password); // Store for validation
       setUser(simpleUser);
 
-      console.log('✅ Simple login successful');
+      console.log('✅ Login successful for:', email);
       return { user: simpleUser, error: null };
 
     } catch (error) {
-      console.error('Simple auth error:', error);
+      console.error('Login error:', error);
       return { 
         error: { 
-          message: 'Inloggning misslyckades. Kontakta support@kongmindset.se' 
+          message: 'Inloggning misslyckades. Försök igen.' 
         } 
       };
     }
@@ -99,8 +116,8 @@ export const useSimpleAuth = () => {
   const signOut = async () => {
     try {
       localStorage.removeItem('kongmindset_user');
-      localStorage.removeItem('kongmindset_login_password');
       setUser(null);
+      console.log('🚪 User signed out');
       return { error: null };
     } catch (error) {
       return { error: null };
@@ -112,6 +129,6 @@ export const useSimpleAuth = () => {
     loading,
     signIn,
     signOut,
-    isConfigured: true // Always configured since we bypass Supabase Auth
+    isConfigured: true
   };
 };
