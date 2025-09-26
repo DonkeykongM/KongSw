@@ -95,34 +95,40 @@ export const useSimpleAuth = () => {
 
       // Check password (simple text comparison for now)
       console.log('🔑 Checking password...');
-      if (loginData.password_hash !== password.trim()) {
-        console.error('❌ Password mismatch');
+      
+      const { data: verifyResult, error: verifyError } = await supabase
+        .rpc('verify_simple_login', { 
+          input_email: email.toLowerCase().trim(), 
+          input_password: password.trim() 
+        });
+
+      if (verifyError) {
+        console.error('❌ RPC error:', verifyError);
         return { 
           error: { 
-            message: 'Fel lösenord. Kontakta support@kongmindset.se om du glömt ditt lösenord.' 
+            message: 'Inloggningsfel. Försök igen.' 
           } 
         };
       }
 
-      console.log('✅ Password correct, updating last login...');
-
-      // Update last login
-      const { error: updateError } = await supabase
-        .from('simple_logins')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', loginData.id);
-
-      if (updateError) {
-        console.warn('⚠️ Could not update last login:', updateError);
+      if (!verifyResult.success) {
+        console.error('❌ Login failed:', verifyResult.error);
+        return { 
+          error: { 
+            message: verifyResult.error || 'Inloggning misslyckades' 
+          } 
+        };
       }
 
-      // Create user from login data
+      console.log('✅ Login successful via RPC');
+      
+      // Create user from RPC result
       const simpleUser: SimpleUser = {
-        id: loginData.id,
-        email: loginData.email,
-        name: loginData.display_name || email.split('@')[0],
-        created_at: loginData.created_at,
-        has_access: loginData.has_course_access || false
+        id: verifyResult.user.id,
+        email: verifyResult.user.email,
+        name: verifyResult.user.display_name || email.split('@')[0],
+        created_at: verifyResult.user.created_at,
+        has_access: verifyResult.user.has_course_access || false
       };
 
       localStorage.setItem('kongmindset_user', JSON.stringify(simpleUser));
