@@ -38,7 +38,7 @@ export const useSimpleAuth = () => {
       console.log('🔐 Attempting login for:', email);
 
       if (!isSupabaseConfigured) {
-        // Demo mode - allow any login
+        // Demo mode - simulera inloggning
         const demoUser: SimpleUser = {
           id: 'demo-user',
           email: email,
@@ -53,48 +53,44 @@ export const useSimpleAuth = () => {
         return { user: demoUser, error: null };
       }
 
-      // Special handling for Mathias - always allow login
-      if (email.toLowerCase().trim() === 'mathias_bahko@hotmail.com') {
-        console.log('🎯 Mathias detected - granting access');
-        
-        const mathiasUser: SimpleUser = {
-          id: 'mathias-special-access',
-          email: email.toLowerCase().trim(),
-          name: 'Mathias',
-          created_at: new Date().toISOString(),
-          has_access: true
-        };
-
-        localStorage.setItem('kongmindset_user', JSON.stringify(mathiasUser));
-        setUser(mathiasUser);
-        
-        return { user: mathiasUser, error: null };
-      }
-
-      // For other users, check if they have purchased
-      const { data: purchaseData, error: purchaseError } = await supabase
-        .from('course_purchases')
+      // Check if user exists in simple_logins table
+      const { data: loginData, error: loginError } = await supabase
+        .from('simple_logins')
         .select('*')
         .eq('email', email.toLowerCase().trim())
-        .eq('payment_status', 'paid')
         .single();
 
-      if (purchaseError || !purchaseData) {
-        console.error('No purchase found:', purchaseError);
+      if (loginError || !loginData) {
+        console.error('No login found:', loginError);
         return { 
           error: { 
-            message: 'Ingen köpt kurs hittades. Kontakta support@kongmindset.se eller köp kursen först.' 
+            message: 'E-post eller lösenord fel. Om du köpt kursen men inte kan logga in, kontakta support@kongmindset.se' 
           } 
         };
       }
 
-      // Create user from purchase data
+      // Simple password check (for demo - in real app use bcrypt)
+      if (loginData.password_hash !== password.trim()) {
+        return { 
+          error: { 
+            message: 'Fel lösenord. Kontakta support@kongmindset.se om du glömt ditt lösenord.' 
+          } 
+        };
+      }
+
+      // Update last login
+      await supabase
+        .from('simple_logins')
+        .update({ last_login: new Date().toISOString() })
+        .eq('id', loginData.id);
+
+      // Create user from login data
       const simpleUser: SimpleUser = {
-        id: purchaseData.user_id || purchaseData.id,
-        email: purchaseData.email,
-        name: email.split('@')[0],
-        created_at: purchaseData.created_at,
-        has_access: true
+        id: loginData.id,
+        email: loginData.email,
+        name: loginData.display_name || email.split('@')[0],
+        created_at: loginData.created_at,
+        has_access: loginData.has_course_access || false
       };
 
       localStorage.setItem('kongmindset_user', JSON.stringify(simpleUser));

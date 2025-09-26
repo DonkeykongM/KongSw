@@ -182,7 +182,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="mathias_bahko@hotmail.com"
+                    placeholder="din@email.com"
                     required
                     disabled={loading}
                   />
@@ -191,7 +191,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
 
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Lösenord {email.toLowerCase().includes('mathias_bahko') && <span className="text-green-600 text-xs">(vilket lösenord som helst fungerar)</span>}
+                  Lösenord
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
@@ -356,7 +356,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
           {/* Help Text */}
           <div className="text-center mt-4 text-xs text-neutral-500">
             {isLogin 
-              ? 'För Mathias: Använd din e-post och vilket lösenord som helst' 
+              ? 'Logga in med samma uppgifter som du använde vid köpet' 
               : 'Efter betalning skapas ditt konto automatiskt med dessa inloggningsuppgifter'
             }
           </div>
