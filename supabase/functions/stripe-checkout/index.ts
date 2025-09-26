@@ -1,79 +1,100 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
+import { createClient } from 'npm:@supabase/supabase-js@2.51.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
+};
 
-const stripe = (await import('https://esm.sh/stripe@14.21.0')).default(
-  Deno.env.get('STRIPE_SECRET_KEY') || '',
-)
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
-
+Deno.serve(async (req: Request) => {
   try {
-    console.log('🛒 Creating checkout session...')
-    
-    const { email, password, name, priceId, success_url, cancel_url } = await req.json()
-    
-    if (!email || !password || !priceId) {
-      console.error('❌ Missing required data:', { email: !!email, password: !!password, priceId: !!priceId })
-      return new Response('Missing required fields', { status: 400, headers: corsHeaders })
+    // Handle CORS preflight
+    if (req.method === 'OPTIONS') {
+      return new Response(null, { status: 200, headers: corsHeaders });
     }
 
-    console.log('📧 Creating checkout for:', email)
-    console.log('💰 Price ID:', priceId)
+    if (req.method !== 'POST') {
+      return new Response('Method not allowed', { status: 405, headers: corsHeaders });
+    }
 
-    // Create Stripe checkout session with COMPLETE metadata
-    const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      payment_method_types: ['card'],
-      customer_email: email,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      success_url: success_url,
-      cancel_url: cancel_url,
-      // CRITICAL: Pass user creation data to webhook
-      metadata: {
-        email: email,
-        password: password,
-        name: name || email.split('@')[0],
-        source: 'kongmindset_purchase',
-        created_at: new Date().toISOString()
+    const { email, password, name, priceId, success_url, cancel_url } = await req.json();
+
+    // Validate required fields
+    if (!email || !password || !priceId) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields: email, password, priceId' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('🛒 Creating checkout for:', email);
+
+    // Initialize Stripe
+    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
+    if (!stripeKey) {
+      console.error('Missing STRIPE_SECRET_KEY');
+      return new Response(
+        JSON.stringify({ error: 'Payment system not configured' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create Stripe checkout session with comprehensive metadata
+    const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${stripeKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      // Additional settings for better UX
-      allow_promotion_codes: true,
-      billing_address_collection: 'auto',
-      phone_number_collection: {
-        enabled: false
-      }
-    })
+      body: new URLSearchParams({
+        'mode': 'payment',
+        'payment_method_types[0]': 'card',
+        'line_items[0][price]': priceId,
+        'line_items[0][quantity]': '1',
+        'customer_email': email,
+        'success_url': success_url || `${new URL(req.url).origin}?payment=success`,
+        'cancel_url': cancel_url || `${new URL(req.url).origin}?payment=cancelled`,
+        
+        // CRITICAL: Add all user data to metadata so webhook can create account
+        'metadata[email]': email,
+        'metadata[password]': password,
+        'metadata[name]': name || email.split('@')[0],
+        'metadata[source]': 'kongmindset_course',
+        'metadata[timestamp]': new Date().toISOString(),
+        
+        // Additional metadata for webhook processing
+        'metadata[create_user]': 'true',
+        'metadata[course_access]': 'lifetime',
+        'metadata[platform]': 'kongmindset'
+      }).toString(),
+    });
 
-    console.log('✅ Checkout session created:', session.id)
-    console.log('🔗 Redirect URL:', session.url)
+    if (!stripeResponse.ok) {
+      const errorText = await stripeResponse.text();
+      console.error('Stripe API error:', stripeResponse.status, errorText);
+      return new Response(
+        JSON.stringify({ error: 'Failed to create checkout session' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    return new Response(JSON.stringify({ 
-      url: session.url,
-      session_id: session.id
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    })
+    const session = await stripeResponse.json();
+    console.log('✅ Checkout session created:', session.id);
+
+    return new Response(
+      JSON.stringify({ url: session.url }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
 
   } catch (error) {
-    console.error('🚨 Checkout creation error:', error)
-    return new Response(`Error creating checkout session: ${error.message}`, { 
-      status: 500,
-      headers: corsHeaders 
-    })
+    console.error('🚨 Checkout error:', error);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error during checkout creation' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
-})
+});
