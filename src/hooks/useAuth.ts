@@ -49,123 +49,114 @@ export const useAuth = () => {
     try {
       console.log('🔐 Försöker logga in:', email)
       
+      // Try direct login first
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
       })
 
       if (error) {
-        console.error('❌ Login error:', error)
+        console.error('❌ Direct login failed:', error.message)
         
-        // Check if user exists in simple_logins table (fallback for users created via webhook)
+        // If login fails, check if user exists in simple_logins (webhook created users)
         if (error.message?.includes('Invalid login credentials')) {
-          console.log('🔍 Checking simple_logins table for user...')
+          console.log('🔍 Checking simple_logins for webhook-created user...')
           
-          const { data: simpleLoginData, error: simpleLoginError } = await supabase
-            .from('simple_logins')
-            .select('*')
-            .eq('email', email.trim())
-            .maybeSingle()
-          
-          if (simpleLoginData && !simpleLoginError) {
-            console.log('✅ Found user in simple_logins:', simpleLoginData.email)
-            console.log('🔐 User has course access:', simpleLoginData.course_access)
+          try {
+            const { data: simpleLoginData, error: simpleLoginError } = await supabase
+              .from('simple_logins')
+              .select('*')
+              .eq('email', email.trim())
+              .maybeSingle()
             
-            // Try to create auth user with the password provided
-            console.log('🔐 Creating auth user for existing simple_logins user...')
-            
-            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-              email: email.trim(),
-              password: password.trim(),
-              options: {
-                emailRedirectTo: undefined,
-                emailConfirm: false,
-                data: {
-                  display_name: simpleLoginData.display_name || 'Kursdeltagare',
-                  stripe_customer_id: simpleLoginData.stripe_customer_id,
-                  purchase_date: simpleLoginData.purchase_date
-                }
-              }
-            })
-            
-            if (signUpError) {
-              console.error('❌ Failed to create auth user:', signUpError)
+            if (simpleLoginData && !simpleLoginError) {
+              console.log('✅ Found user in simple_logins:', simpleLoginData.email)
               
-              // If user already exists in auth, try direct login
-              if (signUpError.message?.includes('already registered')) {
-                console.log('🔄 User already exists in auth, trying direct login...')
+              // User exists in simple_logins but not in auth.users
+              // This means webhook created the user but auth creation might have failed
+              console.log('🔧 Attempting to create missing auth user...')
+              
+              // Try to create the auth user with the provided password
+              const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                email: email.trim(),
+                password: password.trim(),
+                options: {
+                  emailRedirectTo: undefined,
+                  data: {
+                    display_name: simpleLoginData.display_name || 'Kursdeltagare',
+                    stripe_customer_id: simpleLoginData.stripe_customer_id,
+                    purchase_date: simpleLoginData.purchase_date
+                  }
+                }
+              })
+              
+              if (signUpError) {
+                console.error('❌ Auth user creation failed:', signUpError.message)
                 
-                const { data: directLoginData, error: directLoginError } = await supabase.auth.signInWithPassword({
+                if (signUpError.message?.includes('already registered')) {
+                  // User exists in auth but password is wrong
+                  return { error: { message: 'Fel lösenord. Kontrollera att du använder samma lösenord som vid köpet.' } }
+                }
+                
+                return { error: { message: 'Kunde inte skapa användarkonto. Kontakta support.' } }
+              }
+              
+              if (signUpData.user) {
+                console.log('✅ Auth user created from simple_logins data')
+                
+                // Create user profile if it doesn't exist
+                const { error: profileError } = await supabase
+                  .from('user_profiles')
+                  .upsert({
+                    user_id: signUpData.user.id,
+                    email: email.trim(),
+                    display_name: simpleLoginData.display_name || 'Kursdeltagare',
+                    bio: 'Behärskar Napoleon Hills framgångsprinciper',
+                    goals: 'Bygger rikedom genom tankesättstransformation',
+                    favorite_module: 'Önskans kraft',
+                    purchase_date: simpleLoginData.purchase_date,
+                    stripe_customer_id: simpleLoginData.stripe_customer_id
+                  })
+                
+                if (profileError) {
+                  console.error('❌ Profile creation failed:', profileError)
+                } else {
+                  console.log('✅ User profile created/updated')
+                }
+                
+                // Now try to login again
+                const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
                   email: email.trim(),
                   password: password.trim(),
                 })
                 
-                if (directLoginError) {
-                  console.error('❌ Direct login failed:', directLoginError)
-                  return { error: { message: 'Fel lösenord. Använd samma lösenord som vid köpet.' } }
+                if (retryError) {
+                  console.error('❌ Retry login failed:', retryError)
+                  return { error: { message: 'Inloggning misslyckades efter kontoskapande. Försök igen.' } }
                 }
                 
-                console.log('✅ Direct login successful')
-                return { data: directLoginData, error: null }
+                console.log('✅ Login successful after auth user creation')
+                return { data: retryData, error: null }
               }
-              
-              return { error: { message: 'Kunde inte skapa användarkonto: ' + signUpError.message } }
+            } else {
+              console.log('❌ User not found in simple_logins table')
+              return { error: { message: 'Användare hittades inte. Kontrollera att du har köpt kursen eller kontakta support.' } }
             }
-            
-            console.log('✅ Auth user created successfully')
-            
-            // Create user profile if auth user was created
-            if (signUpData.user) {
-              console.log('👤 Creating user profile...')
-              
-              const { error: profileError } = await supabase
-                .from('user_profiles')
-                .insert({
-                  user_id: signUpData.user.id,
-                  email: email.trim(),
-                  display_name: simpleLoginData.display_name || 'Kursdeltagare',
-                  bio: 'Behärskar Napoleon Hills framgångsprinciper',
-                  goals: 'Bygger rikedom genom tankesättstransformation',
-                  favorite_module: 'Önskans kraft',
-                  purchase_date: simpleLoginData.purchase_date,
-                  stripe_customer_id: simpleLoginData.stripe_customer_id
-                })
-              
-              if (profileError) {
-                console.error('❌ Failed to create profile:', profileError)
-              } else {
-                console.log('✅ User profile created')
-              }
-            }
-            
-            // Now try to login with the newly created auth user
-            const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
-              email: email.trim(),
-              password: password.trim(),
-            })
-            
-            if (retryError) {
-              console.error('❌ Retry login failed:', retryError)
-              return { error: { message: 'Inloggning misslyckades. Kontrollera att du använder rätt lösenord.' } }
-            }
-            
-            console.log('✅ Login successful after auth user creation')
-            return { data: retryData, error: null }
-          } else {
-            console.log('❌ User not found in simple_logins table')
-            return { error: { message: 'Användare hittades inte. Kontrollera att du har köpt kursen.' } }
+          } catch (fallbackError) {
+            console.error('❌ Fallback check failed:', fallbackError)
+            return { error: { message: 'Inloggning misslyckades. Kontakta support.' } }
           }
         }
         
-        return { error }
+        return { error: { message: error.message || 'Inloggning misslyckades' } }
       }
 
-      console.log('✅ Login success:', email)
+      console.log('✅ Direct login successful:', email)
       return { data, error: null }
       
     } catch (err: any) {
-      console.error('Login exception:', err)
-      return { error: { message: 'Inloggning misslyckades' } }
+      console.error('❌ Login exception:', err)
+      return { error: { message: 'Ett oväntat fel uppstod vid inloggning' } }
     }
   }
 
