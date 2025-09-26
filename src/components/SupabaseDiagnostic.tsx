@@ -81,7 +81,7 @@ const SupabaseDiagnostic: React.FC = () => {
 
       // Check 3: Webhook functions
       try {
-        const webhookUrl = `${supabaseUrl}/functions/v1/stripe-webhook`;
+        const webhookUrl = `https://acdwexqoonauzzjtoexx.supabase.co/functions/v1/stripe-webhook`;
         const response = await fetch(webhookUrl, {
           method: 'POST',
           headers: {
@@ -116,7 +116,7 @@ const SupabaseDiagnostic: React.FC = () => {
 
       // Check 4: Checkout function
       try {
-        const checkoutUrl = `${supabaseUrl}/functions/v1/stripe-checkout`;
+        const checkoutUrl = `https://acdwexqoonauzzjtoexx.supabase.co/functions/v1/stripe-checkout`;
         const response = await fetch(checkoutUrl, {
           method: 'POST',
           headers: {

@@ -55,7 +55,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
       setSuccess('Förbereder säker betalning...');
 
       // Check if Supabase is configured
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://acdwexqoonauzzjtoexx.supabase.co';
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       
       if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('placeholder')) {
