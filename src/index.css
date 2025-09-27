@@ -441,3 +441,30 @@
 #VG_OVERLAY_CONTAINER button {
   transition: all 0.2s ease !important;
 }
+
+/* Fix duplicate password visibility icons */
+.password-input {
+  position: relative;
+}
+
+/* Hide browser's built-in password reveal button */
+.password-input::-ms-reveal,
+.password-input::-ms-clear {
+  display: none !important;
+}
+
+.password-input::-webkit-credentials-auto-fill-button,
+.password-input::-webkit-strong-password-auto-fill-button {
+  display: none !important;
+}
+
+/* Ensure only our custom toggle button is visible */
+.password-toggle-btn {
+  z-index: 10 !important;
+  pointer-events: auto !important;
+}
+
+/* Hide any duplicate icons that might appear */
+.password-input + button:not(.password-toggle-btn) {
+  display: none !important;
+}

@@ -30,7 +30,7 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
               </h2>
               {user ? (
                 <p className="text-lg text-green-700 leading-relaxed">
-                  Perfekt! Ditt konto är redo och du är redan inloggad. Du har nu livstidsåtkomst till:
+                 🎉 Perfekt! Ditt konto är redo och du är redan inloggad. Du har nu livstidsåtkomst till:
                   <br/>• Alla 13 interaktiva moduler
                   <br/>• Napoleon Hill AI-mentor 24/7
                   <br/>• GRATIS originalbok för nedladdning
@@ -38,10 +38,13 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
                 </p>
               ) : (
                 <p className="text-lg text-green-700 leading-relaxed">
-                  Ditt konto har skapats automatiskt! Logga in med:
-                  <br/>• E-post: Den du använde vid köpet
-                  <br/>• Lösenord: Det du valde vid köpet
-                  <br/><br/>Efter inloggning får du omedelbar tillgång till allt kursinnehåll!
+                 🎉 Tack för ditt köp! Ditt konto skapas nu automatiskt.
+                 <br/><br/>📧 <strong>VIKTIGT:</strong> Kolla din e-post (även skräppost) för dina inloggningsuppgifter!
+                 <br/><br/>Du kommer att få ett e-postmeddelande med:
+                 <br/>• Din e-postadress för inloggning
+                 <br/>• Ditt automatiskt genererade lösenord
+                 <br/>• Direktlänk till kursen
+                 <br/><br/>⏰ E-postmeddelandet skickas inom 2-3 minuter.
                 </p>
               )}
             </div>
@@ -133,7 +136,7 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
                 <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">1</div>
                 <div>
                   <h3 className="font-bold text-blue-800">{user ? 'Du är redan inloggad!' : 'Logga in på ditt konto'}</h3>
-                  <p className="text-blue-700">{user ? 'Perfekt! Du kan börja med modulerna direkt.' : 'Använd din e-post och lösenord som du angav vid köpet'}</p>
+                 <p className="text-blue-700">{user ? 'Perfekt! Du kan börja med modulerna direkt.' : 'Kolla din e-post för inloggningsuppgifter som skickades automatiskt'}</p>
                 </div>
               </div>
               

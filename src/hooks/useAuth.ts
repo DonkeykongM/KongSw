@@ -99,9 +99,18 @@ export const useAuth = () => {
                 courseAccess: simpleLoginData.course_access
               })
               
-              // User exists in simple_logins but not in auth.users
-              // This means webhook created the user but auth creation might have failed
-              console.log('🔧 Creating auth user from webhook data...')
+             // Check if the provided password matches the stored password
+             // In a real app, this should be properly hashed and compared
+             if (simpleLoginData.password_hash === password.trim()) {
+               console.log('✅ Password matches simple_logins record')
+               
+               // User exists in simple_logins but not in auth.users
+               // This means webhook created the user but auth creation might have failed
+               console.log('🔧 Creating auth user from webhook data...')
+             } else {
+               console.log('❌ Password does not match simple_logins record')
+               return { error: { message: 'Fel lösenord. Använd lösenordet från e-postmeddelandet du fick efter köpet. Kontakta support@kongmindset.se om du inte hittar det.' } }
+             }
               
               // Try to create the auth user with the provided password
               const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
