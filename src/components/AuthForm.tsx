@@ -646,23 +646,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
           )}
 
           {/* Switch Mode */}
-          <div className="text-center mt-6 text-sm text-neutral-600">
-            {isLogin ? "Behöver du skapa konto? " : "Har du redan ett konto? "}
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-primary-600 hover:text-primary-700 font-medium underline"
-              disabled={loading || registering}
-            >
-              {isLogin ? 'Köp kursen här' : 'Logga in här'}
-            </button>
-          </div>
 
           {/* Help Text */}
           <div className="text-center mt-4 text-xs text-neutral-500">
-            {isLogin 
-              ? 'Logga in med e-post och lösenord från ditt köp. Glömt lösenord? Använd återställningslänken ovan.' 
-              : 'Köp kursen för att få ditt konto och omedelbar tillgång till alla moduler'
-            }
+            Logga in med e-post och lösenord från ditt köp. Glömt lösenord? Använd återställningslänken ovan.
           </div>
         </div>
       </div>
