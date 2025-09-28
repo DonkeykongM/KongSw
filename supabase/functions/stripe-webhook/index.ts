@@ -70,10 +70,14 @@ serve(async (req) => {
         email: customerEmail,
         password: customerPassword,
         email_confirm: true, // Skip email confirmation
+        email_confirm: true,
+        phone_confirm: true,
         user_metadata: {
           display_name: customerName || customerEmail.split('@')[0],
           full_name: customerName || customerEmail.split('@')[0],
-          source: 'stripe_purchase'
+          source: 'stripe_purchase',
+          email_confirmed_at: new Date().toISOString(),
+          confirmed_at: new Date().toISOString()
         }
       })
 
