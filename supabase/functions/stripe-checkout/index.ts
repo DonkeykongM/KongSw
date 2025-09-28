@@ -1,32 +1,20 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import Stripe from 'https://esm.sh/stripe@10.12.0?target=deno'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-// Initialize Stripe
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') as string, {
-  apiVersion: '2022-11-15',
-  httpClient: Stripe.createFetchHttpClient(),
-})
-
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    console.log('🛒 Checkout request received')
+    const { email, password, name } = await req.json()
     
-    const { email, password, name, source } = await req.json()
-    
-    // Validation
+    // Validate required fields
     if (!email || !password || !name) {
-      console.error('❌ Missing required fields')
       return new Response(
         JSON.stringify({ error: 'Email, password, and name are required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -50,52 +38,53 @@ serve(async (req) => {
       )
     }
 
-    console.log('✅ Creating checkout session for:', email)
+    const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY')
+    if (!stripeSecretKey) {
+      throw new Error('Stripe secret key not configured')
+    }
 
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: 'price_1S7zDfBu2e08097PaQ5APyYq', // Your correct price ID
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      customer_email: email,
-      metadata: {
-        email: email,
-        password: password, // TEMPORARILY pass password to webhook
-        name: name,
-        source: source || 'kongmindset_course_purchase'
+    const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${stripeSecretKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      success_url: `${Deno.env.get('SITE_URL') || 'https://kongmindset.se'}?payment=success`,
-      cancel_url: `${Deno.env.get('SITE_URL') || 'https://kongmindset.se'}?payment=cancelled`,
-      allow_promotion_codes: true,
-      billing_address_collection: 'auto',
-      shipping_address_collection: {
-        allowed_countries: ['SE', 'NO', 'DK', 'FI', 'DE', 'US', 'GB']
-      }
+      body: new URLSearchParams({
+        'payment_method_types[0]': 'card',
+        'line_items[0][price]': 'price_1S7zDfBu2e08097PaQ5APyYq',
+        'line_items[0][quantity]': '1',
+        'mode': 'payment',
+        'success_url': `${Deno.env.get('SITE_URL') || 'https://kongmindset.se'}?payment=success`,
+        'cancel_url': `${Deno.env.get('SITE_URL') || 'https://kongmindset.se'}?payment=cancelled`,
+        'customer_email': email,
+        'metadata[email]': email,
+        'metadata[password]': password,
+        'metadata[name]': name,
+        'metadata[source]': 'kongmindset_course_purchase'
+      }),
     })
 
-    console.log('✅ Checkout session created:', session.id)
+    if (!stripeResponse.ok) {
+      const errorText = await stripeResponse.text()
+      console.error('Stripe error:', errorText)
+      throw new Error(`Stripe API error: ${stripeResponse.status}`)
+    }
 
+    const session = await stripeResponse.json()
+    
+    console.log('✅ Checkout session created:', session.id)
+    
     return new Response(
       JSON.stringify({ url: session.url }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
-    console.error('❌ Checkout error:', error.message)
+    console.error('Checkout error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
