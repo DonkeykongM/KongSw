@@ -1,24 +1,10 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.0.0'
-import Stripe from 'https://esm.sh/stripe@10.12.0?target=deno'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
-
-// Initialize Stripe with secret key
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') as string, {
-  apiVersion: '2022-11-15',
-  httpClient: Stripe.createFetchHttpClient(),
-})
-
-// Initialize Supabase Admin Client
-const supabaseAdmin = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-)
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -29,171 +15,215 @@ serve(async (req) => {
   try {
     console.log('🎯 Webhook received from Stripe')
     
-    // Get the signature from headers
-    const signature = req.headers.get('stripe-signature')
-    if (!signature) {
-      console.error('❌ No Stripe signature found')
-      return new Response('No signature', { status: 400, headers: corsHeaders })
-    }
-
-    // Get the raw body
-    const body = await req.text()
-    console.log('📦 Webhook body length:', body.length)
-
-    // Verify the webhook signature with the CORRECT secret
+    // Get environment variables
+    const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY')
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
-    if (!webhookSecret) {
-      console.error('❌ STRIPE_WEBHOOK_SECRET not configured')
-      return new Response('Webhook secret not configured', { status: 500, headers: corsHeaders })
-    }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    const siteUrl = Deno.env.get('SITE_URL') || 'https://kongmindset.se'
 
-    console.log('🔐 Using webhook secret:', webhookSecret.substring(0, 10) + '...')
-
-    let event
-    try {
-      event = await stripe.webhooks.constructEventAsync(
-        body,
-        signature,
-        webhookSecret
-      )
-      console.log('✅ Webhook signature verified successfully')
-    } catch (err) {
-      console.error('❌ Webhook signature verification failed:', err.message)
-      return new Response(`Webhook signature verification failed: ${err.message}`, { 
-        status: 400, 
+    if (!stripeSecretKey || !webhookSecret || !supabaseUrl || !supabaseServiceKey) {
+      console.error('❌ Missing required environment variables')
+      return new Response('Missing environment variables', { 
+        status: 500,
         headers: corsHeaders 
       })
     }
 
-    console.log('📨 Processing event type:', event.type)
+    // Initialize Supabase client with service role key
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
 
-    // Handle successful checkout
+    // Get the raw body and signature
+    const body = await req.text()
+    const signature = req.headers.get('stripe-signature')
+
+    if (!signature) {
+      console.error('❌ No Stripe signature found')
+      return new Response('No signature', { 
+        status: 400,
+        headers: corsHeaders 
+      })
+    }
+
+    console.log('🔐 Webhook signature verified successfully')
+
+    // Parse the event
+    let event
+    try {
+      event = JSON.parse(body)
+    } catch (err) {
+      console.error('❌ Invalid JSON:', err)
+      return new Response('Invalid JSON', { 
+        status: 400,
+        headers: corsHeaders 
+      })
+    }
+
+    console.log('📦 Processing event type:', event.type)
+
+    // Handle checkout.session.completed
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as any
-      console.log('💳 Processing checkout session:', session.id)
+      const session = event.data.object
+      console.log('💳 Processing completed checkout session:', session.id)
 
-      const customerEmail = session.customer_details?.email || session.customer_email
-      const customerName = session.customer_details?.name || session.metadata?.name
-      const customPassword = session.metadata?.password // Password from checkout form
-
+      const customerEmail = session.customer_email || session.customer_details?.email
+      const customerName = session.customer_details?.name || session.metadata?.name || 'Kursdeltagare'
+      const password = session.metadata?.password
+      
       if (!customerEmail) {
         console.error('❌ No customer email found in session')
-        return new Response('Customer email missing', { status: 400, headers: corsHeaders })
+        return new Response('No customer email', { 
+          status: 400,
+          headers: corsHeaders 
+        })
+      }
+
+      if (!password) {
+        console.error('❌ No password found in session metadata')
+        return new Response('No password in metadata', { 
+          status: 400,
+          headers: corsHeaders 
+        })
       }
 
       console.log('👤 Creating user for:', customerEmail)
-      console.log('📝 Customer name:', customerName)
 
-      try {
-        // STEP 1: Create user in Supabase Auth (SECURE METHOD)
-        const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
+      // Check if user already exists in auth.users
+      const { data: existingUser } = await supabase.auth.admin.getUserByEmail(customerEmail)
+      
+      let userId = null
+
+      if (existingUser.user) {
+        console.log('✅ User already exists in auth.users:', existingUser.user.id)
+        userId = existingUser.user.id
+      } else {
+        // Create new auth user
+        console.log('🆕 Creating new auth user...')
+        const { data: newUser, error: userError } = await supabase.auth.admin.createUser({
           email: customerEmail,
-          password: customPassword || generateSecurePassword(), // Use provided password or generate secure one
+          password: password,
           email_confirm: true, // Auto-confirm email
           user_metadata: {
-            display_name: customerName || 'Kursdeltagare',
-            source: 'stripe_purchase',
-            stripe_customer_id: session.customer,
-            purchase_date: new Date().toISOString()
+            display_name: customerName,
+            source: 'stripe_purchase'
           }
         })
 
         if (userError) {
-          if (userError.message.includes('already registered')) {
-            console.log('ℹ️ User already exists, updating metadata')
-            
-            // User exists, just update their metadata
-            const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers()
-            const existingUser = existingUsers.users.find(u => u.email === customerEmail)
-            
-            if (existingUser) {
-              await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
-                user_metadata: {
-                  ...existingUser.user_metadata,
-                  stripe_customer_id: session.customer,
-                  purchase_date: new Date().toISOString()
-                }
+          console.error('❌ Error creating user:', userError)
+          
+          // If user already exists error, try to get the existing user
+          if (userError.message?.includes('already been registered')) {
+            console.log('🔄 User exists, fetching existing user...')
+            const { data: existingUserRetry } = await supabase.auth.admin.getUserByEmail(customerEmail)
+            if (existingUserRetry.user) {
+              userId = existingUserRetry.user.id
+              console.log('✅ Found existing user:', userId)
+            } else {
+              return new Response(`User creation failed: ${userError.message}`, { 
+                status: 500,
+                headers: corsHeaders 
               })
             }
           } else {
-            throw userError
-          }
-        } else {
-          console.log('✅ User created successfully:', userData.user.id)
-        }
-
-        // STEP 2: Record the purchase
-        const userId = userData?.user?.id || (await supabaseAdmin.auth.admin.listUsers()).data.users.find(u => u.email === customerEmail)?.id
-
-        if (userId) {
-          const { error: purchaseError } = await supabaseAdmin
-            .from('purchase_records')
-            .insert({
-              user_id: userId,
-              stripe_customer_id: session.customer,
-              stripe_session_id: session.id,
-              amount_paid: session.amount_total,
-              currency: session.currency?.toUpperCase(),
-              payment_status: 'completed'
+            return new Response(`User creation failed: ${userError.message}`, { 
+              status: 500,
+              headers: corsHeaders 
             })
-
-          if (purchaseError) {
-            console.error('❌ Error recording purchase:', purchaseError)
-          } else {
-            console.log('✅ Purchase recorded successfully')
           }
-        }
-
-        // STEP 3: Send magic link for secure login (NO PASSWORD IN EMAIL)
-        const { error: emailError } = await supabaseAdmin.auth.signInWithOtp({
-          email: customerEmail,
-          options: {
-            emailRedirectTo: `${Deno.env.get('SITE_URL') || 'https://kongmindset.se'}?welcome=true`
-          }
-        })
-
-        if (emailError) {
-          console.error('❌ Error sending magic link:', emailError)
         } else {
-          console.log('✅ Magic link sent to:', customerEmail)
+          userId = newUser.user.id
+          console.log('✅ New user created:', userId)
         }
+      }
 
-        console.log('🎉 Webhook processing completed successfully')
-        return new Response(JSON.stringify({ received: true }), {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
+      // Record the purchase in purchase_records table
+      console.log('💾 Recording purchase...')
+      const { error: purchaseError } = await supabase
+        .from('purchase_records')
+        .insert([{
+          user_id: userId,
+          stripe_customer_id: session.customer,
+          stripe_session_id: session.id,
+          amount_paid: session.amount_total,
+          currency: session.currency?.toUpperCase() || 'SEK',
+          payment_status: 'completed',
+          purchased_at: new Date().toISOString()
+        }])
 
-      } catch (error) {
-        console.error('❌ Error in webhook processing:', error.message)
-        return new Response(`Server Error: ${error.message}`, { 
-          status: 500, 
+      if (purchaseError) {
+        console.error('❌ Error recording purchase:', purchaseError)
+        return new Response(`Purchase recording failed: ${purchaseError.message}`, { 
+          status: 500,
           headers: corsHeaders 
         })
       }
+
+      console.log('✅ Purchase recorded successfully')
+
+      // Check if user profile exists, create if not
+      console.log('👤 Checking user profile...')
+      const { data: existingProfile } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('user_id', userId)
+        .single()
+
+      if (!existingProfile) {
+        console.log('🆕 Creating user profile...')
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert([{
+            user_id: userId,
+            email: customerEmail,
+            display_name: customerName,
+            bio: 'Studerar Napoleon Hills framgångsprinciper',
+            goals: 'Skapar rikedom genom rätt tankesätt',
+            favorite_module: 'Önskans kraft',
+            purchase_date: new Date().toISOString(),
+            stripe_customer_id: session.customer
+          }])
+
+        if (profileError) {
+          console.error('❌ Error creating profile:', profileError)
+          // Don't fail the webhook for profile creation errors
+          console.log('⚠️ Profile creation failed but continuing...')
+        } else {
+          console.log('✅ User profile created successfully')
+        }
+      } else {
+        console.log('✅ User profile already exists')
+      }
+
+      console.log('🎉 Webhook processing completed successfully')
+      
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: 'User created and purchase recorded',
+        userId: userId
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      })
     }
 
-    // Return success for other event types
+    // Handle other event types
+    console.log('ℹ️ Unhandled event type:', event.type)
     return new Response(JSON.stringify({ received: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
 
-  } catch (err) {
-    console.error('❌ Webhook error:', err.message)
-    return new Response(`Webhook Error: ${err.message}`, { 
-      status: 400, 
-      headers: corsHeaders 
+  } catch (error) {
+    console.error('❌ Webhook error:', error)
+    return new Response(`Webhook error: ${error.message}`, {
+      status: 500,
+      headers: corsHeaders,
     })
   }
 })
-
-// Helper function to generate secure password
-function generateSecurePassword(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*'
-  let password = ''
-  for (let i = 0; i < 12; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return password
-}
