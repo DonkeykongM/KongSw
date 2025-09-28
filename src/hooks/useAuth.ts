@@ -55,8 +55,8 @@ export const useAuth = () => {
         return { error: { message: 'Ange en giltig e-postadress.' } };
       }
       
-      if (password.length < 6) {
-        return { error: { message: 'Lösenordet måste vara minst 6 tecken långt.' } };
+      if (password.length < 8) {
+        return { error: { message: 'Lösenordet måste vara minst 8 tecken långt.' } };
       }
       
       // Use Supabase Auth (SECURE METHOD)
@@ -76,7 +76,9 @@ export const useAuth = () => {
         } else if (error.message?.includes('Too many requests')) {
           userFriendlyMessage = 'För många inloggningsförsök. Vänta 10 minuter och försök igen.';
         } else if (error.message?.includes('Invalid login credentials')) {
-          userFriendlyMessage = 'Fel e-post eller lösenord. Om du köpte kursen nyligen, kolla din e-post för inloggningslänk. Kontakta support@kongmindset.se om problemet kvarstår.';
+          userFriendlyMessage = 'Fel e-post eller lösenord. Kontrollera att du använder rätt uppgifter. Om du glömt lösenordet, använd "Glömt lösenord?"-länken.';
+        } else if (error.message?.includes('signup disabled')) {
+          userFriendlyMessage = 'Registrering är inaktiverad. Kontakta support@kongmindset.se för hjälp.';
         }
         
         return { error: { message: userFriendlyMessage } }
@@ -100,6 +102,65 @@ export const useAuth = () => {
     }
   }
 
+  const signUp = async (email: string, password: string, name: string) => {
+    if (!isSupabaseConfigured) {
+      return { error: { message: 'Systemet är inte konfigurerat. Kontakta support på support@kongmindset.se' } }
+    }
+
+    try {
+      console.log('📝 Attempting registration for:', email.trim())
+      
+      // Validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) {
+        return { error: { message: 'Ange en giltig e-postadress.' } };
+      }
+      
+      if (password.length < 8) {
+        return { error: { message: 'Lösenordet måste vara minst 8 tecken långt.' } };
+      }
+      
+      if (!name.trim()) {
+        return { error: { message: 'Namn krävs för registrering.' } };
+      }
+      
+      // Create user with Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: password.trim(),
+        options: {
+          data: {
+            display_name: name.trim(),
+            full_name: name.trim()
+          }
+        }
+      })
+
+      if (error) {
+        console.error('❌ Registration failed:', error.message)
+        
+        let userFriendlyMessage = 'Registrering misslyckades';
+        
+        if (error.message?.includes('already registered')) {
+          userFriendlyMessage = 'E-postadressen är redan registrerad. Försök logga in istället.';
+        } else if (error.message?.includes('weak password')) {
+          userFriendlyMessage = 'Lösenordet är för svagt. Använd ett starkare lösenord med stor/liten bokstav, siffra och specialtecken.';
+        } else if (error.message?.includes('signup disabled')) {
+          userFriendlyMessage = 'Registrering är inaktiverad. Kontakta support@kongmindset.se för hjälp.';
+        }
+        
+        return { error: { message: userFriendlyMessage } }
+      }
+
+      console.log('✅ Registration successful for:', email.trim())
+      return { data, error: null }
+      
+    } catch (err: any) {
+      console.error('❌ Registration exception:', err)
+      return { error: { message: 'Ett oväntat fel uppstod vid registrering' } }
+    }
+  }
+
   const signOut = async () => {
     if (!isSupabaseConfigured) {
       setUser(null)
@@ -120,6 +181,7 @@ export const useAuth = () => {
     user,
     loading,
     signIn,
+    signUp,
     signOut,
     isConfigured: isSupabaseConfigured
   }
