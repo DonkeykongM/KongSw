@@ -401,6 +401,17 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                   Glömt lösenord?
                 </button>
               </div>
+
+              {/* Purchase Option */}
+              <div className="text-center mt-6 pt-6 border-t border-gray-200">
+                <p className="text-sm text-gray-600 mb-4">Har du inte köpt kursen än?</p>
+                <button
+                  onClick={() => setIsLogin(false)}
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-4 px-4 rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  🛒 Köp kursen - 299 kr
+                </button>
+              </div>
             </form>
           ) : (
             // Course Purchase Form
