@@ -305,28 +305,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
 
         {/* Auth Form */}
         <div className="bg-white/90 rounded-2xl shadow-xl p-8 border border-white/20">
-          {/* Toggle Buttons */}
-          <div className="flex rounded-lg bg-neutral-100 p-1 mb-6">
-            <button
-              onClick={() => setIsLogin(true)}
-              className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-all ${
-                isLogin
-                  ? 'bg-white text-primary-700 shadow-sm'
-                  : 'text-neutral-600 hover:text-primary-600'
-              }`}
-            >
-              Logga in
-            </button>
-            <button
-              onClick={() => setIsLogin(false)}
-              className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-all ${
-                !isLogin
-                  ? 'bg-white text-primary-700 shadow-sm'
-                  : 'text-neutral-600 hover:text-primary-600'
-              }`}
-            >
-              Registrera
-            </button>
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              {isLogin ? 'Logga in på din kurs' : 'Köp KongMindset-kursen'}
+            </h2>
+            <p className="text-gray-600">
+              {isLogin ? 'Använd e-post och lösenord från ditt köp' : 'Få omedelbar tillgång till alla 13 moduler + Napoleon Hill AI'}
+            </p>
           </div>
 
           {isLogin ? (
@@ -417,11 +403,17 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
               </div>
             </form>
           ) : (
-            // Registration Form
+            // Course Purchase Form
             <div className="space-y-6">
-              <div className="text-center mb-4">
-                <h3 className="text-lg font-bold text-gray-800">Skapa ditt konto</h3>
-                <p className="text-sm text-gray-600">Registrera dig för att få tillgång till kursen</p>
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200 mb-6">
+                <div className="text-center">
+                  <h3 className="text-xl font-bold text-green-800 mb-2">🎯 Köp KongMindset-kursen</h3>
+                  <p className="text-green-700 text-sm mb-4">Få omedelbar tillgång efter betalning</p>
+                  <div className="bg-white rounded-lg p-4 border border-green-300">
+                    <div className="text-3xl font-bold text-green-600">299 kr</div>
+                    <div className="text-sm text-green-700">Engångsbetalning - Livstidsåtkomst</div>
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -579,41 +571,53 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                 )}
               </div>
 
-              {/* Registration Options */}
-              <div className="space-y-4">
-                {/* Free Registration */}
-                <button
-                  onClick={handleRegister}
-                  disabled={registering || !isPasswordValid || !passwordsMatch || !email.trim() || !name.trim()}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 px-4 rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
-                >
-                  {registering ? 'Skapar konto...' : '👤 Skapa gratis konto'}
-                </button>
-                
-                <div className="text-center text-sm text-gray-500">
-                  <span>eller</span>
-                </div>
+              {/* What's Included */}
+              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 mb-6">
+                <h4 className="font-bold text-blue-800 mb-3">Vad du får för 299 kr:</h4>
+                <ul className="text-sm text-blue-700 space-y-2">
+                  <li className="flex items-center">
+                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                    <span>13 interaktiva moduler (livstidsåtkomst)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                    <span>Napoleon Hill AI-mentor 24/7</span>
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                    <span>GRATIS originalbok "Tänk och Bli Rik"</span>
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                    <span>30 dagars pengarna-tillbaka-garanti</span>
+                  </li>
+                </ul>
+              </div>
 
-                {/* Course Purchase */}
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <CreditCard className="w-5 h-5 text-green-600" />
-                    <span className="font-semibold text-green-800">Köp komplett KongMindset-kurs</span>
+              {/* Purchase Button */}
+              <button
+                onClick={handleStripeCheckout}
+                disabled={loading || !isPasswordValid || !passwordsMatch || !email.trim() || !name.trim()}
+                className="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-4 px-4 rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
+              >
+                {loading ? 'Förbereder säker betalning...' : '🛒 Köp kurs för 299 kr'}
+              </button>
+              
+              {/* Security Info */}
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div className="flex items-center justify-center space-x-4 text-xs text-gray-600">
+                  <div className="flex items-center space-x-1">
+                    <Shield className="w-3 h-3" />
+                    <span>SSL-säker</span>
                   </div>
-                  <ul className="text-xs text-green-600 space-y-1 mb-4">
-                    <li>🎯 13 interaktiva moduler (livstidsåtkomst)</li>
-                    <li>🧠 Napoleon Hill AI-mentor (24/7)</li>
-                    <li>📚 GRATIS originalbok "Tänk och Bli Rik"</li>
-                    <li>💚 30 dagars pengarna-tillbaka-garanti</li>
-                  </ul>
-                  
-                  <button
-                    onClick={handleStripeCheckout}
-                    disabled={loading || !isPasswordValid || !passwordsMatch || !email.trim() || !name.trim()}
-                    className="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
-                  >
-                    {loading ? 'Förbereder betalning...' : '🛒 Köp kurs för 299 kr'}
-                  </button>
+                  <div className="flex items-center space-x-1">
+                    <CreditCard className="w-3 h-3" />
+                    <span>Stripe-betalning</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <CheckCircle className="w-3 h-3" />
+                    <span>Omedelbar tillgång</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -649,15 +653,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
               className="text-primary-600 hover:text-primary-700 font-medium underline"
               disabled={loading || registering}
             >
-              {isLogin ? 'Registrera här' : 'Logga in här'}
+              {isLogin ? 'Köp kursen här' : 'Logga in här'}
             </button>
           </div>
 
           {/* Help Text */}
           <div className="text-center mt-4 text-xs text-neutral-500">
             {isLogin 
-              ? 'Logga in med din e-post och lösenord. Glömt lösenord? Använd återställningslänken ovan.' 
-              : 'Skapa ett gratis konto eller köp kursen för full tillgång till alla moduler'
+              ? 'Logga in med e-post och lösenord från ditt köp. Glömt lösenord? Använd återställningslänken ovan.' 
+              : 'Köp kursen för att få ditt konto och omedelbar tillgång till alla moduler'
             }
           </div>
         </div>

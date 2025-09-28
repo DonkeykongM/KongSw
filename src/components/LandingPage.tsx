@@ -86,9 +86,9 @@ export default function LandingPage({ onJoinClick }: LandingPageProps) {
             {/* Login Button */}
             <button
               onClick={onJoinClick}
-              className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold py-4 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 inline-flex items-center space-x-2 min-h-[52px] text-base"
+              className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-semibold py-4 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 inline-flex items-center space-x-2 min-h-[52px] text-base"
             >
-              <span>🔑 Logga in</span>
+              <span>🛒 Köp kurs - 299 kr</span>
             </button>
           </div>
         </div>
