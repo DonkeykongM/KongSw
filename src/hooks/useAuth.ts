@@ -14,10 +14,40 @@ export const useAuth = () => {
       return
     }
 
+    // Clear any invalid sessions on startup
+    const clearInvalidSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.user?.email?.includes('admin') || session?.user?.email?.includes('test')) {
+          console.log('🧹 Clearing invalid admin/test session')
+          await supabase.auth.signOut()
+          setUser(null)
+          setLoading(false)
+          return
+        }
+      } catch (error) {
+        console.error('Session cleanup error:', error)
+      }
+    }
+
     // Get initial session
     const getInitialSession = async () => {
       try {
+        await clearInvalidSession()
         const { data: { session } } = await supabase.auth.getSession()
+        
+        // Additional validation for legitimate users
+        if (session?.user) {
+          const email = session.user.email
+          if (email?.includes('admin') || email?.includes('test') || email === 'admin7@admin.com') {
+            console.log('🚫 Invalid user detected, signing out:', email)
+            await supabase.auth.signOut()
+            setUser(null)
+            setLoading(false)
+            return
+          }
+        }
+        
         setUser(session?.user || null)
         console.log('👤 Current user:', session?.user?.email || 'None')
       } catch (error) {
