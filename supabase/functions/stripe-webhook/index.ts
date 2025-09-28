@@ -67,56 +67,43 @@ serve(async (req) => {
         const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
           email: customerEmail,
           password: customerPassword,
-          email_confirm: true,
-          phone_confirm: true,
+          email_confirm: true,  // CRITICAL: Mark email as confirmed
+          phone_confirm: true,  // CRITICAL: Mark phone as confirmed
           user_metadata: {
             display_name: customerName || customerEmail.split('@')[0],
             full_name: customerName || customerEmail.split('@')[0],
-            source: 'stripe_purchase'
+            source: 'stripe_purchase',
+            purchase_session_id: session.id,
+            created_via: 'webhook'
+          },
+          app_metadata: {
+            provider: 'email',
+            providers: ['email']
           }
         })
 
         if (authError) {
-          // If user already exists, try to update password
-          if (authError.message.includes('already registered') || authError.message.includes('already exists')) {
-            console.log('👤 User exists, updating password...')
+          // Check if user already exists
+          if (authError.message?.includes('already registered') || authError.message?.includes('already exists')) {
+            console.log('⚠️ User already exists, trying to get existing user')
             
             // Get existing user
-            const { data: existingUsers } = await supabase.auth.admin.listUsers()
-            const existingUser = existingUsers.users.find(u => u.email === customerEmail)
+            const { data: existingUser, error: getUserError } = await supabase.auth.admin.getUserByEmail(customerEmail)
             
-            if (existingUser) {
-              // Update password for existing user
-              const { error: updateError } = await supabase.auth.admin.updateUserById(
-                existingUser.id,
-                { 
-                  password: customerPassword,
-                  email_confirm: true,
-                  phone_confirm: true,
-                  user_metadata: {
-                    ...existingUser.user_metadata,
-                    display_name: customerName || existingUser.user_metadata?.display_name || customerEmail.split('@')[0],
-                    source: 'stripe_purchase_update'
-                  }
-                }
-              )
-              
-              if (updateError) {
-                console.error('❌ Failed to update existing user:', updateError)
-                throw updateError
-              }
-              
-              console.log('✅ Updated existing user password')
-              
-              // Use existing user for profile creation
-              authUser = { user: existingUser }
+            if (getUserError || !existingUser.user) {
+              console.error('❌ Could not get existing user:', getUserError)
+              throw new Error(`User exists but cannot access: ${getUserError?.message}`)
             }
+            
+            console.log('✅ Found existing user:', existingUser.user.id)
+            userId = existingUser.user.id
           } else {
-            console.error('❌ Auth user creation failed:', authError)
-            throw authError
+            console.error('❌ Failed to create auth user:', authError)
+            throw new Error(`Auth user creation failed: ${authError.message}`)
           }
         } else {
-          console.log('✅ Auth user created successfully:', authUser.user?.id)
+          console.log('✅ Auth user created successfully:', authUser.user.id)
+          userId = authUser.user.id
         }
 
         const userId = authUser?.user?.id
