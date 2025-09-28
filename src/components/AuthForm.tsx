@@ -392,6 +392,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
               >
                 {loading ? 'Förbereder betalning...' : '🛒 Köp kurs för 299 kr'}
               </button>
+              
+              {/* Security Notice */}
+              <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-green-700 text-xs text-center">
+                  🔒 <strong>Säker betalning:</strong> Ditt lösenord lagras säkert och krypterat. 
+                  Efter betalning får du en inloggningslänk via e-post.
+                </p>
+              </div>
             </div>
           )}
 
@@ -434,8 +442,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
           {/* Help Text */}
           <div className="text-center mt-4 text-xs text-neutral-500">
             {isLogin 
-              ? 'Använd samma e-post och lösenord som du använde vid köpet' 
-              : 'Efter betalning skapas ditt konto automatiskt med dessa inloggningsuppgifter'
+              ? 'Logga in med ditt konto. Om du köpte nyligen, kolla din e-post för inloggningslänk.' 
+              : 'Efter betalning får du en säker inloggningslänk via e-post'
             }
           </div>
         </div>

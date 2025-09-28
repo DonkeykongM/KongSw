@@ -3,8 +3,7 @@ import { User } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 export interface UserProfile {
-  id?: string;
-  user_id: string;
+  id: string;
   display_name: string;
   bio: string;
   goals: string;
@@ -28,8 +27,8 @@ export const useProfile = (user: User | null) => {
 
     // Initialize default profile
     const defaultProfile: UserProfile = {
-      user_id: user.id,
-      display_name: user.email?.split('@')[0] || 'Användare',
+      id: user.id,
+      display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'Användare',
       bio: 'Behärskar Napoleon Hills framgångsprinciper',
       goals: 'Bygger rikedom genom tankesättstransformation',
       favorite_module: 'Önskans kraft'
@@ -37,22 +36,6 @@ export const useProfile = (user: User | null) => {
 
     if (!isSupabaseConfigured) {
       // Use localStorage if Supabase is not configured
-      const savedUsers = JSON.parse(localStorage.getItem('demo_users') || '[]');
-      const userData = savedUsers.find((u: any) => u.id === user.id);
-      
-      if (userData) {
-        const profileData = {
-          user_id: user.id,
-          display_name: userData.display_name || user.email?.split('@')[0] || 'Användare',
-          bio: userData.bio || 'Behärskar Napoleon Hills framgångsprinciper',
-          goals: userData.goals || 'Bygger rikedom genom tankesättstransformation',
-          favorite_module: userData.favorite_module || 'Önskans kraft'
-        };
-        setProfile(profileData);
-      } else {
-        setProfile(defaultProfile);
-      }
-      
       const savedProfile = localStorage.getItem(`profile_${user.id}`);
       if (savedProfile) {
         try {
@@ -67,13 +50,13 @@ export const useProfile = (user: User | null) => {
       return;
     }
 
-    // Fetch profile from Supabase
+    // Fetch profile from Supabase (SECURE METHOD)
     const fetchProfile = async () => {
       try {
         const { data, error } = await supabase
-          .from('user_profiles')
+          .from('profiles')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .single();
 
         if (error && error.code !== 'PGRST116') {
@@ -83,10 +66,16 @@ export const useProfile = (user: User | null) => {
         } else if (data) {
           setProfile(data);
         } else {
-          // No profile exists, create one
+          // No profile exists, create one (trigger should have done this)
           const { data: newProfile, error: insertError } = await supabase
-            .from('user_profiles')
-            .insert([defaultProfile])
+            .from('profiles')
+            .insert([{
+              id: user.id,
+              display_name: defaultProfile.display_name,
+              bio: defaultProfile.bio,
+              goals: defaultProfile.goals,
+              favorite_module: defaultProfile.favorite_module
+            }])
             .select()
             .single();
 
@@ -122,7 +111,7 @@ export const useProfile = (user: User | null) => {
 
     try {
       const { error } = await supabase
-        .from('user_profiles')
+        .from('profiles')
         .upsert([updatedProfile]);
 
       if (error) {

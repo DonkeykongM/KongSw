@@ -9,7 +9,7 @@ export const useAuth = () => {
   useEffect(() => {
     // Skip auth if Supabase not configured
     if (!isSupabaseConfigured) {
-      console.log('⚠️ Supabase not configured - skipping auth')
+      console.log('⚠️ Supabase not configured - demo mode')
       setLoading(false)
       return
     }
@@ -47,7 +47,7 @@ export const useAuth = () => {
     }
 
     try {
-      console.log('🔐 Försöker logga in:', email.trim())
+      console.log('🔐 Attempting login for:', email.trim())
       
       // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -59,158 +59,30 @@ export const useAuth = () => {
         return { error: { message: 'Lösenordet måste vara minst 6 tecken långt.' } };
       }
       
-      // Try direct login first
+      // Use Supabase Auth (SECURE METHOD)
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
       })
 
       if (error) {
-        console.error('❌ Direct login failed:', error.message)
-        console.log('🔍 Checking if user exists in simple_logins table...')
+        console.error('❌ Login failed:', error.message)
         
-        // If login fails, check if user exists in simple_logins (webhook created users)
-        if (error.message?.includes('Invalid login credentials')) {
-          console.log('🔍 User not found in auth.users, checking simple_logins...')
-          
-          try {
-            // Add timeout to prevent hanging
-            const timeoutPromise = new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('Timeout')), 15000)
-            );
-            
-            const queryPromise = supabase
-              .from('simple_logins')
-              .select('*')
-              .eq('email', email.trim())
-              .maybeSingle();
-            
-            const { data: simpleLoginData, error: simpleLoginError } = await Promise.race([
-              queryPromise,
-              timeoutPromise
-            ]) as any;
-            
-            if (simpleLoginData && !simpleLoginError) {
-              console.log('✅ Found user in simple_logins table:', simpleLoginData.email)
-              console.log('📊 User data:', {
-                email: simpleLoginData.email,
-                hasStripeCustomer: !!simpleLoginData.stripe_customer_id,
-                purchaseDate: simpleLoginData.purchase_date,
-                courseAccess: simpleLoginData.course_access
-              })
-              
-             // Check if the provided password matches the stored password
-             // In a real app, this should be properly hashed and compared
-             if (simpleLoginData.password_hash === password.trim()) {
-               console.log('✅ Password matches simple_logins record')
-               
-               // User exists in simple_logins but not in auth.users
-               // This means webhook created the user but auth creation might have failed
-               console.log('🔧 Creating auth user from webhook data...')
-             } else {
-               console.log('❌ Password does not match simple_logins record')
-               return { error: { message: 'Fel lösenord. Använd lösenordet från e-postmeddelandet du fick efter köpet. Kontakta support@kongmindset.se om du inte hittar det.' } }
-             }
-              
-              // Try to create the auth user with the provided password
-              const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-                email: email.trim(),
-                password: password.trim(),
-                options: {
-                  emailRedirectTo: undefined,
-                  data: {
-                    display_name: simpleLoginData.display_name || 'Kursdeltagare',
-                    stripe_customer_id: simpleLoginData.stripe_customer_id,
-                    purchase_date: simpleLoginData.purchase_date,
-                    source: 'webhook_recovery'
-                  }
-                }
-              })
-              
-              if (signUpError) {
-                console.error('❌ Auth user creation failed:', signUpError.message)
-                console.log('🔍 Error details:', signUpError)
-                
-                if (signUpError.message?.includes('already registered')) {
-                  // User exists in auth but password is wrong
-                  return { error: { message: 'Fel lösenord. Använd samma lösenord som du valde vid köpet. Kontakta support@kongmindset.se om du glömt det.' } }
-                }
-                
-                return { error: { message: 'Tekniskt fel vid kontoskapande. Kontakta support@kongmindset.se med din e-post så hjälper vi dig.' } }
-              }
-              
-              if (signUpData.user) {
-                console.log('✅ Auth user created successfully from webhook data')
-                console.log('👤 New user ID:', signUpData.user.id)
-                
-                // Create user profile if it doesn't exist
-                const { error: profileError } = await supabase
-                  .from('user_profiles')
-                  .upsert({
-                    user_id: signUpData.user.id,
-                    email: email.trim(),
-                    display_name: simpleLoginData.display_name || 'Kursdeltagare',
-                    bio: 'Behärskar Napoleon Hills framgångsprinciper',
-                    goals: 'Bygger rikedom genom tankesättstransformation',
-                    favorite_module: 'Önskans kraft',
-                    purchase_date: simpleLoginData.purchase_date,
-                    stripe_customer_id: simpleLoginData.stripe_customer_id
-                  })
-                
-                if (profileError) {
-                  console.error('❌ Profile creation failed:', profileError)
-                  console.log('⚠️ User can still access course without profile')
-                } else {
-                  console.log('✅ User profile created successfully')
-                }
-                
-                // Now try to login again
-                const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
-                  email: email.trim(),
-                  password: password.trim(),
-                })
-                
-                if (retryError) {
-                  console.error('❌ Retry login failed after user creation:', retryError)
-                  return { error: { message: 'Kontot skapades men inloggning misslyckades. Vänta 1 minut och försök logga in igen.' } }
-                }
-                
-                console.log('✅ Login successful after auth user creation!')
-                console.log('🎉 User now has full access to course')
-                return { data: retryData, error: null }
-              }
-            } else {
-              console.log('❌ User not found in simple_logins table')
-              console.log('🔍 This means user has not completed purchase via webhook')
-              return { error: { message: 'Användare hittades inte. Du måste först köpa kursen för att få tillgång. Kontakta support@kongmindset.se om du redan betalat.' } }
-            }
-          } catch (fallbackError) {
-            console.error('❌ Fallback check failed:', fallbackError)
-            
-            if (fallbackError.message === 'Timeout') {
-              return { error: { message: 'Anslutningen tog för lång tid. Kontrollera din internetanslutning och försök igen om 30 sekunder.' } }
-            }
-            
-            return { error: { message: 'Tekniskt fel vid inloggning. Kontakta support@kongmindset.se med din e-post så hjälper vi dig.' } }
-          }
-        }
-        
-        // Handle other auth errors
+        // Provide user-friendly error messages
         let userFriendlyMessage = 'Inloggning misslyckades';
         
         if (error.message?.includes('Email not confirmed')) {
-          userFriendlyMessage = 'E-post inte bekräftad. Kontrollera din inkorg eller kontakta support@kongmindset.se';
+          userFriendlyMessage = 'E-post inte bekräftad. Kontrollera din inkorg för bekräftelselänk.';
         } else if (error.message?.includes('Too many requests')) {
           userFriendlyMessage = 'För många inloggningsförsök. Vänta 10 minuter och försök igen.';
         } else if (error.message?.includes('Invalid login credentials')) {
-          userFriendlyMessage = 'Fel e-post eller lösenord. Använd samma uppgifter som vid köpet. Kontakta support@kongmindset.se om problemet kvarstår.';
+          userFriendlyMessage = 'Fel e-post eller lösenord. Om du köpte kursen nyligen, kolla din e-post för inloggningslänk. Kontakta support@kongmindset.se om problemet kvarstår.';
         }
         
         return { error: { message: userFriendlyMessage } }
       }
 
-      console.log('✅ Direct login successful for:', email.trim())
-      console.log('🎉 User authenticated and has course access')
+      console.log('✅ Login successful for:', email.trim())
       return { data, error: null }
       
     } catch (err: any) {

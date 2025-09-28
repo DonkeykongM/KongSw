@@ -38,12 +38,12 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
                 </p>
               ) : (
                 <p className="text-lg text-green-700 leading-relaxed">
-                 🎉 Tack för ditt köp! Ditt konto skapas nu automatiskt.
-                 <br/><br/>📧 <strong>VIKTIGT:</strong> Kolla din e-post (även skräppost) för dina inloggningsuppgifter!
+                 🎉 Tack för ditt köp! Ditt säkra konto skapas nu automatiskt.
+                 <br/><br/>📧 <strong>VIKTIGT:</strong> Kolla din e-post (även skräppost) för din säkra inloggningslänk!
                  <br/><br/>Du kommer att få ett e-postmeddelande med:
-                 <br/>• Din e-postadress för inloggning
-                 <br/>• Ditt automatiskt genererade lösenord
-                 <br/>• Direktlänk till kursen
+                 <br/>• En säker inloggningslänk (ingen lösenord behövs)
+                 <br/>• Direktåtkomst till kursen
+                 <br/>• Instruktioner för att sätta ditt eget lösenord
                  <br/><br/>⏰ E-postmeddelandet skickas inom 2-3 minuter.
                 </p>
               )}
@@ -135,8 +135,8 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
               <div className="flex items-start space-x-4 bg-blue-50 rounded-lg p-4">
                 <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">1</div>
                 <div>
-                  <h3 className="font-bold text-blue-800">{user ? 'Du är redan inloggad!' : 'Logga in på ditt konto'}</h3>
-                 <p className="text-blue-700">{user ? 'Perfekt! Du kan börja med modulerna direkt.' : 'Kolla din e-post för inloggningsuppgifter som skickades automatiskt'}</p>
+                  <h3 className="font-bold text-blue-800">{user ? 'Du är redan inloggad!' : 'Klicka på inloggningslänken'}</h3>
+                 <p className="text-blue-700">{user ? 'Perfekt! Du kan börja med modulerna direkt.' : 'Kolla din e-post för den säkra inloggningslänken som skickades automatiskt'}</p>
                 </div>
               </div>
               
@@ -216,10 +216,11 @@ const SuccessPage: React.FC<SuccessPageProps> = ({ onContinue, user }) => {
           {!user && (
           <div className="mt-6 text-center">
             <p className="text-gray-600">
-              <strong>Påminnelse:</strong> Logga in med e-posten och lösenordet du använde vid köpet
+              <strong>Påminnelse:</strong> Använd den säkra inloggningslänken från din e-post
             </p>
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4 max-w-md mx-auto">
               <p className="text-green-700 font-semibold text-sm">
+                🔒 Säker inloggning via e-postlänk<br/>
                 💚 30 dagars pengarna-tillbaka-garanti<br/>
                 📧 Support: support@kongmindset.se
               </p>
