@@ -21,13 +21,16 @@ export const useAuth = () => {
         
         if (session?.user) {
           const email = session.user.email?.toLowerCase() || ''
+          const displayName = session.user.user_metadata?.display_name?.toLowerCase() || ''
           
           // Force logout of admin/test accounts
           if (email.includes('admin') || 
               email.includes('test') || 
               email === 'admin7@admin.com' ||
               email === 'mathias.bahko@admin.com' ||
-              session.user.user_metadata?.display_name === 'mathias bahko') {
+              displayName === 'mathias bahko' ||
+              displayName.includes('admin') ||
+              email.includes('bahko')) {
             
             console.log('🚫 FORCE LOGOUT invalid user:', email)
             
