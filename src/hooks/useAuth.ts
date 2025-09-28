@@ -5,12 +5,17 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase'
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [authError, setAuthError] = useState<string | null>(null)
 
   useEffect(() => {
+    let mounted = true;
+    
     // Skip auth if Supabase not configured
     if (!isSupabaseConfigured) {
       console.log('⚠️ Supabase not configured - demo mode')
-      setLoading(false)
+      if (mounted) {
+        setLoading(false)
+      }
       return
     }
 
@@ -68,6 +73,8 @@ export const useAuth = () => {
     // Get initial session
     const getInitialSession = async () => {
       try {
+        setAuthError(null);
+        
         const wasForceLoggedOut = await forceLogoutInvalidUsers()
         if (wasForceLoggedOut) return
         
@@ -83,19 +90,28 @@ export const useAuth = () => {
             console.log('🚫 Invalid user detected, signing out:', email)
             await supabase.auth.signOut()
             localStorage.clear()
-            setUser(null)
-            setLoading(false)
+            if (mounted) {
+              setUser(null)
+              setLoading(false)
+            }
             return
           }
         }
         
-        setUser(session?.user || null)
+        if (mounted) {
+          setUser(session?.user || null)
+        }
         console.log('👤 Current user:', session?.user?.email || 'None')
       } catch (error) {
         console.error('Session error:', error)
-        setUser(null)
+        if (mounted) {
+          setUser(null)
+          setAuthError('Kunde inte ladda användardata')
+        }
       } finally {
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+        }
       }
     }
 
@@ -111,19 +127,29 @@ export const useAuth = () => {
         if (email.includes('admin') || email.includes('test') || email === 'admin7@admin.com') {
           console.log('🚫 Blocking invalid user from auth state:', email)
           await supabase.auth.signOut()
-          setUser(null)
+          if (mounted) {
+            setUser(null)
+          }
           return
         }
       }
       
-      setUser(session?.user || null)
-      setLoading(false)
+      if (mounted) {
+        setUser(session?.user || null)
+        setLoading(false)
+        setAuthError(null)
+      }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    }
   }, [])
 
   const signIn = async (email: string, password: string) => {
+    setAuthError(null);
+    
     if (!isSupabaseConfigured) {
       console.log('⚠️ Supabase not configured - demo mode')
       return { error: { message: 'Systemet är inte konfigurerat. Kontakta support på support@kongmindset.se' } }
@@ -263,6 +289,7 @@ export const useAuth = () => {
   return {
     user,
     loading,
+    authError,
     signIn,
     signUp,
     signOut,

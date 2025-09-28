@@ -170,7 +170,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
       setSuccess('Förbereder säker betalning...');
 
       // Check if Supabase is configured
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://acdwexqoonauzzjtoexx.supabase.co';
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       
       if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('placeholder')) {
@@ -242,6 +242,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
         userFriendlyError = 'Kunde inte ansluta till betalningssystemet. Kontrollera din internetanslutning och försök igen.';
       } else if (err.message?.includes('network')) {
         userFriendlyError = 'Nätverksfel. Kontrollera din internetanslutning och försök igen.';
+      } else if (err.message?.includes('Failed to fetch')) {
+        userFriendlyError = 'Anslutningsproblem. Kontrollera din internetanslutning och försök igen.';
       }
       
       setError(userFriendlyError);

@@ -18,7 +18,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: isSupabaseConfigured,
     storage: isSupabaseConfigured ? window.localStorage : undefined,
     detectSessionInUrl: true,
-    flowType: 'pkce'
+    flowType: 'pkce',
+    debug: import.meta.env.DEV
   },
   global: {
     headers: {
@@ -52,5 +53,20 @@ if (import.meta.env.DEV) {
     console.warn('Expected format:');
     console.warn('VITE_SUPABASE_URL=https://your-project.supabase.co');
     console.warn('VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...');
+  }
+  
+  // Test basic connectivity
+  if (isSupabaseConfigured) {
+    supabase.from('profiles').select('count').limit(1)
+      .then(({ error }) => {
+        if (error) {
+          console.error('🚨 Supabase connection test failed:', error.message);
+        } else {
+          console.log('✅ Supabase connection test successful');
+        }
+      })
+      .catch(err => {
+        console.error('🚨 Supabase connection error:', err);
+      });
   }
 }
