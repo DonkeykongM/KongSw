@@ -14,34 +14,70 @@ export const useAuth = () => {
       return
     }
 
-    // Clear any invalid sessions on startup
-    const clearInvalidSession = async () => {
+    // FORCE clear any invalid sessions on startup
+    const forceLogoutInvalidUsers = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
-        if (session?.user?.email?.includes('admin') || session?.user?.email?.includes('test')) {
-          console.log('🧹 Clearing invalid admin/test session')
-          await supabase.auth.signOut()
-          setUser(null)
-          setLoading(false)
-          return
+        
+        if (session?.user) {
+          const email = session.user.email?.toLowerCase() || ''
+          
+          // Force logout of admin/test accounts
+          if (email.includes('admin') || 
+              email.includes('test') || 
+              email === 'admin7@admin.com' ||
+              email === 'mathias.bahko@admin.com' ||
+              session.user.user_metadata?.display_name === 'mathias bahko') {
+            
+            console.log('🚫 FORCE LOGOUT invalid user:', email)
+            
+            // Clear all auth data
+            await supabase.auth.signOut()
+            
+            // Clear localStorage
+            localStorage.clear()
+            sessionStorage.clear()
+            
+            // Clear cookies
+            document.cookie.split(";").forEach(function(c) { 
+              document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+            
+            setUser(null)
+            setLoading(false)
+            
+            // Force page reload to clear all state
+            setTimeout(() => {
+              window.location.reload()
+            }, 1000)
+            return true
+          }
         }
+        return false
       } catch (error) {
-        console.error('Session cleanup error:', error)
+        console.error('Force logout error:', error)
+        return false
       }
     }
 
     // Get initial session
     const getInitialSession = async () => {
       try {
-        await clearInvalidSession()
+        const wasForceLoggedOut = await forceLogoutInvalidUsers()
+        if (wasForceLoggedOut) return
+        
         const { data: { session } } = await supabase.auth.getSession()
         
         // Additional validation for legitimate users
         if (session?.user) {
           const email = session.user.email
-          if (email?.includes('admin') || email?.includes('test') || email === 'admin7@admin.com') {
+          if (email?.includes('admin') || 
+              email?.includes('test') || 
+              email === 'admin7@admin.com' ||
+              email === 'mathias.bahko@admin.com') {
             console.log('🚫 Invalid user detected, signing out:', email)
             await supabase.auth.signOut()
+            localStorage.clear()
             setUser(null)
             setLoading(false)
             return
@@ -63,6 +99,18 @@ export const useAuth = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔄 Auth state change:', event, session?.user?.email || 'No user')
+      
+      // Block invalid users from auth state changes too
+      if (session?.user) {
+        const email = session.user.email?.toLowerCase() || ''
+        if (email.includes('admin') || email.includes('test') || email === 'admin7@admin.com') {
+          console.log('🚫 Blocking invalid user from auth state:', email)
+          await supabase.auth.signOut()
+          setUser(null)
+          return
+        }
+      }
+      
       setUser(session?.user || null)
       setLoading(false)
     })
