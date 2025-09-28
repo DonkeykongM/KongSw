@@ -1,0 +1,19 @@
+{
+  "type": "checkout.session.completed",
+  "data": {
+    "object": {
+      "id": "cs_test_manual_debug",
+      "customer_email": "debug@kongmindset.se",
+      "customer": "cus_debug123",
+      "payment_status": "paid",
+      "amount_total": 29900,
+      "currency": "sek",
+      "metadata": {
+        "email": "debug@kongmindset.se",
+        "password": "DebugTest123!",
+        "name": "Debug Test User",
+        "source": "manual_debug_test"
+      }
+    }
+  }
+}
