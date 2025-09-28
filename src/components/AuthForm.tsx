@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Brain, Mail, Lock, Eye, EyeOff, CreditCard, AlertCircle, ArrowLeft, CheckCircle, User } from 'lucide-react';
+import { Brain, Mail, Lock, Eye, EyeOff, CreditCard, AlertCircle, ArrowLeft, CheckCircle, User, Shield } from 'lucide-react';
 import SupabaseDiagnostic from './SupabaseDiagnostic';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { supabase } from '../lib/supabase';
