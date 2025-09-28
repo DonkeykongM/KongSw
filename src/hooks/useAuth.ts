@@ -28,6 +28,8 @@ export const useAuth = () => {
               email.includes('test') || 
               email === 'admin7@admin.com' ||
               email === 'mathias.bahko@admin.com' ||
+              email === 'mathias.bahko@admin.com' ||
+              displayName.includes('mathias bahko') ||
               displayName === 'mathias bahko' ||
               displayName.includes('admin') ||
               email.includes('bahko')) {
