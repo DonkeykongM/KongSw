@@ -411,7 +411,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                   <p className="text-green-700 text-sm mb-4">Få omedelbar tillgång efter betalning</p>
                   <div className="bg-white rounded-lg p-4 border border-green-300">
                     <div className="text-3xl font-bold text-green-600">299 kr</div>
-                    <div className="text-sm text-green-700">Engångsbetalning - Livstidsåtkomst</div>
+                    <div className="text-sm text-green-700">Kampanj hela 2025</div>
                   </div>
                 </div>
               </div>
