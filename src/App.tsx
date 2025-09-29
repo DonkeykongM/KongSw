@@ -42,6 +42,16 @@ function App() {
     }
   }, []);
 
+  // Debug auth state changes
+  React.useEffect(() => {
+    console.log('🔍 Auth state debug:', {
+      user: user?.email || 'No user',
+      loading,
+      showAuthForm,
+      currentPage,
+      isConfigured
+    });
+  }, [user, loading, showAuthForm, currentPage, isConfigured]);
 
   const handleModuleStart = (moduleId: number) => {
     const module = courseContent.find(m => m.id === moduleId);

@@ -19,7 +19,7 @@ export const useAuth = () => {
       return
     }
 
-    // Get initial session - SIMPLIFIED
+    // Get initial session and set up auth listener
     const getInitialSession = async () => {
       try {
         setAuthError(null);
@@ -28,6 +28,7 @@ export const useAuth = () => {
         
         if (mounted) {
           setUser(session?.user || null)
+          setLoading(false)
         }
         console.log('👤 Current user:', session?.user?.email || 'None')
       } catch (error) {
@@ -35,9 +36,6 @@ export const useAuth = () => {
         if (mounted) {
           setUser(null)
           setAuthError('Kunde inte ladda användardata')
-        }
-      } finally {
-        if (mounted) {
           setLoading(false)
         }
       }
@@ -45,14 +43,18 @@ export const useAuth = () => {
 
     getInitialSession()
 
-    // Listen for auth changes - SIMPLIFIED
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔄 Auth state change:', event, session?.user?.email || 'No user')
       
       if (mounted) {
         setUser(session?.user || null)
-        setLoading(false)
         setAuthError(null)
+        
+        // Only set loading to false after we've processed the auth change
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+          setLoading(false)
+        }
       }
     })
 
