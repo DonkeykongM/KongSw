@@ -83,14 +83,66 @@ export const useAuth = () => {
         return { error: { message: 'Lösenordet måste vara minst 6 tecken långt.' } };
       }
       
-      // Use Supabase Auth
+      // Try standard Supabase login first
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
       })
 
       if (error) {
-        console.error('❌ Login failed:', error.message)
+        console.error('❌ Standard login failed:', error.message)
+        
+        // If standard login fails, check if user exists in simple_logins table
+        // and try to create auth user from webhook data
+        if (error.message?.includes('Invalid login credentials')) {
+          console.log('🔄 Checking for webhook-created user...');
+          
+          try {
+            // Check if user exists in simple_logins table
+            const { data: simpleLoginData, error: simpleLoginError } = await supabase
+              .from('simple_logins')
+              .select('*')
+              .eq('email', email.trim())
+              .single();
+
+            if (simpleLoginData && !simpleLoginError) {
+              console.log('✅ Found user in simple_logins, creating auth user...');
+              
+              // Create auth user from simple_logins data
+              const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                email: email.trim(),
+                password: password.trim(),
+                options: {
+                  data: {
+                    display_name: simpleLoginData.name || email.split('@')[0],
+                    full_name: simpleLoginData.name || email.split('@')[0]
+                  }
+                }
+              });
+
+              if (signUpError) {
+                console.error('❌ Failed to create auth user:', signUpError);
+                return { error: { message: 'Kunde inte skapa användarkonto. Kontakta support.' } };
+              }
+
+              // Now try to sign in again
+              const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+                email: email.trim(),
+                password: password.trim(),
+              });
+
+              if (retryError) {
+                console.error('❌ Retry login failed:', retryError);
+                return { error: { message: 'Inloggning misslyckades efter kontoskapande. Försök igen.' } };
+              }
+
+              console.log('✅ Successfully created and logged in user from webhook data');
+              return { data: retryData, error: null };
+            }
+          } catch (webhookError) {
+            console.error('❌ Error checking webhook data:', webhookError);
+          }
+        }
         
         // Provide user-friendly error messages
         let userFriendlyMessage = 'Fel e-post eller lösenord';
@@ -100,7 +152,7 @@ export const useAuth = () => {
         } else if (error.message?.includes('Too many requests')) {
           userFriendlyMessage = 'För många försök. Vänta 10 minuter.';
         } else if (error.message?.includes('Invalid login credentials')) {
-          userFriendlyMessage = 'Fel e-post eller lösenord. Kontrollera dina uppgifter.';
+          userFriendlyMessage = 'Fel e-post eller lösenord. Har du köpt kursen? Kontrollera dina uppgifter eller köp kursen nedan.';
         }
         
         return { error: { message: userFriendlyMessage } }
@@ -112,64 +164,6 @@ export const useAuth = () => {
     } catch (err: any) {
       console.error('❌ Login exception:', err)
       return { error: { message: 'Ett fel uppstod vid inloggning. Försök igen.' } }
-    }
-  }
-
-  const signUp = async (email: string, password: string, name: string) => {
-    if (!isSupabaseConfigured) {
-      return { error: { message: 'Systemet är inte konfigurerat. Kontakta support.' } }
-    }
-
-    try {
-      console.log('📝 Attempting registration for:', email.trim())
-      
-      // Validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email.trim())) {
-        return { error: { message: 'Ange en giltig e-postadress.' } };
-      }
-      
-      if (password.length < 6) {
-        return { error: { message: 'Lösenordet måste vara minst 6 tecken långt.' } };
-      }
-      
-      if (!name.trim()) {
-        return { error: { message: 'Namn krävs för registrering.' } };
-      }
-      
-      // Create user with Supabase Auth - NO EMAIL CONFIRMATION
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password: password.trim(),
-        options: {
-          emailRedirectTo: undefined, // No email confirmation
-          data: {
-            display_name: name.trim(),
-            full_name: name.trim()
-          }
-        }
-      })
-
-      if (error) {
-        console.error('❌ Registration failed:', error.message)
-        
-        let userFriendlyMessage = 'Registrering misslyckades';
-        
-        if (error.message?.includes('already registered')) {
-          userFriendlyMessage = 'E-postadressen är redan registrerad. Försök logga in istället.';
-        } else if (error.message?.includes('weak password')) {
-          userFriendlyMessage = 'Lösenordet är för svagt. Använd ett starkare lösenord.';
-        }
-        
-        return { error: { message: userFriendlyMessage } }
-      }
-
-      console.log('✅ Registration successful for:', email.trim())
-      return { data, error: null }
-      
-    } catch (err: any) {
-      console.error('❌ Registration exception:', err)
-      return { error: { message: 'Ett fel uppstod vid registrering' } }
     }
   }
 
@@ -194,7 +188,6 @@ export const useAuth = () => {
     loading,
     authError,
     signIn,
-    signUp,
     signOut,
     isConfigured: isSupabaseConfigured
   }
