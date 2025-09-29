@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Brain, Mail, Lock, Eye, EyeOff, CreditCard, AlertCircle, ArrowLeft, CheckCircle, User, Shield } from 'lucide-react';
 import SupabaseDiagnostic from './SupabaseDiagnostic';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { supabase } from '../lib/supabase';
 
 interface AuthFormProps {
   onSignIn: (email: string, password: string) => Promise<{ data?: any; error: any }>;
@@ -20,110 +19,29 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [registering, setRegistering] = useState(false);
 
-  // Password validation
-  const validatePassword = (password: string): string[] => {
-    const errors: string[] = [];
-    if (password.length < 8) errors.push('Minst 8 tecken');
-    if (!/[A-Z]/.test(password)) errors.push('Minst en stor bokstav');
-    if (!/[a-z]/.test(password)) errors.push('Minst en liten bokstav');
-    if (!/[0-9]/.test(password)) errors.push('Minst en siffra');
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) errors.push('Minst ett specialtecken');
-    return errors;
-  };
-
-  const passwordErrors = password ? validatePassword(password) : [];
-  const isPasswordValid = passwordErrors.length === 0 && password.length > 0;
-  const passwordsMatch = password === confirmPassword;
-
-  // Handle direct registration (not purchase)
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRegistering(true);
+    setLoading(true);
     setError('');
     setSuccess('');
 
-    // Validation
-    if (!email.trim() || !password || !confirmPassword || !name.trim()) {
-      setError('Alla fält måste fyllas i');
-      setRegistering(false);
-      return;
-    }
-
-    if (!isPasswordValid) {
-      setError('Lösenordet uppfyller inte säkerhetskraven');
-      setRegistering(false);
-      return;
-    }
-
-    if (!passwordsMatch) {
-      setError('Lösenorden stämmer inte överens');
-      setRegistering(false);
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
-      setError('Ange en giltig e-postadress');
-      setRegistering(false);
-      return;
-    }
-
-    if (!isSupabaseConfigured) {
-      setError('Systemet är inte konfigurerat. Kontakta support.');
-      setRegistering(false);
-      return;
-    }
-
     try {
-      // Create user with Supabase Auth
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: email.trim(),
-        password: password,
-        options: {
-          data: {
-            display_name: name.trim(),
-            full_name: name.trim()
-          }
-        }
-      });
-
-      if (signUpError) {
-        console.error('Registration error:', signUpError);
-        
-        if (signUpError.message.includes('already registered')) {
-          setError('E-postadressen är redan registrerad. Försök logga in istället.');
-        } else if (signUpError.message.includes('weak password')) {
-          setError('Lösenordet är för svagt. Använd ett starkare lösenord.');
-        } else {
-          setError(`Registrering misslyckades: ${signUpError.message}`);
-        }
-        setRegistering(false);
-        return;
+      console.log('🔑 Försöker logga in:', email);
+      
+      const result = await onSignIn(email.trim(), password.trim());
+      
+      if (result.error) {
+        setError(result.error.message || 'Inloggning misslyckades');
+      } else {
+        console.log('✅ Inloggning lyckades');
+        setSuccess('Inloggning lyckades! Omdirigerar...');
       }
-
-      if (data.user) {
-        setSuccess('✅ Konto skapat! Du kan nu logga in med dina uppgifter.');
-        
-        // Clear form
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-        setName('');
-        
-        // Switch to login mode after 2 seconds
-        setTimeout(() => {
-          setIsLogin(true);
-          setSuccess('');
-        }, 2000);
-      }
-
-    } catch (err: any) {
-      console.error('Registration exception:', err);
-      setError('Ett oväntat fel uppstod vid registrering');
+    } catch (err) {
+      console.error('Login exception:', err);
+      setError('Ett oväntat fel uppstod');
     } finally {
-      setRegistering(false);
+      setLoading(false);
     }
   };
 
@@ -140,7 +58,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
         return;
       }
 
-      if (password !== confirmPassword) {
+      if (!isLogin && password !== confirmPassword) {
         setError('Lösenorden stämmer inte överens.');
         setLoading(false);
         return;
@@ -156,13 +74,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email.trim())) {
         setError('Ange en giltig e-postadress.');
-        setLoading(false);
-        return;
-      }
-
-      // Password validation for purchase
-      if (!isPasswordValid) {
-        setError('Lösenordet måste uppfylla säkerhetskraven (se nedan).');
         setLoading(false);
         return;
       }
@@ -212,8 +123,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
             errorMessage = 'Betalningsfunktionen är inte tillgänglig. Kontakta support.';
           } else if (response.status === 500) {
             errorMessage = 'Serverfel uppstod. Försök igen om en stund.';
-          } else if (response.status === 403) {
-            errorMessage = 'Åtkomst nekad. Kontrollera din internetanslutning.';
           }
         }
         
@@ -235,42 +144,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
     } catch (err: any) {
       console.error('Checkout fel:', err);
       
-      // Provide more specific error messages
       let userFriendlyError = err.message || 'Betalningen kunde inte startas';
       
       if (err.message?.includes('fetch')) {
         userFriendlyError = 'Kunde inte ansluta till betalningssystemet. Kontrollera din internetanslutning och försök igen.';
-      } else if (err.message?.includes('network')) {
-        userFriendlyError = 'Nätverksfel. Kontrollera din internetanslutning och försök igen.';
-      } else if (err.message?.includes('Failed to fetch')) {
-        userFriendlyError = 'Anslutningsproblem. Kontrollera din internetanslutning och försök igen.';
       }
       
       setError(userFriendlyError);
       setSuccess('');
-      setLoading(false);
-    }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      console.log('🔑 Försöker logga in:', email);
-      
-      const result = await onSignIn(email.trim(), password.trim());
-      
-      if (result.error) {
-        setError(result.error.message || 'Inloggning misslyckades');
-      } else {
-        console.log('✅ Inloggning lyckades');
-      }
-    } catch (err) {
-      console.error('Login exception:', err);
-      setError('Ett oväntat fel uppstod');
-    } finally {
       setLoading(false);
     }
   };
@@ -349,7 +230,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent password-input"
+                    className="w-full pl-10 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Ditt lösenord"
                     required
                     disabled={loading}
@@ -358,14 +239,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1 password-toggle-btn"
-                    aria-label={showPassword ? 'Dölj lösenord' : 'Visa lösenord'}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1"
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
@@ -378,36 +254,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                 {loading ? 'Loggar in...' : 'Logga in på kursen'}
               </button>
 
-              {/* Forgot Password Link */}
-              <div className="text-center">
-                <button
-                  type="button"
-                  className="text-sm text-primary-600 hover:text-primary-700 underline"
-                  onClick={async () => {
-                    if (!email.trim()) {
-                      setError('Ange din e-postadress först');
-                      return;
-                    }
-                    
-                    setLoading(true);
-                    const { error } = await supabase.auth.resetPasswordForEmail(email.trim());
-                    
-                    if (error) {
-                      setError('Kunde inte skicka återställningslänk');
-                    } else {
-                      setSuccess('Återställningslänk skickad till din e-post!');
-                    }
-                    setLoading(false);
-                  }}
-                >
-                  Glömt lösenord?
-                </button>
-              </div>
-
               {/* Purchase Option */}
               <div className="text-center mt-6 pt-6 border-t border-gray-200">
                 <p className="text-sm text-gray-600 mb-4">Har du inte köpt kursen än?</p>
                 <button
+                  type="button"
                   onClick={() => setIsLogin(false)}
                   className="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-4 px-4 rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
@@ -441,7 +292,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     onChange={(e) => setName(e.target.value)}
                     className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="För- och efternamn"
-                    disabled={loading || registering}
+                    disabled={loading}
                     required
                     autoComplete="name"
                   />
@@ -461,7 +312,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     className="w-full pl-10 pr-4 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="din@email.com"
                     required
-                    disabled={loading || registering}
+                    disabled={loading}
                     autoComplete="email"
                   />
                 </div>
@@ -477,61 +328,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className={`w-full pl-10 pr-12 py-4 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent password-input ${
-                      password && !isPasswordValid ? 'border-red-300 bg-red-50' : 'border-neutral-300'
-                    }`}
-                    placeholder="Minst 8 tecken, stor/liten bokstav, siffra, specialtecken"
+                    className="w-full pl-10 pr-12 py-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="Minst 6 tecken"
                     required
-                    minLength={8}
-                    disabled={loading || registering}
+                    minLength={6}
+                    disabled={loading}
                     autoComplete="new-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1 z-10 password-toggle-btn"
-                    aria-label={showPassword ? 'Dölj lösenord' : 'Visa lösenord'}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1 z-10"
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-                
-                {/* Password Strength Indicator */}
-                {password && (
-                  <div className="mt-2 space-y-1">
-                    <div className="flex space-x-1">
-                      {[1, 2, 3, 4].map((level) => (
-                        <div
-                          key={level}
-                          className={`h-1 flex-1 rounded ${
-                            passwordErrors.length <= 4 - level
-                              ? passwordErrors.length === 0
-                                ? 'bg-green-500'
-                                : passwordErrors.length <= 2
-                                ? 'bg-yellow-500'
-                                : 'bg-red-500'
-                              : 'bg-gray-200'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    {passwordErrors.length > 0 && (
-                      <div className="text-xs text-red-600">
-                        Saknas: {passwordErrors.join(', ')}
-                      </div>
-                    )}
-                    {isPasswordValid && (
-                      <div className="text-xs text-green-600 flex items-center">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Starkt lösenord!
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
 
               <div>
@@ -544,32 +355,27 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className={`w-full pl-10 pr-12 py-4 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent password-input ${
-                      confirmPassword && !passwordsMatch ? 'border-red-300 bg-red-50' : 'border-neutral-300'
+                    className={`w-full pl-10 pr-12 py-4 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                      confirmPassword && password !== confirmPassword ? 'border-red-300 bg-red-50' : 'border-neutral-300'
                     }`}
                     placeholder="Upprepa lösenordet"
                     required
-                    disabled={loading || registering}
+                    disabled={loading}
                     autoComplete="new-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1 z-10 password-toggle-btn"
-                    aria-label={showConfirmPassword ? 'Dölj lösenord' : 'Visa lösenord'}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1 z-10"
                   >
-                    {showConfirmPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
                 
                 {/* Password Match Indicator */}
                 {confirmPassword && (
                   <div className="mt-2">
-                    {passwordsMatch ? (
+                    {password === confirmPassword ? (
                       <div className="text-xs text-green-600 flex items-center">
                         <CheckCircle className="w-3 h-3 mr-1" />
                         Lösenorden matchar
@@ -610,7 +416,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
               {/* Purchase Button */}
               <button
                 onClick={handleStripeCheckout}
-                disabled={loading || !isPasswordValid || !passwordsMatch || !email.trim() || !name.trim()}
+                disabled={loading || !email.trim() || !name.trim() || !password || password !== confirmPassword}
                 className="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white font-bold py-4 px-4 rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
               >
                 {loading ? 'Förbereder säker betalning...' : '🛒 Köp kurs för 299 kr'}
@@ -632,6 +438,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
                     <span>Omedelbar tillgång</span>
                   </div>
                 </div>
+              </div>
+
+              {/* Switch to Login */}
+              <div className="text-center mt-6 pt-6 border-t border-gray-200">
+                <p className="text-sm text-gray-600 mb-4">Har du redan köpt kursen?</p>
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(true)}
+                  className="text-primary-600 hover:text-primary-700 font-semibold underline"
+                >
+                  Logga in här
+                </button>
               </div>
             </div>
           )}
@@ -658,11 +476,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
             </div>
           )}
 
-          {/* Switch Mode */}
-
           {/* Help Text */}
           <div className="text-center mt-4 text-xs text-neutral-500">
-            Logga in med e-post och lösenord från ditt köp. Glömt lösenord? Använd återställningslänken ovan.
+            {isLogin ? 
+              'Logga in med samma e-post och lösenord som du använde vid köpet.' :
+              'Efter betalning kan du logga in direkt med dessa uppgifter.'
+            }
           </div>
         </div>
       </div>
