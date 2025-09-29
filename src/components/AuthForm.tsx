@@ -35,11 +35,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
         setError(result.error.message || 'Inloggning misslyckades');
       } else {
         console.log('✅ Inloggning lyckades');
-        setSuccess('Inloggning lyckades!');
-        // Clear the form and let auth state change handle the redirect
+        setSuccess('Inloggning lyckades! Laddar kursen...');
+        // Clear the form
         setEmail('');
         setPassword('');
-        // The useAuth hook will automatically update user state and App.tsx will handle navigation
+        // Let auth state change handle the redirect automatically
       }
     } catch (err) {
       console.error('Login exception:', err);

@@ -96,18 +96,12 @@ function App() {
       <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-neutral-600 text-lg font-medium">Laddar din kurs...</p>
+          <p className="text-neutral-600 text-lg font-medium">
+            {user ? 'Förbereder din kurs...' : 'Kontrollerar inloggning...'}
+          </p>
           {!isConfigured && (
             <p className="text-neutral-500 text-sm mt-2">⚠️ Supabase inte konfigurerat - kör i demo-läge</p>
           )}
-          <div className="mt-4">
-            <button
-              onClick={() => window.location.reload()}
-              className="text-blue-600 hover:text-blue-700 text-sm underline"
-            >
-              Ladda om om sidan hänger sig
-            </button>
-          </div>
         </div>
       </div>
     );
@@ -122,8 +116,8 @@ function App() {
     );
   }
 
-  // Show auth form if requested or if user not logged in and trying to access protected content
-  if ((showAuthForm || currentPage === 'auth') && !user) {
+  // Show auth form only if explicitly requested and no user
+  if (showAuthForm && !user) {
     return (
       <LanguageProvider>
         <AuthForm onSignIn={signIn} onBack={handleBackToLanding} />
@@ -131,8 +125,8 @@ function App() {
     );
   }
 
-  // Show landing page if no user and not trying to authenticate
-  if (!user && !showAuthForm && currentPage !== 'auth') {
+  // Show landing page if no user and not showing auth form
+  if (!user && !showAuthForm) {
     return (
       <LanguageProvider>
         <LandingPage onJoinClick={handleJoinClick} />

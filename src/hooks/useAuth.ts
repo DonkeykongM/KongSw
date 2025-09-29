@@ -6,15 +6,18 @@ export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [authError, setAuthError] = useState<string | null>(null)
+  const [isInitialized, setIsInitialized] = useState(false)
 
   useEffect(() => {
-    let mounted = true;
+    let mounted = true
+    let authSubscription: any = null
     
     // Skip auth if Supabase not configured
     if (!isSupabaseConfigured) {
       console.log('⚠️ Supabase not configured - demo mode')
       if (mounted) {
         setLoading(false)
+        setIsInitialized(true)
       }
       return
     }
@@ -28,7 +31,13 @@ export const useAuth = () => {
         
         if (mounted) {
           setUser(session?.user || null)
-          setLoading(false)
+          setIsInitialized(true)
+          // Only set loading to false after we have the initial session
+          setTimeout(() => {
+            if (mounted) {
+              setLoading(false)
+            }
+          }, 100)
         }
         console.log('👤 Current user:', session?.user?.email || 'None')
       } catch (error) {
@@ -37,6 +46,7 @@ export const useAuth = () => {
           setUser(null)
           setAuthError('Kunde inte ladda användardata')
           setLoading(false)
+          setIsInitialized(true)
         }
       }
     }
@@ -44,25 +54,27 @@ export const useAuth = () => {
     getInitialSession()
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    authSubscription = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔄 Auth state change:', event, session?.user?.email || 'No user')
       
       if (mounted) {
         setUser(session?.user || null)
         setAuthError(null)
         
-        // Only set loading to false after we've processed the auth change
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        // Only set loading to false after initial setup is complete
+        if (isInitialized && (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED')) {
           setLoading(false)
         }
       }
-    })
+    }).data.subscription
 
     return () => {
-      mounted = false;
-      subscription.unsubscribe();
+      mounted = false
+      if (authSubscription) {
+        authSubscription.unsubscribe()
+      }
     }
-  }, [])
+  }, [isInitialized])
 
   const signIn = async (email: string, password: string) => {
     setAuthError(null);
