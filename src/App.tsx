@@ -113,7 +113,7 @@ function App() {
   }
 
   // Show auth form if requested or if user not logged in and trying to access protected content
-  if (showAuthForm || (currentPage === 'auth')) {
+  if ((showAuthForm || currentPage === 'auth') && !user) {
     return (
       <LanguageProvider>
         <AuthForm onSignIn={signIn} onBack={handleBackToLanding} />
@@ -121,8 +121,8 @@ function App() {
     );
   }
 
-  // Show landing page if no user
-  if (!user) {
+  // Show landing page if no user and not trying to authenticate
+  if (!user && !showAuthForm && currentPage !== 'auth') {
     return (
       <LanguageProvider>
         <LandingPage onJoinClick={handleJoinClick} />

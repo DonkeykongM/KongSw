@@ -35,7 +35,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSignIn, onBack }) => {
         setError(result.error.message || 'Inloggning misslyckades');
       } else {
         console.log('✅ Inloggning lyckades');
-        setSuccess('Inloggning lyckades! Omdirigerar...');
+        setSuccess('Inloggning lyckades! Laddar kursen...');
+        // Don't show success message for too long - user should see course immediately
+        setTimeout(() => {
+          // The auth state change will handle the redirect automatically
+        }, 500);
       }
     } catch (err) {
       console.error('Login exception:', err);

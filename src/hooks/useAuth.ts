@@ -135,7 +135,7 @@ export const useAuth = () => {
               }
 
               console.log('✅ Successfully created and logged in user from webhook data');
-              return { data: retryData, error: null };
+              return { data: retryData, error: null, success: true };
             }
           } catch (webhookError) {
             console.error('❌ Error checking simple_logins:', webhookError);
@@ -157,7 +157,7 @@ export const useAuth = () => {
       }
 
       console.log('✅ Login successful for:', email.trim())
-      return { data, error: null }
+      return { data, error: null, success: true }
       
     } catch (err: any) {
       console.error('❌ Login exception:', err)
