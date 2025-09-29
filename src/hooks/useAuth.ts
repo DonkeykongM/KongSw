@@ -19,12 +19,84 @@ export const useAuth = () => {
       return
     }
 
+    // FORCE clear any invalid sessions on startup
+    const forceLogoutInvalidUsers = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (session?.user) {
+          const email = session.user.email?.toLowerCase() || ''
+          const displayName = session.user.user_metadata?.display_name?.toLowerCase() || ''
+          
+          // Force logout of admin/test accounts
+          if (email.includes('admin') || 
+              email.includes('test') || 
+              email === 'admin7@admin.com' ||
+              email === 'mathias.bahko@admin.com' ||
+              email === 'mathias.bahko@admin.com' ||
+              displayName.includes('mathias bahko') ||
+              displayName === 'mathias bahko' ||
+              displayName.includes('admin') ||
+              email.includes('bahko')) {
+            
+            console.log('🚫 FORCE LOGOUT invalid user:', email)
+            
+            // Clear all auth data
+            await supabase.auth.signOut()
+            
+            // Clear localStorage
+            localStorage.clear()
+            sessionStorage.clear()
+            
+            // Clear cookies
+            document.cookie.split(";").forEach(function(c) { 
+              document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+            
+            setUser(null)
+            setLoading(false)
+            
+            // Force page reload to clear all state
+            setTimeout(() => {
+              window.location.reload()
+            }, 1000)
+            return true
+          }
+        }
+        return false
+      } catch (error) {
+        console.error('Force logout error:', error)
+        return false
+      }
+    }
+
     // Get initial session
     const getInitialSession = async () => {
       try {
         setAuthError(null);
         
+        const wasForceLoggedOut = await forceLogoutInvalidUsers()
+        if (wasForceLoggedOut) return
+        
         const { data: { session } } = await supabase.auth.getSession()
+        
+        // Additional validation for legitimate users
+        if (session?.user) {
+          const email = session.user.email
+          if (email?.includes('admin') || 
+              email?.includes('test') || 
+              email === 'admin7@admin.com' ||
+              email === 'mathias.bahko@admin.com') {
+            console.log('🚫 Invalid user detected, signing out:', email)
+            await supabase.auth.signOut()
+            localStorage.clear()
+            if (mounted) {
+              setUser(null)
+              setLoading(false)
+            }
+            return
+          }
+        }
         
         if (mounted) {
           setUser(session?.user || null)
@@ -48,6 +120,19 @@ export const useAuth = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔄 Auth state change:', event, session?.user?.email || 'No user')
+      
+      // Block invalid users from auth state changes too
+      if (session?.user) {
+        const email = session.user.email?.toLowerCase() || ''
+        if (email.includes('admin') || email.includes('test') || email === 'admin7@admin.com') {
+          console.log('🚫 Blocking invalid user from auth state:', email)
+          await supabase.auth.signOut()
+          if (mounted) {
+            setUser(null)
+          }
+          return
+        }
+      }
       
       if (mounted) {
         setUser(session?.user || null)
@@ -79,80 +164,30 @@ export const useAuth = () => {
         return { error: { message: 'Ange en giltig e-postadress.' } };
       }
       
-      if (password.length < 6) {
-        return { error: { message: 'Lösenordet måste vara minst 6 tecken långt.' } };
+      if (password.length < 8) {
+        return { error: { message: 'Lösenordet måste vara minst 8 tecken långt.' } };
       }
       
-      // Try standard Supabase login first
+      // Use Supabase Auth (SECURE METHOD)
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
       })
 
       if (error) {
-        console.error('❌ Standard login failed:', error.message)
-        
-        // If standard login fails, check if user exists in simple_logins table
-        // and try to create auth user from webhook data
-        if (error.message?.includes('Invalid login credentials')) {
-          console.log('🔄 Checking for webhook-created user...');
-          
-          try {
-            // Check if user exists in simple_logins table
-            const { data: simpleLoginData, error: simpleLoginError } = await supabase
-              .from('simple_logins')
-              .select('*')
-              .eq('email', email.trim())
-              .single();
-
-            if (simpleLoginData && !simpleLoginError) {
-              console.log('✅ Found user in simple_logins, creating auth user...');
-              
-              // Create auth user from simple_logins data
-              const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-                email: email.trim(),
-                password: password.trim(),
-                options: {
-                  data: {
-                    display_name: simpleLoginData.name || email.split('@')[0],
-                    full_name: simpleLoginData.name || email.split('@')[0]
-                  }
-                }
-              });
-
-              if (signUpError) {
-                console.error('❌ Failed to create auth user:', signUpError);
-                return { error: { message: 'Kunde inte skapa användarkonto. Kontakta support.' } };
-              }
-
-              // Now try to sign in again
-              const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
-                email: email.trim(),
-                password: password.trim(),
-              });
-
-              if (retryError) {
-                console.error('❌ Retry login failed:', retryError);
-                return { error: { message: 'Inloggning misslyckades efter kontoskapande. Försök igen.' } };
-              }
-
-              console.log('✅ Successfully created and logged in user from webhook data');
-              return { data: retryData, error: null };
-            }
-          } catch (webhookError) {
-            console.error('❌ Error checking webhook data:', webhookError);
-          }
-        }
+        console.error('❌ Login failed:', error.message)
         
         // Provide user-friendly error messages
-        let userFriendlyMessage = 'Fel e-post eller lösenord';
+        let userFriendlyMessage = 'Inloggning misslyckades';
         
         if (error.message?.includes('Email not confirmed')) {
-          userFriendlyMessage = 'E-post inte bekräftad. Kontrollera din inkorg.';
+          userFriendlyMessage = 'E-post inte bekräftad. Kontrollera din inkorg för bekräftelselänk.';
         } else if (error.message?.includes('Too many requests')) {
-          userFriendlyMessage = 'För många försök. Vänta 10 minuter.';
+          userFriendlyMessage = 'För många inloggningsförsök. Vänta 10 minuter och försök igen.';
         } else if (error.message?.includes('Invalid login credentials')) {
-          userFriendlyMessage = 'Fel e-post eller lösenord. Har du köpt kursen? Kontrollera dina uppgifter eller köp kursen nedan.';
+          userFriendlyMessage = 'Fel e-post eller lösenord. Kontrollera att du använder rätt uppgifter. Om du glömt lösenordet, använd "Glömt lösenord?"-länken.';
+        } else if (error.message?.includes('signup disabled')) {
+          userFriendlyMessage = 'Registrering är inaktiverad. Kontakta support@kongmindset.se för hjälp.';
         }
         
         return { error: { message: userFriendlyMessage } }
@@ -163,7 +198,75 @@ export const useAuth = () => {
       
     } catch (err: any) {
       console.error('❌ Login exception:', err)
-      return { error: { message: 'Ett fel uppstod vid inloggning. Försök igen.' } }
+      
+      let errorMessage = 'Ett oväntat fel uppstod vid inloggning';
+      
+      if (err.message?.includes('fetch')) {
+        errorMessage = 'Kunde inte ansluta till servern. Kontrollera din internetanslutning.';
+      } else if (err.message?.includes('network')) {
+        errorMessage = 'Nätverksfel. Kontrollera din internetanslutning och försök igen.';
+      }
+      
+      return { error: { message: errorMessage } }
+    }
+  }
+
+  const signUp = async (email: string, password: string, name: string) => {
+    if (!isSupabaseConfigured) {
+      return { error: { message: 'Systemet är inte konfigurerat. Kontakta support på support@kongmindset.se' } }
+    }
+
+    try {
+      console.log('📝 Attempting registration for:', email.trim())
+      
+      // Validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) {
+        return { error: { message: 'Ange en giltig e-postadress.' } };
+      }
+      
+      if (password.length < 8) {
+        return { error: { message: 'Lösenordet måste vara minst 8 tecken långt.' } };
+      }
+      
+      if (!name.trim()) {
+        return { error: { message: 'Namn krävs för registrering.' } };
+      }
+      
+      // Create user with Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: password.trim(),
+        options: {
+          data: {
+            display_name: name.trim(),
+            full_name: name.trim()
+          }
+        }
+      })
+
+      if (error) {
+        console.error('❌ Registration failed:', error.message)
+        
+        let userFriendlyMessage = 'Registrering misslyckades';
+        
+        if (error.message?.includes('already registered')) {
+          userFriendlyMessage = 'E-postadressen är redan registrerad. Försök logga in istället.';
+        } else if (error.message?.includes('weak password')) {
+          userFriendlyMessage = 'Lösenordet är för svagt. Använd ett starkare lösenord med stor/liten bokstav, siffra och specialtecken.';
+        } else if (error.message?.includes('signup disabled')) {
+          userFriendlyMessage = 'Registrering är inaktiverad. Kontakta support@kongmindset.se för hjälp.';
+        }
+        
+        return { error: { message: userFriendlyMessage } }
+      }
+
+      console.log('✅ Registration successful for:', email.trim())
+      return { data, error: null }
+      
+    } catch (err: any) {
+      console.error('❌ Registration exception:', err)
+      return { error: { message: 'Ett oväntat fel uppstod vid registrering' } }
     }
   }
 
@@ -188,6 +291,7 @@ export const useAuth = () => {
     loading,
     authError,
     signIn,
+    signUp,
     signOut,
     isConfigured: isSupabaseConfigured
   }

@@ -63,7 +63,6 @@ function App() {
 
   const handleJoinClick = () => {
     setShowAuthForm(true);
-    setCurrentPage('auth');
   };
 
   const handleBackToLanding = () => {
@@ -75,8 +74,8 @@ function App() {
     if (user) {
       setCurrentPage('modules');
     } else {
-      setShowAuthForm(true);
       setCurrentPage('auth');
+      setShowAuthForm(true);
     }
   };
 
@@ -114,7 +113,7 @@ function App() {
   }
 
   // Show auth form if requested or if user not logged in and trying to access protected content
-  if (showAuthForm || currentPage === 'auth') {
+  if (showAuthForm || (currentPage === 'auth')) {
     return (
       <LanguageProvider>
         <AuthForm onSignIn={signIn} onBack={handleBackToLanding} />
